@@ -1,0 +1,75 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v10.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v10.0": {
+      "MindSite.Web/1.0.0": {
+        "dependencies": {
+          "FluentValidation": "12.0.0",
+          "Microsoft.EntityFrameworkCore": "10.0.0"
+        },
+        "runtime": {
+          "MindSite.Web.dll": {}
+        }
+      },
+      "FluentValidation/12.0.0": {
+        "runtime": {
+          "lib/net8.0/FluentValidation.dll": {
+            "assemblyVersion": "12.0.0.0",
+            "fileVersion": "12.0.0.0"
+          }
+        }
+      },
+      "Microsoft.EntityFrameworkCore/10.0.0": {
+        "dependencies": {
+          "Microsoft.EntityFrameworkCore.Abstractions": "10.0.0"
+        },
+        "runtime": {
+          "lib/net10.0/Microsoft.EntityFrameworkCore.dll": {
+            "assemblyVersion": "10.0.0.0",
+            "fileVersion": "10.0.25.52411"
+          }
+        }
+      },
+      "Microsoft.EntityFrameworkCore.Abstractions/10.0.0": {
+        "runtime": {
+          "lib/net10.0/Microsoft.EntityFrameworkCore.Abstractions.dll": {
+            "assemblyVersion": "10.0.0.0",
+            "fileVersion": "10.0.25.52411"
+          }
+        }
+      }
+    }
+  },
+  "libraries": {
+    "MindSite.Web/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "FluentValidation/12.0.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-8NVLxtMUXynRHJIX3Hn1ACovaqZIJASufXIIFkD0EUbcd5PmMsL1xUD5h548gCezJ5BzlITaR9CAMrGe29aWpA==",
+      "path": "fluentvalidation/12.0.0",
+      "hashPath": "fluentvalidation.12.0.0.nupkg.sha512"
+    },
+    "Microsoft.EntityFrameworkCore/10.0.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-hHa2amRjMyBLUH/KTML6FgIAhZ0VFYkhCKwWEax0rO6iNeM1P5MflyeQLE5dniSIOZHc3Oqyv5UIyTFO4e1Auw==",
+      "path": "microsoft.entityframeworkcore/10.0.0",
+      "hashPath": "microsoft.entityframeworkcore.10.0.0.nupkg.sha512"
+    },
+    "Microsoft.EntityFrameworkCore.Abstractions/10.0.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-C+TT9k7f1GQ8agOfV512K9iwrzi76RXVSDiLx+iWC9pz3QhEpSF1Dyk+FpVvd8ULQ+rqymfM8KQ7g48ttQVyMg==",
+      "path": "microsoft.entityframeworkcore.abstractions/10.0.0",
+      "hashPath": "microsoft.entityframeworkcore.abstractions.10.0.0.nupkg.sha512"
+    }
+  }
+}
