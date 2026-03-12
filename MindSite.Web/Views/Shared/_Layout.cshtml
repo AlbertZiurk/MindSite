@@ -1,0 +1,68 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - MindSite.Web</title>
+    <script type="importmap"></script>
+      <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="icon" type="image/x-icon" href="~/favicons/favicon-white.ico" />
+</head>
+<body class="min-h-screen flex flex-col bg-gray-50">
+
+    <header>
+        <nav class="border-b border-gray-300 shadow-sm bg-white">
+            <div class="container mx-auto px-4 flex items-center justify-between py-3">
+
+                <a class="text-xl font-semibold text-gray-900"
+                   asp-area=""
+                   asp-controller="Home"
+                   asp-action="Index">
+                    MindSite.Web
+                </a>
+
+                <ul class="flex space-x-6">
+                    <li>
+                        <a class="text-gray-800 hover:text-gray-600"
+                           asp-area=""
+                           asp-controller="Home"
+                           asp-action="Index">
+                            Home
+                        </a>
+                    </li>
+                    <li>
+                        <a class="text-gray-800 hover:text-gray-600"
+                           asp-area=""
+                           asp-controller="Home"
+                           asp-action="Privacy">
+                            Privacy
+                        </a>
+                    </li>
+                </ul>
+
+            </div>
+        </nav>
+    </header>
+
+
+    <main class="flex-1 container mx-auto px-4 py-6">
+        @RenderBody()
+    </main>
+
+
+    <footer class="border-t border-gray-300 bg-white text-gray-600">
+        <div class="container mx-auto px-4 py-4 text-center">
+            &copy; 2026 - MindSite.Web -
+            <a class="text-blue-600 hover:underline"
+               asp-area=""
+               asp-controller="Home"
+               asp-action="Privacy">
+                Privacy
+            </a>
+        </div>
+    </footer>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
