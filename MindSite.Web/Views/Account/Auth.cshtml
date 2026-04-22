@@ -1,0 +1,255 @@
+@{
+    ViewData["Title"] = "Autenticação";
+    Layout = null; // Ocupa a tela inteira como no seu design original 
+}
+
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - MindSite</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inria+Serif:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        @@import url('https://fonts.googleapis.com/css?family=Montserrat:400,800');
+        
+        /* Estrutura Principal */
+        .auth-container {
+            background-color: #fff;
+            box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
+            position: relative;
+            overflow: hidden;
+            width: 768px;
+            max-width: 100%;
+            min-height: 520px;
+        }
+
+        .form-container {
+            position: absolute;
+            top: 0;
+            height: 100%;
+            transition: all 0.6s ease-in-out;
+        }
+
+        /* Login (Sign In) */
+        .sign-in-container {
+            left: 0;
+            width: 50%;
+            z-index: 2;
+        }
+
+        .auth-container.right-panel-active .sign-in-container {
+            transform: translateX(140%);
+        }
+
+        /* Cadastro (Sign Up) */
+        .sign-up-container {
+            left: 0;
+            width: 50%;
+            opacity: 0;
+            z-index: 1;
+        }
+
+        .auth-container.right-panel-active .sign-up-container {
+            transform: translateX(123%);
+            opacity: 1;
+            z-index: 5;
+            animation: show 0.6s;
+        }
+
+        @@keyframes show {
+            0%, 49.99% { opacity: 0; z-index: 1; }
+            50%, 100% { opacity: 1; z-index: 5; }
+        }
+
+        /* Overlay (Painel Deslizante) */
+        .overlay-container {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            width: 50%;
+            height: 100%;
+            overflow: hidden;
+            transition: transform 0.6s ease-in-out;
+            z-index: 100;
+        }
+
+        .auth-container.right-panel-active .overlay-container {
+            transform: translateX(-100%);
+        }
+
+        .overlay {
+            background: #623f25;
+            background: linear-gradient(to right, #926A44, #623f25);
+            background-repeat: no-repeat;
+            background-size: cover;
+            background-position: 0 0;
+            color: #FFFFFF;
+            position: relative;
+            left: -100%;
+            height: 100%;
+            width: 200%;
+            transform: translateX(0);
+            transition: transform 0.6s ease-in-out;
+        }
+
+        .auth-container.right-panel-active .overlay {
+            transform: translateX(50%);
+        }
+
+        .overlay-panel {
+            position: absolute;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            padding: 0 40px;
+            text-align: center;
+            top: 0;
+            height: 100%;
+            width: 50%;
+            transform: translateX(0);
+            transition: transform 0.6s ease-in-out;
+        }
+
+        .overlay-left { transform: translateX(-20%); }
+        .auth-container.right-panel-active .overlay-left { transform: translateX(0); }
+
+        .overlay-right { right: 0; transform: translateX(0); }
+        .auth-container.right-panel-active .overlay-right { transform: translateX(20%); }
+
+        button.ghost {
+            background-color: transparent;
+            border: 2px solid #FFFFFF;
+        }
+    </style>
+</head>
+<body class="min-h-screen font-sans bg-[#F4F3EE]">
+
+    <div class="auth-container flex flex-row w-full h-screen" id="container">
+        
+        @* Área de Cadastro *@
+        <div class="form-container sign-up-container w-[45%] bg-[#E3DBCE] rounded-l-[50px] shadow-2xl flex items-center justify-center p-10">
+            <form asp-controller="Account" asp-action="Cadastro" method="post" class="w-full max-w-sm flex flex-col gap-5">
+                <h1 class="font-inria text-5xl text-[#6b462c] text-center mb-6 flex flex-row items-center justify-center">
+                    Cadastr
+                    <img src="~/img/logo_img.png" alt="Logo_MindSite" class="h-6 w-6 mt-[19px] ml-[2.5px]"/>
+                </h1>
+                <input type="text" name="nome" placeholder="Nome Completo" required
+                    class="w-full bg-white px-6 py-4 rounded-xl shadow-inner outline-none focus:ring-2 focus:ring-[#623f25]">
+                
+                <input type="email" name="email" placeholder="E-mail" required
+                    class="w-full bg-white px-6 py-4 rounded-xl shadow-inner outline-none focus:ring-2 focus:ring-[#623f25]">
+                
+                <input type="password" name="senha" placeholder="Senha" required
+                    class="w-full bg-white px-6 py-4 rounded-xl shadow-inner outline-none focus:ring-2 focus:ring-[#623f25]">
+                
+                <input type="password" name="confirmarSenha" placeholder="Confirmar Senha" required
+                    class="w-full bg-white px-6 py-4 rounded-xl shadow-inner outline-none focus:ring-2 focus:ring-[#623f25]">
+                    
+                <div class="flex flex-row justify-between gap-4 mt-6 mx-[25px]">
+                    <a id="signIn" 
+                            class="w-[150px] bg-[#6A462C] text-white py-3 rounded-2xl hover:bg-[#4d392a] font-bold text-center">
+                        Cadastrar
+                    </a>
+                    <a id="signEntra"
+                            class="w-[150px] bg-[#926A44] text-white py-3 rounded-2xl hover:bg-[#623f25] font-bold text-center">
+                        Voltar
+                    </a>
+                </div>
+            </form>
+        </div>
+
+        @* Área de Login *@
+        <div class="form-container sign-in-container w-[45%] bg-[#E3DBCE] flex items-center rounded-r-[50px] justify-center p-10 shadow-2xl">
+            <form asp-controller="Account" asp-action="Login" method="post" class="w-full max-w-sm flex flex-col gap-6">
+                <h1 class="font-serif flex flex-row items-center justify-center text-[#6b462c] text-[50px] font-inria text-center mb-8 leading-tight">
+                    L
+                    <img src="~/img/logo_img.png" alt="Logo_MindSite" class="h-6 w-6 mt-2 ml-[2.5px]"/>
+                    gin
+                </h1>
+                <div>
+                    <input type="email" name="email" required 
+                           placeholder="E-mail"
+                           class="w-full bg-white text-[#4d392a] placeholder-[#8d735f] px-6 py-4 rounded-xl shadow-inner outline-none transition focus:ring-2 focus:ring-[#623f25]">
+                </div>
+
+                <div>
+                    <input type="password" name="password" required 
+                           placeholder="Senha"
+                           class="w-full bg-white text-[#4d392a] placeholder-[#8d735f] px-6 py-4 rounded-xl shadow-inner outline-none transition focus:ring-2 focus:ring-[#623f25]">
+                </div>
+
+                <div class="text-right -mt-6">
+                    <a href="#" class="text-sm italic text-[#623f25] hover:text-[#623f25] hover:underline transition-colors">
+                        Esqueci minha senha.......
+                    </a>
+                </div>
+                <div class="flex flex-row justify-between gap-4 mt-6 mx-[25px]">
+                    <button type="submit" 
+                            class="w-[150px] bg-[#6A462C] text-[#fafafa] py-3 rounded-2xl hover:bg-[#4d392a] transition-all font-semibold text-lg shadow-md">
+                        Entrar
+                    </button>
+
+                    <a id="signUp"
+                            class="w-[150px] bg-[#926A44] text-[#fafafa] text-center py-3 rounded-xl hover:bg-[#623f25] transition-all font-semibold text-lg shadow-md">
+                        Cadastrar
+                    </a>
+                </div>    
+            </form>
+        </div>
+
+        <div class="overlay-container">
+    <div class="overlay">
+        
+        @* Área de voltar ao Login (Visível quando o Cadastro está ativo) *@
+        <div class="overlay-panel overlay-left">
+            <div class="absolute inset-0 flex items-center justify-center z-0 pointer-events-none">
+                <img src="~/img/opacity_img.png" alt="Marca d'Água Globo" class="w-[65%] h-auto object-contain opacity-50" />
+            </div>
+            
+            <div class="relative z-10 text-center">
+                <h1 class="text-3xl font-bold mb-4 font-inria text-white">Bem-vindo de volta!</h1>
+                <p class="text-sm mb-8 text-white">Para manter-se conectado, faça login com suas informações pessoais.</p>
+                <button class="ghost px-10 py-2 rounded-full font-bold uppercase text-xs tracking-widest hover:scale-95 transition-transform" id="signIn">Ir para Login</button>
+            </div>
+        </div>
+
+        @* Área de ir para Cadastro (Visível quando o Login está ativo) *@
+        <div class="overlay-panel overlay-right">
+            <div class="absolute inset-0 flex items-center justify-center z-0 pointer-events-none">
+                <img src="~/img/opacity_img.png" alt="Marca d'Água Globo" class="w-[65%] h-auto object-contain opacity-50" />
+            </div>
+
+            <div class="relative z-10 text-center">
+                <h1 class="text-3xl font-bold mb-4 font-inria text-white">Olá, Amigo!</h1>
+                <p class="text-sm mb-8 text-white">Insira seus dados pessoais e comece sua jornada conosco.</p>
+                <button class="ghost px-10 py-2 rounded-full font-bold uppercase text-xs tracking-widest hover:scale-95 transition-transform" id="signUp">Criar Conta</button>
+            </div>
+        </div>
+
+    </div>
+</div>
+    </div>
+
+    <script>
+        const signUpButton = document.getElementById('signUp');
+        const signInButton = document.getElementById('signIn');
+        const signEntraButton = document.getElementById('signEntra');
+        const container = document.getElementById('container');
+
+        signUpButton.addEventListener('click', () => {
+            container.classList.add("right-panel-active");
+        });
+
+        signInButton.addEventListener('click', () => {
+            container.classList.remove("right-panel-active");
+        });
+
+        signEntraButton.addEventListener('click', () => {
+            container.classList.remove("right-panel-active");
+        });
+    </script>
+</body>
+</html>

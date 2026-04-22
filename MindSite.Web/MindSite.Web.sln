@@ -1,0 +1,24 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.2.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MindSite.Web", "MindSite.Web.csproj", "{5F5C6497-0B54-DECD-0501-00E3A0D3FB03}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{5F5C6497-0B54-DECD-0501-00E3A0D3FB03}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5F5C6497-0B54-DECD-0501-00E3A0D3FB03}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5F5C6497-0B54-DECD-0501-00E3A0D3FB03}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5F5C6497-0B54-DECD-0501-00E3A0D3FB03}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {531FF2C1-337E-4C02-A9D9-D93BAAB1074E}
+	EndGlobalSection
+EndGlobal

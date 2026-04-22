@@ -1,8 +1,26 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "O futuro do Web Design chegou!";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="container mx-auto px-6 py-20 flex flex-row items-center justify-between gap-12 w-full">
+    
+    <div class="flex-1 flex flex-col items-start gap-6">
+        
+        <h1 class="font-serif text-[#4d392a] text-5xl font-bold leading-tight">
+            @ViewData["Title"]
+        </h1>
+
+        <p class="text-[#8d735f] text-lg max-w-xl">
+            Lorem ipsum dolor sit amet. In corporis labore qui vero quisquam et enim galisum ab rerum sequi. Non quos sunt vel quam consequuntur a enim vero et repellat praesentium sed cumque illum! Ut consequatur eveniet a error soluta est expedita nostrum aut soluta placeat.
+        </p>
+    </div>
+
+    <div class="flex-1 flex items-center justify-center">
+        
+        <div class="bg-[#d1d5db] w-full h-[350px] rounded-2xl shadow-lg">
+            <img src="~/images/home-hero.jpg" alt="Web Design Future" class="w-full h-full object-cover rounded-2xl hidden" />
+        </div>
+        
+    </div>
+
 </div>

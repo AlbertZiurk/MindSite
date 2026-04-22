@@ -1,68 +1,72 @@
 ﻿<!DOCTYPE html>
-<html lang="en">
+<html lang="pt-br">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - MindSite.Web</title>
-    <script type="importmap"></script>
-      <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="icon" type="image/x-icon" href="~/favicons/favicon-white.ico" />
+    <title>@ViewData["Title"] - MindSite</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    @* Links da Fonte *@
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inria+Serif:wght@400;700&display=swap" rel="stylesheet">
+
+    @* Links para as icons *@
+    <link rel="apple-touch-icon" sizes="180x180" href="favicons/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicons/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicons/favicon-16x16.png">
+    <link rel="manifest" href="favicons/site.webmanifest">
+    <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@700&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'inria': ['"Inria Serif"', 'serif'],
+                        'serif': ['Merriweather', 'serif'],
+                        'sans': ['Poppins', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
 </head>
-<body class="min-h-screen flex flex-col bg-gray-50">
+<body class="min-h-screen flex flex-col font-sans bg-[#F4F3EE]">
 
-    <header>
-        <nav class="border-b border-gray-300 shadow-sm bg-white">
-            <div class="container mx-auto px-4 flex items-center justify-between py-3">
+    <header class="bg-[#E3DBCE]">
+        <nav class="container mx-auto px-6 py-4 flex items-center justify-between">
+            
+            <a class="flex items-center gap-1 text-4xl font-inria text-[#6B462C]" asp-controller="Home" asp-action="Index">
+                Mind<img src="~/img/logo_img.png" alt="Logo_MindSite" class="h-14 w-auto" />Site
+            </a>
 
-                <a class="text-xl font-semibold text-gray-900"
-                   asp-area=""
-                   asp-controller="Home"
-                   asp-action="Index">
-                    MindSite.Web
-                </a>
-
-                <ul class="flex space-x-6">
-                    <li>
-                        <a class="text-gray-800 hover:text-gray-600"
-                           asp-area=""
-                           asp-controller="Home"
-                           asp-action="Index">
-                            Home
-                        </a>
-                    </li>
-                    <li>
-                        <a class="text-gray-800 hover:text-gray-600"
-                           asp-area=""
-                           asp-controller="Home"
-                           asp-action="Privacy">
-                            Privacy
-                        </a>
-                    </li>
+            <div class="flex items-center gap-8">
+                <ul class="flex space-x-6 text-[#4d392a] font-medium text-sm">
+                    <li><a class="hover:text-[#623f25] transition-colors" asp-controller="Home" asp-action="Index">Home</a></li>
+                    <li><a class="hover:text-[#623f25] transition-colors" asp-controller="Home" asp-action="SobreNos">Sobre nós</a></li>
+                    <li><a class="hover:text-[#623f25] transition-colors" asp-controller="Home" asp-action="Contato">Contatos</a></li>
+                    <li><a class="hover:text-[#623f25] transition-colors" asp-controller="Home" asp-action="Servicos">Serviços</a></li>
                 </ul>
 
+                <a asp-controller="Account" asp-action="Login" id="login" class="bg-[#623f25] text-[#fafafa] px-5 py-2 rounded-md hover:bg-[#4d392a] transition-all font-bold text-sm">
+                    Login
+                </a>
             </div>
         </nav>
     </header>
 
-
-    <main class="flex-1 container mx-auto px-4 py-6">
+    <main class="flex-1">
         @RenderBody()
     </main>
 
-
-    <footer class="border-t border-gray-300 bg-white text-gray-600">
-        <div class="container mx-auto px-4 py-4 text-center">
-            &copy; 2026 - MindSite.Web -
-            <a class="text-blue-600 hover:underline"
-               asp-area=""
-               asp-controller="Home"
-               asp-action="Privacy">
-                Privacy
-            </a>
+    <footer class="bg-[#4d392a] text-[#fafafa]">
+        <div class="container mx-auto px-6 py-6 text-center text-xs">
+            &copy; 2026 - MindSite.Web - O futuro do Web Design chegou!
         </div>
     </footer>
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
+
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
