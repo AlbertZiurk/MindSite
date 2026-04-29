@@ -12,7 +12,7 @@ namespace MindSite.Web.Controllers
     {
         public IActionResult Login()
         {
-            return View("Login");
+            return View("Auth");
         }
 
         public IActionResult Cadastro()
