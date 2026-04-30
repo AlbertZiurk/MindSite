@@ -1,0 +1,11 @@
+{
+    "recommendations": [
+        "fernandoescolar.vscode-solution-explorer",
+        "ecmel.vscode-html-css",
+        "formulahendry.auto-complete-tag",
+        "ms-dotnettools.csdevkit",
+        "ms-dotnettools.csharp",
+        "kreativ-software.csharpextensions",
+        "patcx.vscode-nuget-gallery"
+    ]
+}
