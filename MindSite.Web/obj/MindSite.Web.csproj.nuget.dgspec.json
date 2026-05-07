@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\LENOVO\\Documents\\Mindsite_Clone\\MindSite\\MindSite.Web\\MindSite.Web.csproj": {}
+    "D:\\guilherme\\MindSite\\MindSite\\MindSite.Web\\MindSite.Web.csproj": {}
   },
   "projects": {
-    "C:\\Users\\LENOVO\\Documents\\Mindsite_Clone\\MindSite\\MindSite.Web\\MindSite.Web.csproj": {
+    "D:\\guilherme\\MindSite\\MindSite\\MindSite.Web\\MindSite.Web.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\LENOVO\\Documents\\Mindsite_Clone\\MindSite\\MindSite.Web\\MindSite.Web.csproj",
+        "projectUniqueName": "D:\\guilherme\\MindSite\\MindSite\\MindSite.Web\\MindSite.Web.csproj",
         "projectName": "MindSite.Web",
-        "projectPath": "C:\\Users\\LENOVO\\Documents\\Mindsite_Clone\\MindSite\\MindSite.Web\\MindSite.Web.csproj",
-        "packagesPath": "C:\\Users\\LENOVO\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\LENOVO\\Documents\\Mindsite_Clone\\MindSite\\MindSite.Web\\obj\\",
+        "projectPath": "D:\\guilherme\\MindSite\\MindSite\\MindSite.Web\\MindSite.Web.csproj",
+        "packagesPath": "C:\\Users\\Aluno\\.nuget\\packages\\",
+        "outputPath": "D:\\guilherme\\MindSite\\MindSite\\MindSite.Web\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\LENOVO\\AppData\\Roaming\\NuGet\\NuGet.Config"
+          "C:\\Users\\Aluno\\AppData\\Roaming\\NuGet\\NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net10.0"

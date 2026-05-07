@@ -11,53 +11,57 @@ build_property.EnforceExtendedAnalyzerRules =
 build_property._SupportedPlatformList = Linux,macOS,Windows
 build_property.RootNamespace = MindSite.Web
 build_property.RootNamespace = MindSite.Web
-build_property.ProjectDir = C:\Users\LENOVO\Documents\Mindsite_Clone\MindSite\MindSite.Web\
+build_property.ProjectDir = D:\guilherme\MindSite\MindSite\MindSite.Web\
 build_property.EnableComHosting = 
 build_property.EnableGeneratedComInterfaceComImportInterop = 
 build_property.RazorLangVersion = 9.0
 build_property.SupportLocalizedComponentNames = 
 build_property.GenerateRazorMetadataSourceChecksumAttributes = 
-build_property.MSBuildProjectDirectory = C:\Users\LENOVO\Documents\Mindsite_Clone\MindSite\MindSite.Web
+build_property.MSBuildProjectDirectory = D:\guilherme\MindSite\MindSite\MindSite.Web
 build_property._RazorSourceGeneratorDebug = 
 build_property.EffectiveAnalysisLevelStyle = 10.0
 build_property.EnableCodeStyleSeverity = 
 
-[C:/Users/LENOVO/Documents/Mindsite_Clone/MindSite/MindSite.Web/Views/Account/Auth.cshtml]
+[D:/guilherme/MindSite/MindSite/MindSite.Web/Views/Account/Auth.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWNjb3VudFxBdXRoLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/LENOVO/Documents/Mindsite_Clone/MindSite/MindSite.Web/Views/Account/Cadastro.cshtml]
+[D:/guilherme/MindSite/MindSite/MindSite.Web/Views/Account/Cadastro.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWNjb3VudFxDYWRhc3Ryby5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/LENOVO/Documents/Mindsite_Clone/MindSite/MindSite.Web/Views/Account/Login.cshtml]
+[D:/guilherme/MindSite/MindSite/MindSite.Web/Views/Account/Login.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWNjb3VudFxMb2dpbi5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/LENOVO/Documents/Mindsite_Clone/MindSite/MindSite.Web/Views/Home/Index.cshtml]
+[D:/guilherme/MindSite/MindSite/MindSite.Web/Views/Account/UserProfile.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWNjb3VudFxVc2VyUHJvZmlsZS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/guilherme/MindSite/MindSite/MindSite.Web/Views/Home/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxJbmRleC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/LENOVO/Documents/Mindsite_Clone/MindSite/MindSite.Web/Views/Home/Privacy.cshtml]
+[D:/guilherme/MindSite/MindSite/MindSite.Web/Views/Home/Privacy.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxQcml2YWN5LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/LENOVO/Documents/Mindsite_Clone/MindSite/MindSite.Web/Views/Shared/Error.cshtml]
+[D:/guilherme/MindSite/MindSite/MindSite.Web/Views/Shared/Error.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXEVycm9yLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/LENOVO/Documents/Mindsite_Clone/MindSite/MindSite.Web/Views/Shared/_Layout.cshtml]
+[D:/guilherme/MindSite/MindSite/MindSite.Web/Views/Shared/_Layout.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9MYXlvdXQuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/LENOVO/Documents/Mindsite_Clone/MindSite/MindSite.Web/Views/Shared/_ValidationScriptsPartial.cshtml]
+[D:/guilherme/MindSite/MindSite/MindSite.Web/Views/Shared/_ValidationScriptsPartial.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9WYWxpZGF0aW9uU2NyaXB0c1BhcnRpYWwuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/LENOVO/Documents/Mindsite_Clone/MindSite/MindSite.Web/Views/_ViewImports.cshtml]
+[D:/guilherme/MindSite/MindSite/MindSite.Web/Views/_ViewImports.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcX1ZpZXdJbXBvcnRzLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/LENOVO/Documents/Mindsite_Clone/MindSite/MindSite.Web/Views/_ViewStart.cshtml]
+[D:/guilherme/MindSite/MindSite/MindSite.Web/Views/_ViewStart.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcX1ZpZXdTdGFydC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
