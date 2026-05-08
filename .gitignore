@@ -14,6 +14,12 @@
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
 
+# Ignorar pastas de build do .NET
+bin/
+obj/
+**/bin/
+**/obj/
+
 # Build results
 [Dd]ebug/
 [Dd]ebugPublic/

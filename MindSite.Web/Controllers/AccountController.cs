@@ -19,6 +19,10 @@ namespace MindSite.Web.Controllers
         {
             return View("Cadastro");
         }
+        public IActionResult UserProfile()
+        {
+            return View("UserProfile");
+        }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
