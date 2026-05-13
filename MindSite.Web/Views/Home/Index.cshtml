@@ -2,25 +2,171 @@
     ViewData["Title"] = "O futuro do Web Design chegou!";
 }
 
-<div class="container mx-auto px-6 py-20 flex flex-row items-center justify-between gap-12 w-full">
-    
-    <div class="flex-1 flex flex-col items-start gap-6">
-        
-        <h1 class="font-serif text-[#4d392a] text-5xl font-bold leading-tight">
-            @ViewData["Title"]
-        </h1>
+<div class="flex flex-col w-full">
 
-        <p class="text-[#8d735f] text-lg max-w-xl">
-            Lorem ipsum dolor sit amet. In corporis labore qui vero quisquam et enim galisum ab rerum sequi. Non quos sunt vel quam consequuntur a enim vero et repellat praesentium sed cumque illum! Ut consequatur eveniet a error soluta est expedita nostrum aut soluta placeat.
-        </p>
-    </div>
+    @* --- Home --- *@
+    <section id="home" class="scroll-mt-20 min-h-screen flex items-center">
+        <div class="container mx-auto px-6 py-20 flex flex-col md:flex-row items-center justify-between gap-16 w-full">
+            
+            <div class="flex-1 flex flex-col items-start gap-8">
+                <h1 class="font-inria text-[#4d392a] text-7xl font-bold leading-tight">
+                    @ViewData["Title"]
+                </h1>
 
-    <div class="flex-1 flex items-center justify-center">
-        
-        <div class="bg-[#d1d5db] w-full h-[350px] rounded-2xl shadow-lg">
-            <img src="~/images/home-hero.jpg" alt="Web Design Future" class="w-full h-full object-cover rounded-2xl hidden" />
+                <p class="text-[#8d735f] text-xl max-w-2xl leading-relaxed font-sans">
+                    Lorem ipsum dolor sit amet. In corporis labore qui vero quisquam et enim galisum ab rerum sequi. 
+                    Non quos sunt vel quam consequuntur a enim vero et repellat praesentium sed cumque illum! 
+                    Ut consequatur eveniet a error soluta est expedita nostrum aut soluta placeat.
+                </p>
+            </div>
+
+            <div class="flex-1 flex items-center justify-center relative mt-16 md:mt-0">
+                <div class="bg-[#8d6945] w-[480px] h-[280px] rounded-[30px] shadow-lg"></div>
+
+                <div class="absolute bg-[#eeede8] w-[400px] h-[500px] rounded-[30px] shadow-2xl p-8 flex flex-col gap-6 transform -translate-y-10">
+                    
+                    <div class="w-full h-[280px] rounded-[25px] overflow-hidden shadow-inner">
+                        <img src="~/img/corporacao.png" alt="Sede MindSite" class="w-full h-full object-cover">
+                    </div>
+
+                    <div class="flex flex-col gap-4 mt-2">
+                        <a href="#servicos" class="w-full bg-[#d9d9d9] text-[#623f25] py-4 rounded-lg font-bold text-lg text-center hover:bg-[#c9c9c9] transition-all">
+                            Veja nossos serviços
+                        </a>
+
+                        <a href="#contato" class="w-full bg-[#8d6945] text-white py-4 rounded-lg font-bold text-lg text-center hover:bg-[#6A462C] transition-all shadow-md">
+                            Feche um orçamento conosco
+                        </a>
+                    </div>
+                </div>
+            </div>
         </div>
-        
-    </div>
+    </section>
+
+    @* Sobre Nós *@
+    <section id="sobrenos" class="scroll-mt-20 min-h-screen flex items-center bg-[#F9F8F3]">
+        <div class="container mx-auto px-6 py-20 flex flex-col lg:flex-row gap-12 items-start relative">
+
+            <div class="flex-[1.5] flex flex-col gap-8">
+                
+                <div class="bg-[#E3DBCE] rounded-[40px] p-10 shadow-sm">
+                    <h2 class="font-inria text-[#4d392a] text-5xl font-bold mb-6">Nossa História e Missão</h2>
+                    <p class="text-[#4d392a] text-lg leading-relaxed font-sans">
+                        Lorem ipsum dolor sit amet. In corporis labore qui vero quisquam et enim galisum ab rerum sequi. 
+                        Non quos sunt vel quam consequuntur a enim vero et repellat praesentium sed cumque illum! 
+                        Ut consequatur eveniet a error soluta est expedita nostrum aut soluta placeat.
+                    </p>
+                </div>
+
+                <div class="w-full h-[450px] rounded-[40px] overflow-hidden shadow-lg border-4 border-white">
+                    <img src="~/img/predio.png" alt="Sede Corporativa MindSite" class="w-full h-full object-cover">
+                </div>
+            </div>
+
+            <div class="flex-1 flex flex-col gap-8 items-center lg:pt-10">
+                
+                <div class="relative flex items-center justify-center w-full">
+                    <div class="bg-[#8d6945] w-[320px] h-[220px] rounded-[30px] shadow-md"></div>
+
+                    <div class="absolute bg-[#eeede8] w-[450px] h-[400px] rounded-[30px] shadow-xl p-5 flex flex-col gap-4 transform -translate-y-4">
+                        <div class="w-full h-[200px] rounded-[20px] overflow-hidden border border-gray-200">
+                            <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2513.0492301068216!2d-46.735069421154854!3d-23.527892430912853!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x94cef8b811e8e3a1%3A0xa7564bb4c78f41b3!2sSenai%20Vila%20Leopoldina%20-%20Mariano%20Ferraz!5e0!3m2!1spt-BR!2sbr!4v1778180945751!5m2!1spt-BR!2sbr" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                        </div>
+
+                        <a href="https://maps.app.goo.gl/HGtj6xRkAvy9UN1m6" 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        class="w-full bg-[#d9d9d9] text-[#4d392a] py-3 rounded-xl font-bold text-sm hover:bg-[#c9c9c9] transition-all text-center block shadow-sm">
+                            Ver no Maps
+                        </a>
+                    </div>
+                </div>
+
+                @* Botão Entre em contato conosco *@
+                <div class="w-full max-w-[400px] mt-20">
+                    <a href="#contato" class="block w-full bg-[#8d6945] text-white py-4 rounded-xl font-bold text-lg text-center hover:bg-[#6A462C] transition-all shadow-md">
+                        Entre em contato conosco
+                    </a>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    @* Serviços *@
+    <section id="servicos" class="container mx-auto px-6 py-20 flex flex-col lg:flex-row gap-16 items-start">
+    
+        <div class="flex-1 w-full">
+            <h1 class="font-inria text-[#4d392a] text-6xl font-bold mb-12">Serviços</h1>
+            
+            <div class="flex flex-col gap-6">
+                
+                <div class="bg-[#E3DBCE] rounded-[40px] flex items-center justify-between shadow-sm">
+                    <div class="flex items-center gap-6">
+                        <div class="w-40 h-full bg-none rounded-[40px] p-4 flex flex-col justify-center items-center shadow-inner border-4 border-[#623f25]">
+                            <img src="~/img/bolsa.png" alt="E-commerce" class="w-24 h-24 object-contain" />
+                            <span class="mt-[15px] font-inria text-[#4d392a] text-xl font-bold">E-commerce</span>
+                        </div>
+                    </div>
+                    <a href="#" class="bg-[#8d6945] mr-16 text-white text-xs px-6 py-2 rounded-lg font-bold hover:bg-[#623f25] transition-all">Solicitar serviço</a>
+                </div>
+
+                <div class="bg-[#E3DBCE] rounded-[40px] flex items-center justify-between shadow-sm">
+                    <div class="flex items-center gap-6">
+                        <div class="w-40 h-full bg-none rounded-[40px] p-4 flex flex-col justify-center items-center shadow-inner border-4 border-[#623f25]">
+                            <img src="~/img/message.png" alt="Blog" class="w-24 h-24 object-contain" />
+                            <span class="mt-[15px] font-inria text-[#4d392a] text-xl font-bold">Blog</span>
+                        </div>
+                    </div>
+                    <a href="#" class="bg-[#8d6945] mr-16 text-white text-xs px-6 py-2 rounded-lg font-bold hover:bg-[#623f25] transition-all">Solicitar serviço</a>
+                </div>
+
+                <div class="bg-[#E3DBCE] rounded-[40px] flex items-center justify-between shadow-sm">
+                    <div class="flex items-center gap-6">
+                        <div class="w-40 h-full bg-none rounded-[40px] p-4 flex flex-col justify-center items-center shadow-inner border-4 border-[#623f25]">
+                            <img src="~/img/notepencil.png" alt="Designing" class="w-24 h-24 object-contain" />
+                            <span class=" mt-[15px] font-inria text-[#4d392a] text-xl font-bold">Designing</span>
+                        </div>
+                    </div>
+                    <a href="#" class="bg-[#8d6945] mr-16 text-white text-xs px-6 py-2 rounded-lg font-bold hover:bg-[#623f25] transition-all">Solicitar serviço</a>
+                </div>
+
+                <div class="bg-[#E3DBCE] rounded-[40px] flex items-center justify-between shadow-sm">
+                    <div class="flex items-center gap-6">
+                        <div class="w-40 h-full bg-none rounded-[40px] p-4 flex flex-col justify-center items-center shadow-inner border-4 border-[#623f25]">
+                            <img src="~/img/smartphone.png" alt="Marketing" class="w-24 h-24 object-contain" />
+                            <span class=" mt-[15px] font-inria text-[#4d392a] text-xl font-bold">Marketing</span>
+                        </div>
+                    </div>
+                    <a href="#" class="bg-[#8d6945] mr-16 text-white text-xs px-6 py-2 rounded-lg font-bold hover:bg-[#623f25] transition-all">Solicitar serviço</a>
+                </div>
+
+            </div>
+        </div>
+
+        @* Botões de Ação *@
+        <div class="flex-1 lg:pt-32 flex flex-col gap-10">
+            <div class="space-y-6">
+                <p class="text-[#4d392a] text-lg leading-relaxed font-sans">
+                    Lorem ipsum dolor sit amet. Est impedit accusantium aut alias cupiditate sit autem culpa est dolores recusandae a voluptatem iusto qui modi suscipit ea autem Quis. Ea ducimus rerum ut odio illum nam omnis ipsa.
+                </p>
+
+                <p class="text-[#4d392a] text-lg leading-relaxed font-sans">
+                    Non quod quos qui omnis nihil ad sequi iste? Sit reiciendis soluta hic nisi rerum et quas recusandae aut galisum molestiae et ipsam tenetur.
+                </p>
+            </div>
+
+            @* Botões de Ação *@
+            <div class="flex flex-wrap gap-4 mt-4">
+                <button class="bg-[#5c4b3c] text-white px-8 py-4 rounded-xl font-bold text-lg hover:bg-[#4d392a] transition-all shadow-md">
+                    Solução Personalizada
+                </button>
+                <button class="bg-[#5c4b3c] text-white px-8 py-4 rounded-xl font-bold text-lg hover:bg-[#4d392a] transition-all shadow-md">
+                    Meus serviços
+                </button>
+            </div>
+        </div>
+
+    </section>
 
 </div>

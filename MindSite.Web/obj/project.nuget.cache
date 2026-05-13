@@ -15,7 +15,7 @@
     {
       "code": "NU1510",
       "level": "Warning",
-      "message": "PackageReference Microsoft.AspNetCore.SignalR will not be pruned. Consider removing this package from your dependencies, as it is likely unnecessary.",
+      "message": "PackageReference Microsoft.AspNetCore.SignalR não será podado. Considere remover este pacote das dependências, pois\u00A0ele provavelmente é desnecessário.",
       "projectPath": "C:\\Users\\LENOVO\\Documents\\Mindsite_Clone\\MindSite\\MindSite.Web\\MindSite.Web.csproj",
       "warningLevel": 1,
       "filePath": "C:\\Users\\LENOVO\\Documents\\Mindsite_Clone\\MindSite\\MindSite.Web\\MindSite.Web.csproj",
