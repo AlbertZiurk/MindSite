@@ -1,5 +1,5 @@
 ﻿<!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-br" class="scroll-smooth">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -35,7 +35,7 @@
 </head>
 <body class="min-h-screen flex flex-col font-sans bg-[#F4F3EE]">
 
-    <header class="bg-[#E3DBCE]">
+    <header class="bg-[#E3DBCE] sticky top-0 z-50 shadow-md">
         <nav class="container mx-auto px-6 py-4 flex items-center justify-between">
             
             <a class="flex items-center gap-1 text-4xl font-inria text-[#6B462C]" asp-controller="Home" asp-action="Index">
@@ -43,14 +43,13 @@
             </a>
 
             <div class="flex items-center gap-8">
-                <ul class="flex space-x-6 text-[#4d392a] font-medium text-sm">
-                    <li><a class="hover:text-[#623f25] transition-colors" asp-controller="Home" asp-action="Index">Home</a></li>
-                    <li><a class="hover:text-[#623f25] transition-colors" asp-controller="Home" asp-action="SobreNos">Sobre nós</a></li>
-                    <li><a class="hover:text-[#623f25] transition-colors" asp-controller="Home" asp-action="Contato">Contatos</a></li>
-                    <li><a class="hover:text-[#623f25] transition-colors" asp-controller="Home" asp-action="Servicos">Serviços</a></li>
+                <ul id="nav-menu" class="flex flex-row items-center space-x-6 text-[#4d392a] font-medium text-sm">
+                    <li><a href="#home" class="nav-link hover:text-[#623f25] transition-all px-1 py-1">Home</a></li>
+                    <li><a href="#sobrenos" class="nav-link hover:text-[#623f25] transition-all px-1 py-1">Sobre nós</a></li>
+                    <li><a href="#servicos" class="nav-link hover:text-[#623f25] transition-all px-1 py-1">Serviços</a></li>
                 </ul>
 
-                <a asp-controller="Account" asp-action="Login" id="login" class="bg-[#623f25] text-[#fafafa] px-5 py-2 rounded-md hover:bg-[#4d392a] transition-all font-bold text-sm">
+                <a asp-controller="Account" asp-action="Login" class="bg-[#623f25] text-[#fafafa] px-5 py-2 rounded-md hover:bg-[#4d392a] transition-all font-bold text-sm">
                     Login
                 </a>
             </div>
@@ -61,12 +60,91 @@
         @RenderBody()
     </main>
 
-    <footer class="bg-[#4d392a] text-[#fafafa]">
-        <div class="container mx-auto px-6 py-6 text-center text-xs">
-            &copy; 2026 - MindSite.Web - O futuro do Web Design chegou!
+    <footer class="bg-[#E3DBCE] py-12 border-t border-[#6B462C]/10">
+        <div class="container mx-auto px-6">
+            <div class="grid grid-cols-1 md:grid-cols-3 items-center gap-10">
+                
+                @* Coluna da Esquerda *@
+                <div class="flex flex-col gap-4 text-[#4d392a] font-sans text-sm">
+                    <div>
+                        <p>Lorem ipsum dolor sit amet.</p>
+                        <div class="w-24 h-[1px] bg-[#4d392a] my-2"></div>
+                    </div>
+                    <div>
+                        <p>Lorem ipsum dolor sit amet.</p>
+                        <p class="font-bold">(_) _____-_____</p>
+                    </div>
+                </div>
+
+                <div class="flex justify-center">
+                    <img src="~/img/logo_img.png" alt="Logo MindSite" class="h-24 w-auto opacity-90" />
+                </div>
+
+                @* Coluna da Direita *@
+                <div class="text-[#4d392a] font-sans text-sm md:text-right">
+                    <p class="leading-relaxed">
+                        Lorem ipsum dolor sit amet. In corporis labore qui vero quisquam et enim galisum ab rerum sequi.
+                    </p>
+                    <div class="mt-12 pt-6 border-t border-[#4d392a]/10 text-center text-[#4d392a]/60 text-xs">
+                        &copy; 2026 - MindSite.Web - O futuro do Web Design chegou!
+                    </div>
+                </div>
+            </div>
         </div>
     </footer>
 
     @await RenderSectionAsync("Scripts", required: false)
+
+    <script>
+    const sections = document.querySelectorAll("section");
+    const navLinks = document.querySelectorAll(".nav-link");
+
+    const observerOptions = {
+        root: null,
+        rootMargin: "-100px 0px -75% 0px", // Margem superior maior que o header
+        threshold: 0
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+            // entry.isIntersecting verifica se a seção entrou na zona de detecção
+            if (entry.isIntersecting) {
+                const id = entry.target.getAttribute("id");
+                
+                navLinks.forEach((link) => {
+                    // Remove destaque de todos
+                    link.classList.remove("font-[1000]", "text-[15px]", "border-b-2", "border-[#623f25]");
+                    
+                    // Aplica apenas ao link correto
+                    if (link.getAttribute("href") === `#${id}`) {
+                        link.classList.add("font-[1000]", "text-[15px]", "border-b-2", "border-[#623f25]");
+                    }
+                });
+            }
+        });
+    }, observerOptions);
+
+    sections.forEach((section) => observer.observe(section));
+
+    // Lógica de Scroll Suave (Mantida)
+    navLinks.forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            const targetId = this.getAttribute('href');
+            const targetElement = document.querySelector(targetId);
+
+            if (targetElement) {
+                const headerOffset = 80;
+                const elementPosition = targetElement.getBoundingClientRect().top;
+                const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+
+                window.scrollTo({
+                    top: offsetPosition,
+                    behavior: "smooth"
+                });
+            }
+        });
+    });
+</script>
 </body>
 </html>
