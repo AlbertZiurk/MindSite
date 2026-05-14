@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("MindSite.Web")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+13d98f3e09bb944de761802137a064f8e50c2bd0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+84e0669ea9ce008be4aa00f6bdcc1b1be9fd92dc")]
 [assembly: System.Reflection.AssemblyProductAttribute("MindSite.Web")]
 [assembly: System.Reflection.AssemblyTitleAttribute("MindSite.Web")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
