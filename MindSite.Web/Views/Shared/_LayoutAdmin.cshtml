@@ -44,14 +44,29 @@
 
             <div class="flex items-center gap-8">
                 <ul id="nav-menu" class="flex flex-row items-center space-x-6 text-[#4d392a] font-medium text-sm">
-                    <li><a href="#home" class="nav-link hover:text-[#623f25] transition-all px-1 py-1">Home</a></li>
-                    <li><a href="#sobrenos" class="nav-link hover:text-[#623f25] transition-all px-1 py-1">Sobre nós</a></li>
-                    <li><a href="#servicos" class="nav-link hover:text-[#623f25] transition-all px-1 py-1">Serviços</a></li>
+                    <li><a href="/Admin/Index" class="nav-link hover:text-[#623f25] transition-all px-1 py-1">Home</a></li>
+                    <li><a href="/Admin/Chat" class="nav-link hover:text-[#623f25] transition-all px-1 py-1">Chat</a></li>
+                    <li><a href="/Admin/Usuarios" class="nav-link hover:text-[#623f25] transition-all px-1 py-1">Usuários</a></li>
                 </ul>
 
-                <a asp-controller="Account" asp-action="Login" class="bg-[#623f25] text-[#fafafa] px-5 py-2 rounded-md hover:bg-[#4d392a] transition-all font-bold text-sm">
-                    Login
-                </a>
+                <div class="flex items-center gap-5">
+                    @* SVG de Notificação *@
+                    <button class="relative text-[#6B462C] hover:scale-110 transition-transform p-1" title="Notificações">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                        </svg>
+                        <span class="absolute top-1 right-1 h-2 w-2 bg-red-500 rounded-full border border-[#E3DBCE]"></span>
+                    </button>
+
+                    <a asp-controller="Account" asp-action="ProfileAdmin" class="flex flex-col items-center group select-none" title="Painel Admin">
+                        <div class="bg-[#6B462C] p-1.5 rounded-full text-[#F4F3EE] shadow-sm group-hover:bg-[#4d392a] group-hover:scale-105 transition-all duration-200">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-9 w-9" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                            </svg>
+                        </div>
+                        <span class="text-[12px] font-bold text-[#4d392a] mt-[5px] group-hover:text-[#623f25] group-hover:scale-105 uppercase mt-0.5 tracking-wider font-sans transition-all duration-200 origin-top">Admin</span>
+                    </a>
+                </div>
             </div>
         </nav>
     </header>
@@ -145,28 +160,26 @@
 
     @await RenderSectionAsync("Scripts", required: false)
 
-    <script>
+<script>
     const sections = document.querySelectorAll("section");
     const navLinks = document.querySelectorAll(".nav-link");
 
     const observerOptions = {
         root: null,
-        rootMargin: "-100px 0px -75% 0px", // Margem superior maior que o header
+        rootMargin: "-100px 0px -75% 0px", 
         threshold: 0
     };
 
     const observer = new IntersectionObserver((entries) => {
         entries.forEach((entry) => {
-            // entry.isIntersecting verifica se a seção entrou na zona de detecção
             if (entry.isIntersecting) {
                 const id = entry.target.getAttribute("id");
                 
                 navLinks.forEach((link) => {
-                    // Remove destaque de todos
                     link.classList.remove("font-[1000]", "text-[15px]", "border-b-2", "border-[#623f25]");
                     
-                    // Aplica apenas ao link correto
-                    if (link.getAttribute("href") === `#${id}`) {
+                    // Compara o final do atributo href com a seção visível na tela
+                    if (link.getAttribute("href").endsWith(`#${id}`)) {
                         link.classList.add("font-[1000]", "text-[15px]", "border-b-2", "border-[#623f25]");
                     }
                 });
@@ -176,22 +189,27 @@
 
     sections.forEach((section) => observer.observe(section));
 
-    // Lógica de Scroll Suave (Mantida)
+    // Lógica Inteligente de Rolagem Suave ou Redirecionamento
     navLinks.forEach(anchor => {
         anchor.addEventListener('click', function (e) {
-            e.preventDefault();
-            const targetId = this.getAttribute('href');
-            const targetElement = document.querySelector(targetId);
+            const href = this.getAttribute('href');
 
-            if (targetElement) {
-                const headerOffset = 80;
-                const elementPosition = targetElement.getBoundingClientRect().top;
-                const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+            if (href.includes('#')) {
+                const targetId = href.split('#')[1];
+                const targetElement = document.getElementById(targetId);
 
-                window.scrollTo({
-                    top: offsetPosition,
-                    behavior: "smooth"
-                });
+                // Se a seção existe no DOM atual (o usuário está na Home), faz o scroll suave
+                if (targetElement) {
+                    e.preventDefault();
+                    const headerOffset = 80;
+                    const elementPosition = targetElement.getBoundingClientRect().top;
+                    const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+
+                    window.scrollTo({
+                        top: offsetPosition,
+                        behavior: "smooth"
+                    });
+                }
             }
         });
     });
