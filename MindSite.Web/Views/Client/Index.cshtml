@@ -1,0 +1,207 @@
+@{
+    ViewData["Title"] = "O futuro do Web Design chegou!";
+    Layout = "_LayoutClient";
+}
+
+<div class="flex flex-col w-full">
+
+    @* Home *@
+    <section id="home" class="scroll-mt-20 min-h-screen flex items-center">
+        <div class="container mx-auto px-6 py-20 mt-20 flex flex-col md:flex-row items-center justify-between gap-16 w-full">
+            
+            <div class="flex-1 flex flex-col items-start gap-8">
+                <h1 class="font-inria text-[#4d392a] text-7xl font-bold leading-tight">
+                    @ViewData["Title"]
+                </h1>
+
+                <p class="text-[#8d735f] text-xl max-w-2xl leading-relaxed font-sans">
+                    Lorem ipsum dolor sit amet. In corporis labore qui vero quisquam et enim galisum ab rerum sequi. 
+                    Non quos sunt vel quam consequuntur a enim vero et repellat praesentium sed cumque illum! 
+                    Ut consequatur eveniet a error soluta est expedita nostrum aut soluta placeat.
+                </p>
+            </div>
+
+            <div class="flex-1 flex items-center justify-center relative mt-16 md:mt-0">
+                <div class="bg-[#8d6945] w-[480px] h-[280px] rounded-[30px] shadow-lg"></div>
+
+                <div class="absolute bg-[#eeede8] w-[400px] h-[500px] rounded-[30px] shadow-2xl p-8 flex flex-col gap-6 transform -translate-y-10">
+                    
+                    <div class="w-full h-[280px] rounded-[25px] overflow-hidden shadow-inner">
+                        <img src="~/img/corporacao.png" alt="Sede MindSite" class="w-full h-full object-cover">
+                    </div>
+
+                    <div class="flex flex-col gap-4 mt-2">
+                        <a href="#servicos" class="w-full bg-[#d9d9d9] text-[#623f25] py-4 rounded-lg font-bold text-lg text-center hover:bg-[#c9c9c9] transition-all">
+                            Veja nossos serviços
+                        </a>
+
+                        <a href="#contato" class="w-full bg-[#8d6945] text-white py-4 rounded-lg font-bold text-lg text-center hover:bg-[#6A462C] transition-all shadow-md">
+                            Quero me tornar um Fornecedor
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    @* Serviços *@
+    <section id="servicos" class="bg-[#F9F8F3]">
+        <div class="container mx-auto px-6 py-20 flex flex-col lg:flex-row gap-16 items-start">
+        
+            <div class="flex-1 w-full">
+                <h1 class="font-inria text-[#4d392a] text-6xl font-bold mb-12">Serviços</h1>
+                
+                <div class="flex flex-col gap-6">
+                    
+                    <div class="bg-[#E3DBCE] rounded-l-[40px] rounded-r-[60px] flex items-end justify-between shadow-sm">
+                        <div class="flex items-center gap-6">
+                            <div class="w-40 h-full bg-none rounded-[40px] p-4 flex flex-col justify-center items-center shadow-inner border-4 border-[#623f25]">
+                                <img src="~/img/bolsa.png" alt="E-commerce" class="w-24 h-24 object-contain" />
+                                <span class="mt-[15px] font-inria text-[#4d392a] text-xl font-bold">E-commerce</span>
+                            </div>
+                        </div>
+                        <a href="#" class="bg-[#8d6945] text-white text-base px-10 py-3 rounded-br-[50px] rounded-tl-[50px] font-bold hover:bg-[#623f25] transition-all">Solicitar serviço</a>
+                    </div>
+
+                    <div class="bg-[#E3DBCE] rounded-l-[40px] rounded-r-[60px] flex items-end justify-between shadow-sm">
+                        <div class="flex items-center gap-6">
+                            <div class="w-40 h-full bg-none rounded-[40px] p-4 flex flex-col justify-center items-center shadow-inner border-4 border-[#623f25]">
+                                <img src="~/img/message.png" alt="Blog" class="w-24 h-24 object-contain" />
+                                <span class="mt-[15px] font-inria text-[#4d392a] text-xl font-bold">Blog</span>
+                            </div>
+                        </div>
+                        <a href="#" class="bg-[#8d6945] text-white text-base px-10 py-3 rounded-br-[50px] rounded-tl-[50px] font-bold hover:bg-[#623f25] transition-all">Solicitar serviço</a>
+                    </div>
+
+                    <div class="bg-[#E3DBCE] rounded-l-[40px] rounded-r-[60px] flex items-end justify-between shadow-sm">
+                        <div class="flex items-center gap-6">
+                            <div class="w-40 h-full bg-none rounded-[40px] p-4 flex flex-col justify-center items-center shadow-inner border-4 border-[#623f25]">
+                                <img src="~/img/notepencil.png" alt="Designing" class="w-24 h-24 object-contain" />
+                                <span class=" mt-[15px] font-inria text-[#4d392a] text-xl font-bold">Designing</span>
+                            </div>
+                        </div>
+                        <a href="#" class="bg-[#8d6945] text-white text-base px-10 py-3 rounded-br-[50px] rounded-tl-[50px] font-bold hover:bg-[#623f25] transition-all">Solicitar serviço</a>
+                    </div>
+
+                    <div class="bg-[#E3DBCE] rounded-l-[40px] rounded-r-[60px] flex items-end justify-between shadow-sm">
+                        <div class="flex items-center gap-6">
+                            <div class="w-40 h-full bg-none rounded-[40px] p-4 flex flex-col justify-center items-center shadow-inner border-4 border-[#623f25]">
+                                <img src="~/img/smartphone.png" alt="Marketing" class="w-24 h-24 object-contain" />
+                                <span class=" mt-[15px] font-inria text-[#4d392a] text-xl font-bold">Marketing</span>
+                            </div>
+                        </div>
+                        <a href="#" class="bg-[#8d6945] text-white text-base px-10 py-3 rounded-br-[50px] rounded-tl-[50px] font-bold hover:bg-[#623f25] transition-all">Solicitar serviço</a>
+                    </div>
+
+                </div>
+            </div>
+
+            @* Botões de Ação *@
+            <div class="flex-1 lg:pt-32 flex flex-col gap-10">
+                <div class="space-y-6">
+                    <p class="text-[#4d392a] text-lg leading-relaxed font-sans">
+                        Lorem ipsum dolor sit amet. Est impedit accusantium aut alias cupiditate sit autem culpa est dolores recusandae a voluptatem iusto qui modi suscipit ea autem Quis. Ea ducimus rerum ut odio illum nam omnis ipsa.
+                    </p>
+
+                    <p class="text-[#4d392a] text-lg leading-relaxed font-sans">
+                        Non quod quos qui omnis nihil ad sequi iste? Sit reiciendis soluta hic nisi rerum et quas recusandae aut galisum molestiae et ipsam tenetur.
+                    </p>
+                </div>
+
+                @* Botões de Ação *@
+                <div class="flex flex-wrap gap-4 mt-4">
+                    <button class="bg-[#5c4b3c] text-white px-8 py-4 rounded-xl font-bold text-lg hover:bg-[#4d392a] transition-all shadow-md">
+                        Meus serviços
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    @* Fornecedor *@
+    <section id="fornecedor" class="scroll-mt-20 min-h-screen flex items-center bg-[#F4F3EE]">
+        <div class="container mx-auto px-6 py-24 flex flex-col lg:flex-row gap-16 items-center">
+
+            <div class="flex-[1.4] flex flex-col gap-8">
+
+                <div class="bg-[#E3DBCE] rounded-[30px] px-8 py-5 self-start shadow-sm">
+                    <h2 class="font-inria text-[#4d392a] text-4xl font-bold">Junte-se ao time</h2>
+                </div>
+
+                <div class="flex flex-col gap-5 text-[#4d392a] text-base leading-relaxed font-sans max-w-xl">
+                    <p>
+                        Lorem ipsum dolor sit amet. Est impedit accusantium aut alias cupiditate sit autem culpa est 
+                        dolores recusandae a voluptatem iusto qui modi suscipit ea autem Quis. Ea ducimus rerum ut odio 
+                        illum nam omnis ipsa. Cum eaque maxime eos ullam architecto aut voluptatibus voluptates qui 
+                        fugiat quam id quia consequatur et vitae consequatur in quia voluptas.
+                    </p>
+                    <p>
+                        Non quod quos qui omnis nihil ad sequi iste? Sit reiciendis soluta hic nisi rerum et quas 
+                        recusandae aut galisum molestiae et ipsam tenetur.
+                    </p>
+                    <p>
+                        Qui veritatis eaque aut illum voluptates vel labore corporis aut nisi pariatur et maiores 
+                        assumenda est illo iusto cum animi aperiam.
+                    </p>
+                </div>
+
+                @* Benefícios de ser fornecedor *@
+                <div class="flex flex-col gap-3 mt-2">
+                    <div class="flex items-center gap-3">
+                        <span class="w-6 h-6 bg-[#6B462C] rounded-full flex items-center justify-center flex-shrink-0">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
+                            </svg>
+                        </span>
+                        <span class="text-[#4d392a] text-sm font-medium">Acesso a clientes qualificados da plataforma</span>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <span class="w-6 h-6 bg-[#6B462C] rounded-full flex items-center justify-center flex-shrink-0">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
+                            </svg>
+                        </span>
+                        <span class="text-[#4d392a] text-sm font-medium">Gestão de projetos e entregas centralizadas</span>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <span class="w-6 h-6 bg-[#6B462C] rounded-full flex items-center justify-center flex-shrink-0">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
+                            </svg>
+                        </span>
+                        <span class="text-[#4d392a] text-sm font-medium">Pagamentos seguros e transparentes</span>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="flex-1 flex flex-col items-center gap-6">
+
+                <div class="flex-1 flex items-center justify-center relative mt-16 md:mt-0">
+                    <div class="bg-[#8d6945] w-[480px] h-[280px] rounded-[30px] shadow-lg"></div>
+
+                    <div class="absolute bg-[#eeede8] w-[400px] h-[500px] rounded-[30px] shadow-2xl p-8 flex flex-col gap-6 transform -translate-y-10">
+                        
+                        <div class="w-full h-[280px] rounded-[25px] overflow-hidden shadow-inner">
+                            <img src="~/img/contrato.png" alt="Sede MindSite" class="w-full h-full object-cover">
+                        </div>
+
+                        <div class="flex flex-col gap-4 mt-2">
+                            <a href="/Account/Cadastro?tipo=fornecedor"
+                               class="block w-full bg-[#8d6945] text-white py-4 px-8 rounded-lg font-bold text-lg text-center 
+                                    hover:bg-[#4d392a] transition-all shadow-md hover:shadow-lg hover:scale-[1.02] active:scale-[0.98]">
+                                Virar Fornecedor
+                            </a>
+                            <p class="text-center text-base text-[#8d6945] mt-3">
+                                Já tem conta? <a href="/Account/Login" class="underline hover:text-[#4d392a] transition-colors">Entre aqui</a>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+
+</div>
