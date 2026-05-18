@@ -35,6 +35,12 @@
 </head>
 <body class="min-h-screen flex flex-col font-sans bg-[#F4F3EE]">
 
+    @{
+        // Pegamos o Controller e Action atuais do ASP.NET
+        var currentController = ViewContext.RouteData.Values["Controller"]?.ToString();
+        var currentAction = ViewContext.RouteData.Values["Action"]?.ToString();
+    }
+
     <header class="bg-[#E3DBCE] sticky top-0 z-50 shadow-md">
         <nav class="container mx-auto px-6 py-4 flex items-center justify-between">
             
@@ -44,9 +50,24 @@
 
             <div class="flex items-center gap-8">
                 <ul id="nav-menu" class="flex flex-row items-center space-x-6 text-[#4d392a] font-medium text-sm">
-                    <li><a asp-controller="Admin" asp-action="Index" class="nav-link hover:text-[#623f25] transition-all px-1 py-1">Home</a></li>
-                    <li><a asp-controller="Admin" asp-action="Chat" class="nav-link hover:text-[#623f25] transition-all px-1 py-1">Chat</a></li>
-                    <li><a asp-controller="Admin" asp-action="Usuarios" class="nav-link hover:text-[#623f25] transition-all px-1 py-1">Usuários</a></li>
+                    <li>
+                        <a asp-controller="Admin" asp-action="Index" 
+                           class="nav-link hover:text-[#623f25] transition-all px-1 py-1 @(currentController == "Admin" && currentAction == "Index" ? "font-[1000] text-[15px] border-b-2 border-[#623f25]" : "")">
+                            Home
+                        </a>
+                    </li>
+                    <li>
+                        <a asp-controller="Admin" asp-action="Chat" 
+                           class="nav-link hover:text-[#623f25] transition-all px-1 py-1 @(currentController == "Admin" && currentAction == "Chat" ? "font-[1000] text-[15px] border-b-2 border-[#623f25]" : "")">
+                            Chat
+                        </a>
+                    </li>
+                    <li>
+                        <a asp-controller="Admin" asp-action="Usuarios" 
+                           class="nav-link hover:text-[#623f25] transition-all px-1 py-1 @(currentController == "Admin" && currentAction == "Usuarios" ? "font-[1000] text-[15px] border-b-2 border-[#623f25]" : "")">
+                            Usuários
+                        </a>
+                    </li>
                 </ul>
 
                 <div class="flex items-center gap-5">

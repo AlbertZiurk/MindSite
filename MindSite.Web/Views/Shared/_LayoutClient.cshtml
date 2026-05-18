@@ -35,6 +35,12 @@
 </head>
 <body class="min-h-screen flex flex-col font-sans bg-[#F4F3EE]">
 
+    @{
+        var currentController = ViewContext.RouteData.Values["Controller"]?.ToString();
+        var currentAction = ViewContext.RouteData.Values["Action"]?.ToString();
+        bool isChatPage = currentController == "Client" && currentAction == "Chat";
+    }
+
     <header class="bg-[#E3DBCE] sticky top-0 z-50 shadow-md">
         <nav class="container mx-auto px-6 py-4 flex items-center justify-between">
             
@@ -44,10 +50,15 @@
 
             <div class="flex items-center gap-8">
                 <ul id="nav-menu" class="flex flex-row items-center space-x-6 text-[#4d392a] font-medium text-sm">
-                    <li><a href="/Client/Index#home" class="nav-link hover:text-[#623f25] transition-all px-1 py-1">Home</a></li>
-                    <li><a href="/Client/Index#servicos" class="nav-link hover:text-[#623f25] transition-all px-1 py-1">Serviços</a></li>
-                    <li><a href="/Client/Index#fornecedor" class="nav-link hover:text-[#623f25] transition-all px-1 py-1">Fornecedor</a></li>
-                    <li><a asp-controller="Client" asp-action="Chat" class="nav-link hover:text-[#623f25] transition-all px-1 py-1">Chat</a></li>
+                    <li><a href="/Home/Index#home" class="nav-link hover:text-[#623f25] transition-all px-1 py-1">Home</a></li>
+                    <li><a href="/Home/Index#servicos" class="nav-link hover:text-[#623f25] transition-all px-1 py-1">Serviços</a></li>
+                    <li><a href="/Home/Index#fornecedor" class="nav-link hover:text-[#623f25] transition-all px-1 py-1">Fornecedor</a></li>
+                    <li>
+                        <a asp-controller="Client" asp-action="Chat" 
+                           class="nav-link hover:text-[#623f25] transition-all px-1 py-1 @(isChatPage ? "font-[1000] text-[15px] border-b-2 border-[#623f25]" : "")">
+                            Chat
+                        </a>
+                    </li>
                 </ul>
 
                 <div class="flex items-center gap-5">
@@ -159,58 +170,69 @@
     @await RenderSectionAsync("Scripts", required: false)
 
 <script>
-    const sections = document.querySelectorAll("section");
-    const navLinks = document.querySelectorAll(".nav-link");
+    document.addEventListener("DOMContentLoaded", () => {
+        const sections = document.querySelectorAll("section");
+        const navLinks = document.querySelectorAll(".nav-link");
+        
+        // Verifica se estamos na Home institucional olhando se o DOM possui seções
+        const isHomePage = sections.length > 0;
 
-    // Roda apenas se houver seções na página atual (Evita falhas em páginas avulsas como o Chat)
-    if(sections.length > 0) {
-        const observerOptions = {
-            root: null,
-            rootMargin: "-100px 0px -75% 0px", 
-            threshold: 0
-        };
+        // 1. COMPORTAMENTO DE SCROLL (Apenas se estiver na página com seções)
+        if (isHomePage) {
+            const observerOptions = {
+                root: null,
+                rootMargin: "-120px 0px -70% 0px", // Margem ajustada para ativar no momento certo do scroll
+                threshold: 0
+            };
 
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach((entry) => {
-                if (entry.isIntersecting) {
-                    const id = entry.target.getAttribute("id");
-                    
-                    navLinks.forEach((link) => {
-                        link.classList.remove("font-[1000]", "text-[15px]", "border-b-2", "border-[#623f25]");
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting) {
+                        const id = entry.target.getAttribute("id");
                         
-                        if (link.getAttribute("href") && link.getAttribute("href").endsWith(`#${id}`)) {
-                            link.classList.add("font-[1000]", "text-[15px]", "border-b-2", "border-[#623f25]");
-                        }
-                    });
+                        navLinks.forEach((link) => {
+                            const href = link.getAttribute("href");
+                            // Se NÃO for a página do chat, gerencia o destaque das seções
+                            if (href && href.includes('#')) {
+                                link.classList.remove("font-[1000]", "text-[15px]", "border-b-2", "border-[#623f25]");
+                                if (href.endsWith(`#${id}`)) {
+                                    link.classList.add("font-[1000]", "text-[15px]", "border-b-2", "border-[#623f25]");
+                                }
+                            }
+                        });
+                    }
+                });
+            }, observerOptions);
+
+            sections.forEach((section) => observer.observe(section));
+        }
+
+        // 2. ROLAGEM SUAVE AO CLICAR
+        navLinks.forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                const href = this.getAttribute('href');
+
+                if (href && href.includes('#')) {
+                    const targetId = href.split('#')[1];
+                    const targetElement = document.getElementById(targetId);
+
+                    // Se a seção existe na tela atual (está na Home), faz o efeito deslizante
+                    if (targetElement) {
+                        e.preventDefault();
+                        const headerOffset = 85;
+                        const elementPosition = targetElement.getBoundingClientRect().top;
+                        const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+
+                        window.scrollTo({
+                            top: offsetPosition,
+                            behavior: "smooth"
+                        });
+                        
+                        // Atualiza a URL sem recarregar
+                        history.pushState(null, null, `#${targetId}`);
+                    }
                 }
             });
-        }, observerOptions);
-
-        sections.forEach((section) => observer.observe(section));
-    }
-
-    // Lógica Inteligente de Rolagem Suave ou Redirecionamento Corrigida
-    navLinks.forEach(anchor => {
-        anchor.addEventListener('click', function (e) {
-            const href = this.getAttribute('href');
-
-            if (href && href.includes('#')) {
-                const targetId = href.split('#')[1];
-                const targetElement = document.getElementById(targetId);
-
-                // Se o elemento existe na tela atual (está na Home), faz a rolagem suave
-                if (targetElement) {
-                    e.preventDefault();
-                    const headerOffset = 80;
-                    const elementPosition = targetElement.getBoundingClientRect().top;
-                    const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
-
-                    window.scrollTo({
-                        top: offsetPosition,
-                        behavior: "smooth"
-                    });
-                }
-            }
         });
     });
 </script>
