@@ -1,0 +1,42 @@
+@{
+    ViewData["Title"] = "O futuro do Web Design chegou!";
+    Layout = "_LayoutSupplier";
+}
+
+<div class="flex flex-col w-full">
+
+    @* Home *@
+    <section id="home" class="scroll-mt-20 min-h-screen flex items-center">
+        <div class="container mx-auto px-6 py-20 mt-20 flex flex-col md:flex-row items-center justify-between gap-16 w-full">
+            
+            <div class="flex-1 flex flex-col items-start gap-8">
+                <h1 class="font-inria text-[#4d392a] text-7xl font-bold leading-tight">
+                    @ViewData["Title"]
+                </h1>
+
+                <p class="text-[#8d735f] text-xl max-w-2xl leading-relaxed font-sans">
+                    Lorem ipsum dolor sit amet. In corporis labore qui vero quisquam et enim galisum ab rerum sequi. 
+                    Non quos sunt vel quam consequuntur a enim vero et repellat praesentium sed cumque illum! 
+                    Ut consequatur eveniet a error soluta est expedita nostrum aut soluta placeat.
+                </p>
+            </div>
+
+            <div class="flex-1 flex items-center justify-center relative mt-16 md:mt-0">
+                <div class="bg-[#8d6945] w-[480px] h-[280px] rounded-[30px] shadow-lg"></div>
+
+                <div class="absolute bg-[#eeede8] w-[400px] h-[500px] rounded-[30px] shadow-2xl p-8 flex flex-col gap-6 transform -translate-y-10">
+                    
+                    <div class="w-full h-[280px] rounded-[25px] overflow-hidden shadow-inner">
+                        <img src="~/img/corporacao.png" alt="Sede MindSite" class="w-full h-full object-cover">
+                    </div>
+
+                    <div class="flex flex-col gap-4 mt-2">
+                        <a href="/Supplier/Servicos" class="w-full bg-[#d9d9d9] text-[#623f25] py-4 rounded-lg font-bold text-lg text-center hover:bg-[#c9c9c9] transition-all">
+                            Acessar serviços
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>

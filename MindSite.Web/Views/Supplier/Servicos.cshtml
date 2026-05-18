@@ -1,0 +1,336 @@
+@{
+    ViewData["Title"] = "Serviços Disponíveis";
+    Layout = "_LayoutSupplier";
+}
+
+<style>
+    @@keyframes modalIn {
+        from { opacity: 0; transform: scale(0.95) translateY(10px); }
+        to   { opacity: 1; transform: scale(1) translateY(0); }
+    }
+    .modal-animate { animation: modalIn 0.25s ease-out forwards; }
+
+    .badge-aguardando { background: #fef3c7; color: #92400e; }
+    .badge-urgente    { background: #fee2e2; color: #991b1b; }
+    .badge-novo       { background: #d1fae5; color: #065f46; }
+
+    .modal-scroll::-webkit-scrollbar { width: 4px; }
+    .modal-scroll::-webkit-scrollbar-track { background: transparent; }
+    .modal-scroll::-webkit-scrollbar-thumb { background: #6B462C40; border-radius: 10px; }
+</style>
+
+<div class="flex flex-col w-full">
+
+    @* HEADER *@
+    <section class="bg-[#F4F3EE] pt-28 pb-10 border-b border-[#6B462C]/10">
+        <div class="container mx-auto px-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+            <div>
+                <h1 class="font-inria text-[#4d392a] text-5xl font-bold">Serviços Pedidos</h1>
+                <p class="text-[#8d6945] text-base mt-2 font-sans">Clique em um serviço para ver os detalhes do pedido do cliente.</p>
+            </div>
+            <div class="flex items-center gap-3 flex-wrap">
+                <button onclick="filtrar('todos')" id="btn-todos"
+                    class="filtro-btn bg-[#E3DBCE] text-[#6B462C] border-[#6B462C]/30 px-4 py-2 rounded-full text-sm font-semibold border transition-all">
+                    Todos
+                </button>
+                <button onclick="filtrar('novo')" id="btn-novo"
+                    class="filtro-btn text-[#8d6945] border-[#6B462C]/20 px-4 py-2 rounded-full text-sm font-semibold border hover:bg-[#E3DBCE] transition-all">
+                    Novos
+                </button>
+                <button onclick="filtrar('urgente')" id="btn-urgente"
+                    class="filtro-btn text-[#8d6945] border-[#6B462C]/20 px-4 py-2 rounded-full text-sm font-semibold border hover:bg-[#E3DBCE] transition-all">
+                    Urgentes
+                </button>
+                <button onclick="filtrar('aguardando')" id="btn-aguardando"
+                    class="filtro-btn text-[#8d6945] border-[#6B462C]/20 px-4 py-2 rounded-full text-sm font-semibold border hover:bg-[#E3DBCE] transition-all">
+                    Aguardando
+                </button>
+            </div>
+        </div>
+    </section>
+
+    @* LISTA DE SERVIÇOS *@
+    <section class="bg-[#F4F3EE] py-10 min-h-screen">
+        <div class="container mx-auto px-6">
+            <div id="listaServicos" class="flex flex-col gap-5">
+
+                @* Card 1 - E-commerce *@
+                <div class="servico-card" data-status="novo" onclick="abrirModal('ecommerce')">
+                    <div class="bg-white border border-[#6B462C]/10 rounded-2xl p-5 flex items-center gap-6 cursor-pointer hover:shadow-md hover:border-[#6B462C]/30 transition-all group">
+                        <div class="w-16 h-16 bg-[#E3DBCE] rounded-xl flex items-center justify-center flex-shrink-0 border-2 border-[#623f25] group-hover:scale-105 transition-transform">
+                            <img src="~/img/bolsa.png" alt="E-commerce" class="w-10 h-10 object-contain" />
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center gap-3 mb-1">
+                                <h3 class="font-inria text-[#4d392a] text-xl font-bold">E-commerce</h3>
+                                <span class="badge-novo text-xs font-bold px-3 py-0.5 rounded-full">Novo</span>
+                            </div>
+                            <p class="text-[#8d6945] text-sm truncate">Loja online de roupas femininas com pagamento integrado e controle de estoque...</p>
+                            <div class="flex items-center gap-4 mt-2 text-xs text-[#8d6945]">
+                                <span>👤 Maria Souza</span>
+                                <span>📅 30 dias</span>
+                                <span>💰 R$ 3.000 – R$ 5.000</span>
+                            </div>
+                        </div>
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-[#8d6945] group-hover:text-[#6B462C] flex-shrink-0 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                        </svg>
+                    </div>
+                </div>
+
+                @* Card 2 - Blog *@
+                <div class="servico-card" data-status="urgente" onclick="abrirModal('blog')">
+                    <div class="bg-white border border-[#6B462C]/10 rounded-2xl p-5 flex items-center gap-6 cursor-pointer hover:shadow-md hover:border-[#6B462C]/30 transition-all group">
+                        <div class="w-16 h-16 bg-[#E3DBCE] rounded-xl flex items-center justify-center flex-shrink-0 border-2 border-[#623f25] group-hover:scale-105 transition-transform">
+                            <img src="~/img/message.png" alt="Blog" class="w-10 h-10 object-contain" />
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center gap-3 mb-1">
+                                <h3 class="font-inria text-[#4d392a] text-xl font-bold">Blog</h3>
+                                <span class="badge-urgente text-xs font-bold px-3 py-0.5 rounded-full">Urgente</span>
+                            </div>
+                            <p class="text-[#8d6945] text-sm truncate">Blog de culinária com receitas semanais, newsletter e integração com redes sociais...</p>
+                            <div class="flex items-center gap-4 mt-2 text-xs text-[#8d6945]">
+                                <span>👤 João Pereira</span>
+                                <span>📅 15 dias</span>
+                                <span>💰 R$ 1.000 – R$ 2.000</span>
+                            </div>
+                        </div>
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-[#8d6945] group-hover:text-[#6B462C] flex-shrink-0 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                        </svg>
+                    </div>
+                </div>
+
+                @* Card 3 - Designing *@
+                <div class="servico-card" data-status="aguardando" onclick="abrirModal('designing')">
+                    <div class="bg-white border border-[#6B462C]/10 rounded-2xl p-5 flex items-center gap-6 cursor-pointer hover:shadow-md hover:border-[#6B462C]/30 transition-all group">
+                        <div class="w-16 h-16 bg-[#E3DBCE] rounded-xl flex items-center justify-center flex-shrink-0 border-2 border-[#623f25] group-hover:scale-105 transition-transform">
+                            <img src="~/img/notepencil.png" alt="Designing" class="w-10 h-10 object-contain" />
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center gap-3 mb-1">
+                                <h3 class="font-inria text-[#4d392a] text-xl font-bold">Designing</h3>
+                                <span class="badge-aguardando text-xs font-bold px-3 py-0.5 rounded-full">Aguardando</span>
+                            </div>
+                            <p class="text-[#8d6945] text-sm truncate">Redesign completo de identidade visual para escritório de advocacia...</p>
+                            <div class="flex items-center gap-4 mt-2 text-xs text-[#8d6945]">
+                                <span>👤 Ana Lima</span>
+                                <span>📅 45 dias</span>
+                                <span>💰 R$ 2.500 – R$ 4.000</span>
+                            </div>
+                        </div>
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-[#8d6945] group-hover:text-[#6B462C] flex-shrink-0 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                        </svg>
+                    </div>
+                </div>
+
+                @* Card 4 - Marketing *@
+                <div class="servico-card" data-status="novo" onclick="abrirModal('marketing')">
+                    <div class="bg-white border border-[#6B462C]/10 rounded-2xl p-5 flex items-center gap-6 cursor-pointer hover:shadow-md hover:border-[#6B462C]/30 transition-all group">
+                        <div class="w-16 h-16 bg-[#E3DBCE] rounded-xl flex items-center justify-center flex-shrink-0 border-2 border-[#623f25] group-hover:scale-105 transition-transform">
+                            <img src="~/img/smartphone.png" alt="Marketing" class="w-10 h-10 object-contain" />
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center gap-3 mb-1">
+                                <h3 class="font-inria text-[#4d392a] text-xl font-bold">Marketing Digital</h3>
+                                <span class="badge-novo text-xs font-bold px-3 py-0.5 rounded-full">Novo</span>
+                            </div>
+                            <p class="text-[#8d6945] text-sm truncate">Campanha de lançamento de produto com foco em Instagram e Google Ads...</p>
+                            <div class="flex items-center gap-4 mt-2 text-xs text-[#8d6945]">
+                                <span>👤 Carlos Mendes</span>
+                                <span>📅 60 dias</span>
+                                <span>💰 R$ 4.000 – R$ 7.000</span>
+                            </div>
+                        </div>
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-[#8d6945] group-hover:text-[#6B462C] flex-shrink-0 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                        </svg>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+</div>
+
+@* MODAL *@
+<div id="modalOverlay"
+     class="fixed inset-0 z-50 hidden items-center justify-center p-4"
+     style="background: rgba(30,18,10,0.45); backdrop-filter: blur(6px);"
+     onclick="fecharModalFora(event)">
+
+    <div id="modalBox"
+         class="modal-animate bg-white rounded-3xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden border border-[#6B462C]/10"
+         onclick="event.stopPropagation()">
+
+        <div class="bg-[#E3DBCE] px-7 py-5 flex items-center justify-between border-b border-[#6B462C]/15 flex-shrink-0">
+            <div>
+                <h2 id="modalTitulo" class="font-inria text-[#4d392a] text-2xl font-bold"></h2>
+                <p class="text-[#8d6945] text-xs mt-0.5 font-sans">Formulário preenchido pelo cliente</p>
+            </div>
+            <button onclick="fecharModal()" class="p-2 rounded-xl text-[#8d6945] hover:text-[#4d392a] hover:bg-[#6B462C]/10 transition-all">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+        </div>
+
+        <div id="modalCorpo" class="modal-scroll flex-1 overflow-y-auto px-7 py-6 space-y-5 font-sans text-sm text-[#4d392a]"></div>
+
+        <div class="px-7 py-5 border-t border-[#6B462C]/10 flex gap-3 flex-shrink-0 bg-white">
+            <button onclick="fecharModal()"
+                class="flex-1 border border-[#6B462C]/30 text-[#8d6945] py-3 rounded-xl font-bold hover:bg-[#F4F3EE] transition-all">
+                Fechar
+            </button>
+            <button class="flex-1 bg-[#6B462C] text-white py-3 rounded-xl font-bold hover:bg-[#4d392a] transition-all shadow-md">
+                Aceitar Serviço
+            </button>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    const formularios = {
+        ecommerce: {
+            titulo: 'Pedido — E-commerce', status: 'Novo', badge: 'badge-novo',
+            campos: [
+                { label: 'Nome do Cliente',        valor: 'Maria Souza' },
+                { label: 'E-mail',                 valor: 'maria.souza@email.com' },
+                { label: 'Telefone',               valor: '(11) 98765-4321' },
+                { label: 'Tipo de Site',            valor: 'E-commerce (Loja Virtual)' },
+                { label: 'Segmento / Nicho',        valor: 'Moda feminina — roupas e acessórios' },
+                { label: 'Descrição do Projeto',    valor: 'Quero uma loja online para vender minhas peças de roupa feminina. Preciso de carrinho de compras, sistema de pagamento (Pix, cartão e boleto), controle de estoque básico e integração com Instagram Shopping.' },
+                { label: 'Número de Páginas',       valor: 'Home, Catálogo, Produto, Carrinho, Checkout, Contato — aprox. 6 páginas' },
+                { label: 'Prazo de Entrega',        valor: '30 dias corridos' },
+                { label: 'Orçamento Estimado',      valor: 'R$ 3.000 – R$ 5.000' },
+                { label: 'Cores / Identidade',      valor: 'Rosa claro, branco e dourado. Estilo clean e feminino.' },
+                { label: 'Referências de Sites',    valor: 'Farm Rio (farmbrasil.com.br), Animale (animale.com.br)' },
+                { label: 'Funcionalidades Extra',   valor: 'Blog de moda, cupom de desconto, lista de favoritos, avaliação de produtos' },
+                { label: 'Possui Domínio?',         valor: 'Sim — mariamodas.com.br' },
+                { label: 'Precisa de Hospedagem?',  valor: 'Sim, indicar plano compatível' },
+                { label: 'Observações',             valor: 'Preciso que o site seja 100% responsivo para celular, pois a maioria dos meus clientes compra pelo smartphone.' },
+            ]
+        },
+        blog: {
+            titulo: 'Pedido — Blog', status: 'Urgente', badge: 'badge-urgente',
+            campos: [
+                { label: 'Nome do Cliente',        valor: 'João Pereira' },
+                { label: 'E-mail',                 valor: 'joao.pereira@email.com' },
+                { label: 'Telefone',               valor: '(21) 97654-3210' },
+                { label: 'Tipo de Site',            valor: 'Blog Editorial' },
+                { label: 'Segmento / Nicho',        valor: 'Gastronomia e culinária caseira' },
+                { label: 'Descrição do Projeto',    valor: 'Blog com publicações semanais de receitas, categorias por tipo de prato, sistema de busca, newsletter e botões de compartilhamento nas redes sociais. Também quero uma área de membros para receitas exclusivas.' },
+                { label: 'Número de Páginas',       valor: 'Home, Blog, Receita (template), Sobre, Contato, Área de Membros — 6 páginas' },
+                { label: 'Prazo de Entrega',        valor: '15 dias (URGENTE — lançamento agendado)' },
+                { label: 'Orçamento Estimado',      valor: 'R$ 1.000 – R$ 2.000' },
+                { label: 'Cores / Identidade',      valor: 'Tons quentes — laranja, vermelho e creme. Estilo acolhedor e artesanal.' },
+                { label: 'Referências de Sites',    valor: 'Panelinha (panelinha.com.br), Tastemade Brasil' },
+                { label: 'Funcionalidades Extra',   valor: 'Newsletter integrada (MailChimp), comentários, avaliação de receitas com estrelas' },
+                { label: 'Possui Domínio?',         valor: 'Não — precisa registrar joaocozinha.com.br' },
+                { label: 'Precisa de Hospedagem?',  valor: 'Sim' },
+                { label: 'Observações',             valor: 'Tenho um lançamento marcado com influencers em 20 dias. O prazo é crítico.' },
+            ]
+        },
+        designing: {
+            titulo: 'Pedido — Designing', status: 'Aguardando', badge: 'badge-aguardando',
+            campos: [
+                { label: 'Nome do Cliente',        valor: 'Ana Lima' },
+                { label: 'E-mail',                 valor: 'ana.lima@advocacia.com' },
+                { label: 'Telefone',               valor: '(31) 96543-2109' },
+                { label: 'Tipo de Serviço',         valor: 'Redesign de Identidade Visual + Site Institucional' },
+                { label: 'Segmento / Nicho',        valor: 'Advocacia — Direito de Família e Trabalhista' },
+                { label: 'Descrição do Projeto',    valor: 'Nosso escritório precisa de uma nova identidade visual completa: novo logotipo, paleta de cores, tipografia e manual de marca. Além disso, quero um site institucional moderno que transmita credibilidade e seriedade.' },
+                { label: 'Número de Páginas',       valor: 'Home, Áreas de Atuação, Equipe, Blog Jurídico, Contato — 5 páginas' },
+                { label: 'Prazo de Entrega',        valor: '45 dias corridos' },
+                { label: 'Orçamento Estimado',      valor: 'R$ 2.500 – R$ 4.000' },
+                { label: 'Cores / Identidade',      valor: 'Azul-marinho, dourado e branco. Estilo sóbrio e profissional.' },
+                { label: 'Referências de Sites',    valor: 'Machado Meyer (machadomeyer.com.br)' },
+                { label: 'Entregáveis Esperados',   valor: 'Logo em SVG/PNG, paleta de cores, tipografia, papelaria (cartão, papel timbrado), mockup do site' },
+                { label: 'Possui Domínio?',         valor: 'Sim — analima-advocacia.adv.br' },
+                { label: 'Precisa de Hospedagem?',  valor: 'Já possui hospedagem' },
+                { label: 'Observações',             valor: 'O logo atual é muito antigo e não representa mais o escritório. Quero algo elegante, mas moderno.' },
+            ]
+        },
+        marketing: {
+            titulo: 'Pedido — Marketing Digital', status: 'Novo', badge: 'badge-novo',
+            campos: [
+                { label: 'Nome do Cliente',        valor: 'Carlos Mendes' },
+                { label: 'E-mail',                 valor: 'carlos@mendestech.com.br' },
+                { label: 'Telefone',               valor: '(11) 95432-1098' },
+                { label: 'Tipo de Serviço',         valor: 'Campanha de Marketing Digital' },
+                { label: 'Segmento / Nicho',        valor: 'Tecnologia — Software de gestão para pequenas empresas' },
+                { label: 'Descrição do Projeto',    valor: 'Vamos lançar um novo produto (SaaS de gestão financeira) e precisamos de uma campanha completa: anúncios no Instagram, Facebook e Google Ads, criação de landing page de conversão e estratégia de conteúdo para 3 meses.' },
+                { label: 'Objetivo Principal',      valor: 'Gerar 500 leads qualificados nos primeiros 60 dias' },
+                { label: 'Prazo da Campanha',       valor: '60 dias (início imediato após aprovação)' },
+                { label: 'Orçamento Estimado',      valor: 'R$ 4.000 – R$ 7.000 (inclui verba de mídia paga)' },
+                { label: 'Público-alvo',            valor: 'Donos de pequenas empresas (25–50 anos), SP e RJ, renda acima de R$ 5.000' },
+                { label: 'Canais Desejados',        valor: 'Instagram Ads, Facebook Ads, Google Search Ads, LinkedIn orgânico' },
+                { label: 'Referências',             valor: 'Campanhas da Conta Azul, Omie e Bling' },
+                { label: 'Entregáveis',             valor: 'Landing page, criativos (stories, feed, banner), copy dos anúncios, relatório mensal' },
+                { label: 'Possui Site?',            valor: 'Sim — mendestech.com.br (pode ser usado como base)' },
+                { label: 'Observações',             valor: 'Produto em fase beta. Queremos criar expectativa antes do lançamento com uma campanha de pré-cadastro.' },
+            ]
+        }
+    };
+
+    function abrirModal(tipo) {
+        const d = formularios[tipo];
+        if (!d) return;
+
+        document.getElementById('modalTitulo').textContent = d.titulo;
+
+        const fullFields = ['Descrição do Projeto', 'Observações', 'Entregáveis', 'Entregáveis Esperados'];
+
+        let html = `<div class="flex items-center gap-2 mb-4">
+            <span class="${d.badge} text-xs font-bold px-3 py-1 rounded-full">${d.status}</span>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">`;
+
+        d.campos.forEach(c => {
+            const full = fullFields.includes(c.label) ? 'md:col-span-2' : '';
+            html += `<div class="${full} bg-[#F4F3EE] rounded-xl p-4 border border-[#6B462C]/10">
+                <p class="text-[10px] font-bold text-[#8d6945] uppercase tracking-widest mb-1">${c.label}</p>
+                <p class="text-[#4d392a] text-sm leading-relaxed">${c.valor}</p>
+            </div>`;
+        });
+
+        html += `</div>`;
+        document.getElementById('modalCorpo').innerHTML = html;
+
+        const overlay = document.getElementById('modalOverlay');
+        overlay.classList.remove('hidden');
+        overlay.classList.add('flex');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function fecharModal() {
+        const overlay = document.getElementById('modalOverlay');
+        overlay.classList.add('hidden');
+        overlay.classList.remove('flex');
+        document.body.style.overflow = '';
+    }
+
+    function fecharModalFora(e) {
+        if (e.target === document.getElementById('modalOverlay')) fecharModal();
+    }
+
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') fecharModal(); });
+
+    function filtrar(status) {
+        document.querySelectorAll('.filtro-btn').forEach(b => {
+            b.classList.remove('bg-[#E3DBCE]', 'text-[#6B462C]', 'border-[#6B462C]/30');
+            b.classList.add('text-[#8d6945]', 'border-[#6B462C]/20');
+        });
+        const btn = document.getElementById('btn-' + status);
+        btn.classList.add('bg-[#E3DBCE]', 'text-[#6B462C]', 'border-[#6B462C]/30');
+        btn.classList.remove('text-[#8d6945]', 'border-[#6B462C]/20');
+
+        document.querySelectorAll('.servico-card').forEach(card => {
+            card.style.display = (status === 'todos' || card.dataset.status === status) ? '' : 'none';
+        });
+    }
+</script>
+}
