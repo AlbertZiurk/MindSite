@@ -81,6 +81,7 @@ MindSite/
 ├── docker-compose.yml      # Orquestração
 ├── Program.cs              # Inicializador da aplicação, middlewares e injeção de dependências
 └── README.md               # Documentação principal do projeto
+```
 
 ## 👤 Equipe
 
