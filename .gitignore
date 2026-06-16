@@ -1,0 +1,46 @@
+## ─── .NET (C#) CONFIGURATIONS ───────────────────────────────────────
+# Ignorar pastas de compilação e artefatos gerados pelo dotnet compiler
+bin/
+obj/
+**/bin/
+**/obj/
+[Bb]in/
+[Oo]bj/
+
+# Arquivos gerados por testes e code coverage
+TestResults/
+*.jfm
+
+## ─── CONFIGURAÇÕES SENSÍVEIS (SECRETS) ────────────────────────────────
+# Proteção contra vazamento de chaves, tokens e strings de banco no GitHub
+appsettings.Test.json
+appsettings.Test.*.json
+*.secrets.json
+*.pem
+*.key
+docker-compose-test.yml
+
+## ─── DOCKER & WSL ENVIRONMENT ────────────────────────────────────────
+# Ignorar arquivos locais gerados pelo ciclo de vida de contêineres locais
+.env
+.wslconfig
+mysql_data/
+mysql_production_data/
+
+## ─── VISUAL STUDIO & VS CODE CONFIGURATIONS ────────────────────────────
+# Arquivos de preferências pessoais de editores (não devem subir para a equipe)
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+## ─── FRONTEND & BUILD ARTIFACTS (IF APPLICABLE) ────────────────────────
+# Se o projeto compilar pacotes npm ou CSS dinâmico via Tailwind CLI
+node_modules/
+.npm/
+dist/
+wwwroot/uploads/*
+!wwwroot/uploads/.gitkeep
+
+## BIN e OBJ]

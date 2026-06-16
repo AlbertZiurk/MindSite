@@ -1,0 +1,62 @@
+@model List<MindSite.Entities.SolicitacaoMudanca>
+@{
+    ViewData["Title"] = "Solicitações de Mudança";
+    Layout = "_LayoutAdmin";
+}
+
+<div class="container mx-auto px-6 py-8">
+    <div class="mb-6">
+        <h1 class="font-inria text-3xl font-bold" style="color:var(--text)">Solicitações de Mudança</h1>
+        <p class="text-sm mt-1" style="color:var(--text-muted)">Mudanças pendentes solicitadas pelos clientes</p>
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="ms-card p-16 text-center">
+            <svg class="w-16 h-16 mx-auto mb-4 opacity-30" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="color:var(--text-muted)" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            <p class="text-lg font-medium" style="color:var(--text-muted)">Nenhuma mudança pendente</p>
+        </div>
+    }
+    else
+    {
+        <div class="ms-card overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm ms-table">
+                    <thead>
+                        <tr>
+                            <th class="text-left hidden sm:table-cell">#</th>
+                            <th class="text-left">Serviço</th>
+                            <th class="text-left">Cliente</th>
+                            <th class="text-left hidden md:table-cell">Fornecedor</th>
+                            <th class="text-left">Descrição</th>
+                            <th class="text-left hidden sm:table-cell">Data</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var m in Model)
+                        {
+                            <tr>
+                                <td class="hidden sm:table-cell" style="color:var(--text-muted)">@m.Id</td>
+                                <td>
+                                    @if (m.Servico != null)
+                                    {
+                                        <span class="font-semibold" style="color:var(--text)">@m.Servico.Tipo</span>
+                                        <span class="badge badge-amber text-[9px] ml-1">@m.Servico.Status</span>
+                                    }
+                                </td>
+                                <td style="color:var(--text)">@(m.Servico?.Cliente?.NomeCompleto ?? "—")</td>
+                                <td class="hidden md:table-cell" style="color:var(--text)">@(m.Servico?.Fornecedor?.NomeCompleto ?? "Sem fornecedor")</td>
+                                <td class="max-w-xs">
+                                    <p class="truncate" style="color:var(--text-muted)" title="@m.Descricao">@m.Descricao</p>
+                                </td>
+                                <td class="hidden sm:table-cell" style="color:var(--text-muted)">@m.CriadaEm.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
+</div>

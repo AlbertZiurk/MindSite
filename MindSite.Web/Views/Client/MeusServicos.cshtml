@@ -1,0 +1,832 @@
+﻿@model List<MindSite.Entities.Servico>
+@{
+ViewData["Title"] = "Meus Projetos";
+Layout = "_LayoutClient";
+var tipoNome = new Dictionary<MindSite.Enums.TipoServico, string> {
+{ MindSite.Enums.TipoServico.Ecommerce, "E-commerce" },
+{ MindSite.Enums.TipoServico.Blog, "Blog" },
+{ MindSite.Enums.TipoServico.Designing, "Web Design" },
+{ MindSite.Enums.TipoServico.Marketing, "Marketing" },
+{ MindSite.Enums.TipoServico.SiteInstitucional, "Sites Institucionais" },
+{ MindSite.Enums.TipoServico.LandingPage, "Landing Pages" },
+{ MindSite.Enums.TipoServico.OnePage, "One-Page Sites" },
+{ MindSite.Enums.TipoServico.Portfolio, "Portfólios Digitais" },
+{ MindSite.Enums.TipoServico.BlogPortal, "Blogs e Portais" },
+{ MindSite.Enums.TipoServico.PlataformaEAD, "Plataformas EAD" },
+{ MindSite.Enums.TipoServico.LinkBio, "Links para Bio" },
+{ MindSite.Enums.TipoServico.SistemaWeb, "Sistemas Web" },
+{ MindSite.Enums.TipoServico.Agendamento, "Agendamento" },
+{ MindSite.Enums.TipoServico.MultiIdioma, "Multi-idiomas" },
+{ MindSite.Enums.TipoServico.Redesign, "Redesign" },
+{ MindSite.Enums.TipoServico.Manutencao, "Manutenção" },
+{ MindSite.Enums.TipoServico.SEO, "SEO & Performance" },
+{ MindSite.Enums.TipoServico.Migracao, "Migração" }
+};
+int currentUserId = (int)(ViewBag.UserId ?? 0);
+// Inject anti-forgery token for proposal choice forms
+}
+
+@* Modal concluir *@
+<div id="modalConcluir" class="modal-overlay hidden fixed inset-0 z-50 flex items-center justify-center"
+aria-modal="true" role="dialog">
+<div class="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
+<div class="modal-box relative ms-card p-8 w-full max-w-sm mx-4 z-10 text-center">
+<svg class="w-14 h-14 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+style="color:var(--brown)" aria-hidden="true">
+<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+</svg>
+<h3 class="font-inria text-2xl font-bold mb-2" style="color:var(--text)">Concluir Projeto</h3>
+<p class="text-sm mb-6" style="color:var(--text-muted)">Confirma que o projeto foi entregue e você está
+satisfeito?</p>
+<form id="formConcluir" asp-controller="Client" asp-action="ConcluirServico" method="post">
+@Html.AntiForgeryToken()
+<input type="hidden" id="hidConcluirId" name="id" />
+<div class="flex gap-3">
+<button type="button" onclick="closeModal('modalConcluir')" class="btn-ghost flex-1">Cancelar</button>
+<button type="submit" class="btn-primary flex-1">Confirmar</button>
+</div>
+</form>
+</div>
+</div>
+
+@* Modal solicitar mudança *@
+<div id="modalMudanca" class="modal-overlay hidden fixed inset-0 z-50 flex items-center justify-center"
+aria-modal="true" role="dialog">
+<div class="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
+<div class="modal-box relative ms-card p-8 w-full max-w-sm mx-4 z-10">
+<button onclick="closeModal('modalMudanca')" class="absolute top-4 right-4" style="color:var(--text-muted)"
+aria-label="Fechar">
+<svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+</svg>
+</button>
+<h3 class="font-inria text-2xl font-bold mb-4" style="color:var(--text)">Solicitar Mudança</h3>
+<form id="formMudanca" asp-controller="Client" asp-action="SolicitarMudanca" method="post"
+class="flex flex-col gap-4">
+@Html.AntiForgeryToken()
+<input type="hidden" id="hidMudancaId" name="servicoId" />
+<div>
+<label class="text-xs font-semibold uppercase tracking-wider mb-1 block"
+style="color:var(--text-muted)">Descreva o que precisa mudar</label>
+<textarea name="descricao" class="ms-textarea" rows="5" required
+placeholder="Detalhe a mudança desejada..."></textarea>
+</div>
+<div class="flex gap-3">
+<button type="button" onclick="closeModal('modalMudanca')" class="btn-ghost flex-1">Cancelar</button>
+<button type="submit" class="btn-secondary flex-1">Enviar</button>
+</div>
+</form>
+</div>
+</div>
+
+@* Modal escolher fornecedor *@
+<div id="modalEscolher" class="modal-overlay hidden fixed inset-0 z-50 flex items-center justify-center"
+aria-modal="true" role="dialog">
+<div class="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
+<div class="modal-box relative ms-card p-8 w-full max-w-sm mx-4 z-10 text-center">
+<svg class="w-14 h-14 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+style="color:var(--brown)" aria-hidden="true">
+<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+</svg>
+<h3 class="font-inria text-2xl font-bold mb-2" style="color:var(--text)">Confirmar Fornecedor</h3>
+<p class="text-sm mb-1" style="color:var(--text-muted)">Você está escolhendo:</p>
+<p id="escolherNome" class="font-semibold mb-1" style="color:var(--text)"></p>
+<p id="escolherValor" class="text-sm mb-6" style="color:var(--brown)"></p>
+<form id="formEscolher" asp-controller="Client" asp-action="EscolherFornecedor" method="post">
+<input type="hidden" id="hidEscolherServicoId" name="servicoId" />
+<input type="hidden" id="hidEscolherPropostaId" name="propostaId" />
+<div class="flex gap-3">
+<button type="button" onclick="closeModal('modalEscolher')" class="btn-ghost flex-1">Cancelar</button>
+<button type="submit" class="btn-primary flex-1">Confirmar</button>
+</div>
+</form>
+</div>
+</div>
+
+@* Modal cancelar projeto *@
+<div id="modalCancelar" class="modal-overlay hidden fixed inset-0 z-50 flex items-center justify-center"
+aria-modal="true" role="dialog">
+<div class="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
+<div class="modal-box relative ms-card p-8 w-full max-w-sm mx-4 z-10 text-center">
+<svg class="w-14 h-14 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="color:#ef4444"
+aria-hidden="true">
+<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+</svg>
+<h3 class="font-inria text-2xl font-bold mb-2" style="color:var(--text)">Cancelar Projeto</h3>
+<p id="avisoCancelar" class="text-sm mb-6" style="color:var(--text-muted)">Tem certeza que deseja cancelar este
+projeto? O fornecedor será notificado.</p>
+<form id="formCancelar" asp-controller="Client" asp-action="CancelarServico" method="post">
+@Html.AntiForgeryToken()
+<input type="hidden" id="hidCancelarId" name="id" />
+<div class="flex gap-3">
+<button type="button" onclick="closeModal('modalCancelar')" class="btn-ghost flex-1">Voltar</button>
+<button type="submit" class="btn-danger flex-1">Cancelar Projeto</button>
+</div>
+</form>
+</div>
+</div>
+
+@* Modal pagamento Stripe (versão antiga desativada)
+<div id="modalPix" class="modal-overlay hidden fixed inset-0 z-50 flex items-center justify-center" aria-modal="true"
+role="dialog">
+<div class="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
+<div class="modal-box relative ms-card p-8 w-full max-w-sm mx-4 z-10 text-center">
+<button onclick="closeModal('modalPix')" class="absolute top-4 right-4" style="color:var(--text-muted)"
+aria-label="Fechar">
+<svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+</svg>
+</button>
+<h3 class="font-inria text-2xl font-bold mb-2" style="color:var(--text)">Finalizar Pagamento</h3>
+<p id="pixValorTexto" class="text-sm mb-4 font-semibold" style="color:var(--brown)"></p>
+
+<form id="formConfirmarPix" asp-controller="Pagamento" asp-action="IniciarCheckout" method="post">
+@Html.AntiForgeryToken()
+<input type="hidden" id="pixServicoId" name="servicoId" />
+<input type="hidden" id="pixTipo" name="tipo" />
+
+<div class="rounded-xl p-4 mb-4 text-left text-sm" style="background:var(--bg2);color:var(--text)">
+<p class="font-semibold mb-2" style="color:var(--brown)">Selecione a forma de pagamento:</p>
+
+<div class="flex flex-col gap-2">
+<label class="flex items-center gap-2 cursor-pointer p-1">
+<input type="radio" name="metodoPagamento" value="pix" checked class="accent-amber-800" />
+<span>Pix (Aprovação imediata)</span>
+</label>
+<label class="flex items-center gap-2 cursor-pointer p-1">
+<input type="radio" name="metodoPagamento" value="card" class="accent-amber-800" />
+<span>Cartão de Crédito / Débito</span>
+</label>
+</div>
+</div>
+
+<button type="submit" class="btn-primary w-full">Ir para o Pagamento Seguro</button>
+</form>
+<p class="text-xs mt-3" style="color:var(--text-muted)">Você será redirecionado para o ambiente seguro do Stripe
+para concluir a transação.</p>
+</div>
+</div> *@
+
+@* Modal pagamento unificado (stripe + webhook) *@
+<div id="modalPix" class="modal-overlay hidden fixed inset-0 z-50 flex items-center justify-center" aria-modal="true" role="dialog">
+    <div class="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
+    <div class="modal-box relative ms-card p-8 w-full max-w-sm mx-4 z-10 text-center">
+        <button onclick="closeModal('modalPix')" class="absolute top-4 right-4" style="color:var(--text-muted)" aria-label="Fechar">
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+        <h3 class="font-inria text-2xl font-bold mb-2" style="color:var(--text)">Finalizar Pagamento</h3>
+        <p id="pixValorTexto" class="text-sm mb-4 font-semibold" style="color:var(--brown)"></p>
+        
+        <div class="rounded-xl p-4 mb-4 text-left text-sm" style="background:var(--bg2);color:var(--text)">
+            <p class="font-semibold mb-2" style="color:var(--brown)">Selecione a forma de pagamento:</p>
+            
+            <div class="flex flex-col gap-2">
+                @* <label class="flex items-center gap-2 cursor-pointer p-1">
+                    <input type="radio" name="metodoPagamento" value="pix" checked class="accent-amber-800" />
+                    <span>Pix (Aprovação imediata via Stripe)</span>
+                </label> *@
+                <label class="flex items-center gap-2 cursor-pointer p-1">
+                    <input type="radio" name="metodoPagamento" value="card" class="accent-amber-800" />
+                    <span>Cartão de Crédito / Débito</span>
+                </label>
+            </div>
+        </div>
+
+        <form asp-controller="Pagamento" asp-action="IniciarCheckout" method="post">
+            @Html.AntiForgeryToken()
+            <input type="hidden" id="pixServicoId" name="servicoId"/>
+            <input type="hidden" id="pixTipo" name="tipo"/>
+            <input type="hidden" id="metodoSelecionado" name="metodoPagamento" value="card" />
+
+            <button type="submit" class="btn-primary w-full">Pagar</button>
+        </form>
+        @* <p class="text-xs mt-3" style="color:var(--text-muted)">Você será redirecionado para o ambiente seguro do Stripe. O processamento local será feito via Docker-Compose CLI.</p> *@
+    </div>
+</div>
+
+@* MODAL AVALIAR (2 passos: fornecedor → plataforma) *@
+<div id="modalAvaliar" class="modal-overlay hidden fixed inset-0 z-50 flex items-center justify-center"
+aria-modal="true" role="dialog">
+<div class="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
+<div class="modal-box relative ms-card p-8 w-full max-w-sm mx-4 z-10">
+<button onclick="closeModal('modalAvaliar')" class="absolute top-4 right-4" style="color:var(--text-muted)"
+aria-label="Fechar">
+<svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+</svg>
+</button>
+<form asp-controller="Client" asp-action="AvaliarCompleto" method="post" class="flex flex-col gap-4">
+@Html.AntiForgeryToken()
+<input type="hidden" id="hidAvaliarId" name="ServicoId" />
+
+@* Passo 1: Fornecedor *@
+<div id="stepFornecedor">
+<div class="flex items-center gap-2 mb-1">
+<span class="text-xs font-bold uppercase tracking-widest px-2 py-0.5 rounded-full"
+style="background:var(--bg2);color:var(--brown)">1 / 2</span>
+</div>
+<h3 class="font-inria text-2xl font-bold mb-1" style="color:var(--text)">Avaliar Fornecedor</h3>
+<p class="text-sm mb-5" style="color:var(--text-muted)">Como foi a experiência com o fornecedor?</p>
+<div>
+<label class="text-xs font-semibold uppercase tracking-wider mb-2 block"
+style="color:var(--text-muted)">Estrelas</label>
+<div class="flex gap-2" id="starsFornecedor">
+@for (int i = 1; i <= 5; i++)
+{
+<button type="button" data-val="@i" class="star-forn text-3xl transition-colors"
+style="color:var(--text-muted)" onclick="selecionarEstrelaFornecedor(@i)">★</button>
+}
+</div>
+<input type="hidden" name="EstrelasFornecedor" id="hidEstrelasFornecedor" value="0" />
+</div>
+<div class="mt-3">
+<label class="text-xs font-semibold uppercase tracking-wider mb-1 block"
+style="color:var(--text-muted)">Comentário (opcional)</label>
+<textarea name="ComentarioFornecedor" class="ms-textarea" rows="3"
+placeholder="Descreva sua experiência..."></textarea>
+</div>
+<div class="flex gap-3 mt-4">
+<button type="button" onclick="closeModal('modalAvaliar')"
+class="btn-ghost flex-1">Cancelar</button>
+<button type="button" id="btnProximo" onclick="irParaSistema()" class="btn-primary flex-1"
+disabled>Próximo →</button>
+</div>
+</div>
+
+@* Passo 2: Plataforma *@
+<div id="stepSistema" class="hidden">
+<div class="flex items-center gap-2 mb-1">
+<span class="text-xs font-bold uppercase tracking-widest px-2 py-0.5 rounded-full"
+style="background:var(--bg2);color:var(--brown)">2 / 2</span>
+</div>
+<h3 class="font-inria text-2xl font-bold mb-1" style="color:var(--text)">Avaliar a Plataforma</h3>
+<p class="text-sm mb-5" style="color:var(--text-muted)">Como foi sua experiência com o MindSite?</p>
+<div>
+<label class="text-xs font-semibold uppercase tracking-wider mb-2 block"
+style="color:var(--text-muted)">Estrelas</label>
+<div class="flex gap-2" id="starsSistema">
+@for (int i = 1; i <= 5; i++)
+{
+<button type="button" data-val="@i" class="star-sist text-3xl transition-colors"
+style="color:var(--text-muted)" onclick="selecionarEstrelasSistema(@i)">★</button>
+}
+</div>
+<input type="hidden" name="EstrelasSistema" id="hidEstrelasSistema" value="0" />
+</div>
+<div class="mt-3">
+<label class="text-xs font-semibold uppercase tracking-wider mb-1 block"
+style="color:var(--text-muted)">Comentário (opcional)</label>
+<textarea name="ComentarioSistema" class="ms-textarea" rows="3"
+placeholder="Descreva sua experiência com a plataforma..."></textarea>
+</div>
+<div class="flex gap-3 mt-4">
+<button type="button" onclick="voltarParaFornecedor()" class="btn-ghost flex-1">← Voltar</button>
+<button type="submit" id="btnEnviarCompleto" class="btn-primary flex-1" disabled>Enviar
+Avaliações</button>
+</div>
+</div>
+</form>
+</div>
+</div>
+
+@* MODAL AVALIAR SÓ A PLATAFORMA (fornecedor já avaliado) *@
+<div id="modalAvaliarSistema" class="modal-overlay hidden fixed inset-0 z-50 flex items-center justify-center"
+aria-modal="true" role="dialog">
+<div class="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
+<div class="modal-box relative ms-card p-8 w-full max-w-sm mx-4 z-10">
+<button onclick="closeModal('modalAvaliarSistema')" class="absolute top-4 right-4"
+style="color:var(--text-muted)" aria-label="Fechar">
+<svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+</svg>
+</button>
+<h3 class="font-inria text-2xl font-bold mb-1" style="color:var(--text)">Avaliar a Plataforma</h3>
+<p class="text-sm mb-5" style="color:var(--text-muted)">Como foi sua experiência com o MindSite?</p>
+<form asp-controller="Client" asp-action="AvaliarSistema" method="post" class="flex flex-col gap-4">
+@Html.AntiForgeryToken()
+<input type="hidden" id="hidAvaliarSistemaId" name="ServicoId" />
+<div>
+<label class="text-xs font-semibold uppercase tracking-wider mb-2 block"
+style="color:var(--text-muted)">Estrelas</label>
+<div class="flex gap-2" id="starsOnlySistema">
+@for (int i = 1; i <= 5; i++)
+{
+<button type="button" data-val="@i" class="star-only-sist text-3xl transition-colors"
+style="color:var(--text-muted)" onclick="selecionarStarsOnlySistema(@i)">★</button>
+}
+</div>
+<input type="hidden" name="Estrelas" id="hidOnlyEstrelasSistema" value="0" />
+</div>
+<div>
+<label class="text-xs font-semibold uppercase tracking-wider mb-1 block"
+style="color:var(--text-muted)">Comentário (opcional)</label>
+<textarea name="Comentario" class="ms-textarea" rows="3"
+placeholder="Descreva sua experiência com a plataforma..."></textarea>
+</div>
+<div class="flex gap-3">
+<button type="button" onclick="closeModal('modalAvaliarSistema')"
+class="btn-ghost flex-1">Cancelar</button>
+<button type="submit" id="btnSubmitSistema" class="btn-primary flex-1" disabled>Enviar</button>
+</div>
+</form>
+</div>
+</div>
+
+<div class="container mx-auto px-6 py-10">
+<div class="flex items-center justify-between mb-8 flex-wrap gap-4">
+<div>
+<h1 class="font-inria text-4xl font-bold" style="color:var(--text)">Meus Projetos</h1>
+<p class="text-sm mt-1" style="color:var(--text-muted)">Gerencie todos os seus projetos digitais</p>
+</div>
+@if (Model.Any())
+{
+<a href="/Client/Index?form=true" class="btn-primary text-sm flex items-center gap-2">
+<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+</svg>
+Novo Projeto
+</a>
+}
+</div>
+
+@if (!Model.Any())
+{
+<div class="ms-card p-16 text-center">
+<svg class="w-16 h-16 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+style="color:var(--text-muted)" aria-hidden="true">
+<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+</svg>
+<p class="text-lg font-medium mb-2" style="color:var(--text-muted)">Você ainda não tem projetos</p>
+<p class="text-sm mb-6" style="color:var(--text-muted)">Solicite seu primeiro projeto e conecte-se a um dos
+nossos fornecedores.</p>
+<a href="/Client/Index?form=true" class="btn-primary mt-2 inline-block text-sm">Criar meu primeiro projeto</a>
+</div>
+}
+else
+{
+@* Filtro de status *@
+<div class="flex flex-wrap gap-2 mb-6" id="filtroTabs" role="tablist">
+@foreach (var f in new[] { ("todos", "Todos"), ("andamento", "Em andamento"), ("aguardando", "Aguardando"),
+("concluido", "Concluídos"), ("cancelado", "Cancelados") })
+{
+<button type="button" role="tab"
+class="filtro-tab px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all"
+data-filtro="@f.Item1" onclick="filtrar('@f.Item1')">
+@f.Item2
+</button>
+}
+</div>
+
+<div class="flex flex-col gap-4" id="listaServicos">
+@foreach (var s in Model)
+{
+var filtroGrupo = s.Status switch
+{
+ServicoStatus.Ativo or ServicoStatus.MudancaSolicitada => "andamento",
+ServicoStatus.Pendente or ServicoStatus.AguardandoPropostas
+or ServicoStatus.AguardandoEscolha or ServicoStatus.AguardandoPagamentoFinal => "aguardando",
+ServicoStatus.Concluido => "concluido",
+_ => "cancelado"
+};
+var (badgeClass, badgeLabel) = s.Status switch
+{
+ServicoStatus.Pendente => ("badge-amber", "Aguardando revisão"),
+ServicoStatus.AguardandoPropostas => ("badge-blue", "Buscando fornecedores"),
+ServicoStatus.AguardandoEscolha => ("badge-blue", "Escolha seu fornecedor"),
+ServicoStatus.Ativo => ("badge-green", "Em andamento"),
+ServicoStatus.MudancaSolicitada => ("badge-blue", "Mudança solicitada"),
+ServicoStatus.AguardandoPagamentoFinal => ("badge-amber", "Aguardando pgto. final"),
+ServicoStatus.Concluido => ("badge-green", "Concluído"),
+ServicoStatus.Cancelado => ("badge-red", "Cancelado"),
+_ => ("badge-red", "Recusado")
+};
+
+var statusMsg = s.Status switch
+{
+ServicoStatus.Pendente => "Aguardando revisão do admin",
+ServicoStatus.AguardandoPropostas => "Admin enviou para fornecedores — aguardando propostas",
+ServicoStatus.AguardandoEscolha => "Propostas recebidas! Escolha um fornecedor abaixo",
+ServicoStatus.Ativo when !s.PagamentoInicialFeito && s.PagamentoInicialEm.HasValue => "Pagamento confirmado — aguardando verificação pelo admin",
+ServicoStatus.Ativo when !s.PagamentoInicialFeito => "Fornecedor selecionado — realize o pagamento inicial para começar",
+ServicoStatus.Ativo => "✓ Projeto em andamento",
+ServicoStatus.MudancaSolicitada => "↺ Mudança solicitada — aguardando resposta do fornecedor",
+ServicoStatus.AguardandoPagamentoFinal => "Entrega confirmada — realize o pagamento final para concluir",
+ServicoStatus.Concluido => "✓ Projeto concluído com sucesso",
+ServicoStatus.Cancelado => "✗ Projeto cancelado",
+_ => "✗ Projeto recusado pelo fornecedor"
+};
+
+var statusColor = s.Status switch
+{
+ServicoStatus.Concluido => "color:#16a34a",
+ServicoStatus.Cancelado or ServicoStatus.Recusado => "color:#ef4444",
+ServicoStatus.AguardandoEscolha => "color:var(--brown)",
+_ => "color:var(--text-muted)"
+};
+
+bool podeAcionar = (s.Status == ServicoStatus.Ativo || s.Status == ServicoStatus.MudancaSolicitada) &&
+s.PagamentoInicialFeito;
+bool podeCancelar = s.Status == ServicoStatus.Pendente || s.Status == ServicoStatus.AguardandoPropostas ||
+s.Status == ServicoStatus.Ativo || s.Status == ServicoStatus.MudancaSolicitada;
+
+<div class="ms-card p-6" data-filtro="@filtroGrupo">
+<div class="flex flex-wrap items-start justify-between gap-4">
+<div class="flex-1 min-w-0">
+<div class="flex items-center gap-3 flex-wrap mb-1">
+    <h3 class="font-bold text-lg" style="color:var(--text)">
+        @(string.IsNullOrEmpty(s.NomeProjeto) ? tipoNome[s.Tipo] : s.NomeProjeto)
+    </h3>
+    <span class="badge badge-amber text-[10px]">@tipoNome[s.Tipo]</span>
+    <span class="badge @badgeClass">@badgeLabel</span>
+</div>
+<p class="text-xs mt-1 font-medium" style="@statusColor">@statusMsg</p>
+<div class="flex flex-wrap gap-4 mt-2 text-xs" style="color:var(--text-muted)">
+    <span>Solicitado em @s.CriadoEm.ToLocalTime().ToString("dd/MM/yyyy")</span>
+    @if (s.Fornecedor != null)
+    {
+        <span>Fornecedor:
+            <strong>@s.Fornecedor.NomeCompleto</strong></span>
+        }
+        @if (s.Valor.HasValue)
+        {
+            <span>Valor: R$ @s.Valor.Value.ToString("N2")</span>
+        }
+        @if (s.DataEntrega.HasValue)
+        {
+            <span>Entrega prevista:
+                @s.DataEntrega.Value.ToString("dd/MM/yyyy")</span>
+            }
+        </div>
+        @if (s.Mudancas.Any(m => !m.Aceita && !m.Recusada))
+        {
+            <p class="text-xs mt-1" style="color:var(--text-muted)">@s.Mudancas.Count(m => !m.Aceita &&
+                                                                                                                                                                                                                                        !m.Recusada) mudança(s) pendente(s)</p>
+            }
+        </div>
+
+        <div class="flex gap-2 flex-wrap w-full sm:w-auto border-t sm:border-t-0 pt-3 sm:pt-0 mt-2 sm:mt-0"
+                style="border-color:var(--border)">
+            @if (s.FornecedorId.HasValue && s.PagamentoInicialFeito && s.Status != ServicoStatus.Cancelado)
+            {
+                <a asp-controller="Client" asp-action="Chat" asp-route-contatoId="@s.FornecedorId"
+                    class="btn-ghost text-xs px-3 py-1.5">Chat</a>
+            }
+            @* Botão pagamento inicial — só exibe se ainda não confirmou *@
+            @if (s.Status == ServicoStatus.Ativo && !s.PagamentoInicialFeito && !s.PagamentoInicialEm.HasValue
+    && s.Valor.HasValue)
+            {
+                var valorInicial = s.Valor.Value * 0.3m;
+                var valInicialJs = valorInicial.ToString("F2", System.Globalization.CultureInfo.InvariantCulture);
+                <button type="button" class="btn-primary text-xs px-3 py-1.5"
+                        onclick="abrirPix(@s.Id, @valInicialJs, 'inicial')">
+                    Pagamento Inicial (R$ @valorInicial.ToString("N2"))
+                </button>
+            }
+            @if (s.Status == ServicoStatus.Ativo && !s.PagamentoInicialFeito && s.PagamentoInicialEm.HasValue)
+            {
+                <span class="text-xs font-semibold px-3 py-1.5 rounded-xl"
+                        style="background:rgba(22,163,74,.1);color:#16a34a">
+                    Pagamento enviado — aguardando admin
+                </span>
+            }
+            @* Botão pagamento final — só exibe se ainda não confirmou *@
+            @if (s.Status == ServicoStatus.AguardandoPagamentoFinal && !s.PagamentoFinalFeito &&
+    !s.PagamentoFinalEm.HasValue && s.Valor.HasValue)
+            {
+                var valorFinal = s.Valor.Value * 0.7m;
+                var valFinalJs = valorFinal.ToString("F2", System.Globalization.CultureInfo.InvariantCulture);
+                <button type="button" class="btn-primary text-xs px-3 py-1.5"
+                        onclick="abrirPix(@s.Id, @valFinalJs, 'final')">
+                    Pagamento Final (R$ @valorFinal.ToString("N2"))
+                </button>
+            }
+            @if (s.Status == ServicoStatus.AguardandoPagamentoFinal && !s.PagamentoFinalFeito &&
+    s.PagamentoFinalEm.HasValue)
+            {
+                <span class="text-xs font-semibold px-3 py-1.5 rounded-xl"
+                        style="background:rgba(22,163,74,.1);color:#16a34a">
+                    Pagamento enviado — aguardando admin
+                </span>
+            }
+            @if (podeAcionar)
+            {
+                <button onclick="abrirConcluir(@s.Id)" class="btn-primary text-xs px-3 py-1.5">Concluir</button>
+                <button onclick="abrirMudanca(@s.Id)" class="btn-secondary text-xs px-3 py-1.5">Solicitar
+                    Mudança</button>
+                }
+                @if (podeCancelar)
+                {
+                    <button onclick="abrirCancelar(@s.Id, @(s.PagamentoInicialFeito ? "true" : "false"))"
+                            class="btn-danger text-xs px-3 py-1.5">Cancelar</button>
+                }
+            </div>
+        </div>
+
+        @if (!string.IsNullOrEmpty(s.Observacoes))
+        {
+            <div class="mt-4 p-3 rounded-xl text-sm" style="background:var(--bg2);color:var(--text-muted)">
+                <strong style="color:var(--text)">Observações do fornecedor:</strong> @s.Observacoes
+            </div>
+        }
+
+        @* PROPOSTAS (AguardandoEscolha) *@
+        @if (s.Status == ServicoStatus.AguardandoEscolha && s.Propostas.Any(p => p.FechadaPeloAdmin))
+        {
+            <div class="mt-4 pt-4" style="border-top:1px solid var(--border)">
+                <p class="text-sm font-semibold mb-3" style="color:var(--text)">Propostas recebidas — escolha um
+                    fornecedor:</p>
+                    <div class="flex flex-col gap-3">
+                        @foreach (var p in s.Propostas.Where(p => p.FechadaPeloAdmin).OrderBy(p => p.Valor))
+                        {
+                            <div class="rounded-xl p-4 flex flex-wrap items-start justify-between gap-3"
+                                    style="background:var(--bg2)">
+                                <div class="flex-1">
+                                    <p class="font-semibold text-sm" style="color:var(--text)">@p.Fornecedor?.NomeCompleto</p>
+                                    <p class="text-xs mt-0.5" style="color:var(--text-muted)">
+                                        Valor: <strong style="color:var(--brown)">R$ @p.Valor.ToString("N2")</strong>
+                                        &nbsp;·&nbsp;Entrega: @p.DataEntrega.ToString("dd/MM/yyyy")
+                                    </p>
+                                    @if (!string.IsNullOrEmpty(p.Mensagem))
+                                    {
+                                        <p class="text-xs mt-1 italic" style="color:var(--text-muted)">"@p.Mensagem"</p>
+                                    }
+                                </div>
+                                <button type="button" class="btn-primary text-xs px-4 py-2 self-center"
+                                        onclick="abrirEscolher(@s.Id, @p.Id, '@Html.Raw((p.Fornecedor?.NomeCompleto ?? "Fornecedor").Replace("'","\\'"))', 'R$ @p.Valor.ToString("N2")')">
+                                    Escolher
+                                </button>
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+
+            @* Modal de pagamento simulado local *@
+<div id="modalPixSimulado" class="modal-overlay hidden fixed inset-0 z-50 flex items-center justify-center" aria-modal="true" role="dialog">
+    <div class="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
+    <div class="modal-box relative ms-card p-8 w-full max-w-md mx-4 z-10 text-center">
+        <button onclick="closeModal('modalPixSimulado')" class="absolute top-4 right-4" style="color:var(--text-muted)" aria-label="Fechar">
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+        
+        <h3 class="font-inria text-2xl font-bold mb-2" style="color:var(--text)">Ambiente de Testes</h3>
+        <p class="text-xs mb-6" style="color:var(--text-muted)">Simulação de pagamento via PIX para o ambiente de desenvolvimento.</p>
+        
+        <div class="bg-white p-4 rounded-xl inline-block mb-4 shadow-inner border border-gray-200">
+            <svg class="w-40 h-40 mx-auto text-slate-800" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M3 3h6v6H3V3zm2 2v2h2V5H5zm8-2h6v6h-6V3zm2 2v2h2V5h-2M3 13h6v6H3v-6zm2 2v2h2v-2H5zm13-2h3v2h-3v-2zm-2 2h2v2h-2v-2zm2 2h3v3h-3v-3zm-2 2h2v1h-2v-1zm-2-4h2v2h-2v-2zm4-4h1v2h-1V11zm-1 1h-1v1h1v-1zm-3-1h2v1h-2v-1zm-1 5h1v2h-1v-2zm2 2h1v1h-1v-1zm-1-6h1v1h-1v-1zm5-2h1v1h-1v-1zm-2 2h1v1h-1v-1zm-1-3h1v1h-1V5zm4 4h1v1h-1V9zm-8 2h1v1h-1v-1zm1 1h1v1h-1v-1zm-2 2h1v1h-1v-1zm1 4h1v1h-1v-1zm3 2h1v1h-1v-1zm-5-4h1v1h-1v-1zm2-2h1v1h-1v-1zm-3 2h1v1h-1v-1zm5 2h1v1h-1v-1z"/>
+            </svg>
+        </div>
+        
+        <div class="bg-amber-500/10 border border-amber-500/30 text-amber-600 rounded-xl p-3 text-xs mb-6 text-left">
+            Ao clicar no botão abaixo, o sistema entenderá que o PIX foi pago e enviará o pedido para a fila de aprovação do Administrador.
+        </div>
+
+    </div>
+</div>
+
+            @* AVALIAÇÃO (Concluido) *@
+            @if (s.Status == ServicoStatus.Concluido)
+            {
+                bool avFornecedor = s.Avaliacao != null;
+                bool avSistema = s.AvaliacoesSistema.Any(a => a.UsuarioId == currentUserId);
+                var avSistObj = s.AvaliacoesSistema.FirstOrDefault(a => a.UsuarioId == currentUserId);
+
+                <div class="mt-4 pt-4 flex flex-wrap gap-2 items-start" style="border-top:1px solid var(--border)">
+                    @* Botões de ação *@
+                    @if (!avFornecedor)
+                    {
+                        <button type="button" class="btn-primary text-xs px-4 py-2" onclick="abrirAvaliar(@s.Id, false)">
+                            ★ Avaliar Fornecedor e Plataforma
+                        </button>
+                    }
+                    else if (!avSistema)
+                    {
+                        <button type="button" class="btn-secondary text-xs px-4 py-2" onclick="abrirAvaliarSistema(@s.Id)">
+                            ★ Avaliar a Plataforma
+                        </button>
+                    }
+
+                    @* Avaliação do fornecedor (exibe se feita) *@
+                    @if (avFornecedor)
+                    {
+                        <div class="text-xs" style="color:var(--text-muted)">
+                            <span class="font-semibold" style="color:var(--text)">Fornecedor:</span>
+                            <strong style="color:var(--brown)">@(new string('★', s.Avaliacao!.Estrelas))@(new string('☆', 5 -
+                                                                                                                                                                                                                                                                                                        s.Avaliacao.Estrelas))</strong>
+                                @if (!string.IsNullOrEmpty(s.Avaliacao.Comentario))
+                                {
+                                    <span class="italic"> "@s.Avaliacao.Comentario"</span>
+                                }
+                            </div>
+                        }
+
+                        @* Avaliação da plataforma (exibe se feita) *@
+                        @if (avSistema && avSistObj != null)
+                        {
+                            <div class="text-xs" style="color:var(--text-muted)">
+                                <span class="font-semibold" style="color:var(--text)">Plataforma:</span>
+                                <strong style="color:var(--brown)">@(new string('★', avSistObj.Estrelas))@(new string('☆', 5 -
+                                                                                                                                                                                                                                                                                                                        avSistObj.Estrelas))</strong>
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    }
+</div>
+}
+
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script>
+        // Sincroniza a escolha do rádio com o input oculto que vai para a Controller
+        document.addEventListener('change', function(e) {
+            if (e.target && e.target.name === 'metodoPagamento') {
+                const inputMetodoOculto = document.getElementById('metodoSelecionado');
+                if (inputMetodoOculto) {
+                    inputMetodoOculto.value = e.target.value;
+                }
+            }
+        });
+
+        // Abre o modal de pagamento configurando os IDs e o valor
+        function abrirPix(servicoId, valor, tipo) {
+            document.getElementById('pixServicoId').value = servicoId;
+            document.getElementById('pixTipo').value = tipo;
+
+            const label = tipo === 'inicial' ? 'Pagamento Inicial (30%)' : 'Pagamento Final (70%)';
+            const valorFormatado = Number(valor).toLocaleString('pt-BR', {
+                style: 'currency',
+                currency: 'BRL'
+            });
+
+            const txtElement = document.getElementById('pixValorTexto');
+            if (txtElement) {
+                txtElement.textContent = `${label} — ${valorFormatado}`;
+            }
+
+            // Define o método padrão como 'pix' no input oculto
+            const inputMetodoOculto = document.getElementById('metodoSelecionado');
+            if (inputMetodoOculto) {
+                inputMetodoOculto.value = 'pix';
+            }
+
+            // Força o rádio a marcar Pix por padrão ao abrir
+            const radioPadrao = document.querySelector('input[name="metodoPagamento"][value="pix"]');
+            if (radioPadrao) radioPadrao.checked = true;
+
+            openModal('modalPix');
+        }
+
+        // Abre o modal de quitação final direcionando para a mesma estrutura do Stripe
+        function abrirConcluir(id, valorContrato) {
+            abrirPix(id, valorContrato, 'final');
+            const txtElement = document.getElementById('pixValorTexto');
+            if (txtElement) {
+                txtElement.textContent = "Quitação Final do Projeto (70% do contrato + adicionais)";
+            }
+        }
+
+        // Outras funções do seu sistema (manutenção)
+
+        function abrirMudanca(id) {
+            document.getElementById('hidMudancaId').value = id;
+            if (typeof MsVal !== 'undefined' && MsVal.limpar) {
+                MsVal.limpar(document.getElementById('formMudanca'));
+            }
+            document.querySelector('#formMudanca textarea').value = '';
+            openModal('modalMudanca');
+        }
+
+        document.getElementById('formMudanca')?.addEventListener('submit', function (e) {
+            if (typeof MsVal !== 'undefined' && MsVal.form && !MsVal.form(this)) {
+                e.preventDefault();
+            }
+        });
+
+        function abrirCancelar(id, pagamentoFeito) {
+            document.getElementById('hidCancelarId').value = id;
+            const aviso = document.getElementById('avisoCancelar');
+            if (pagamentoFeito) {
+                aviso.innerHTML = '<strong>Atenção:</strong> o pagamento inicial já foi realizado.<br>Multa por cancelamento:<br>• Até 3 dias: 10% de multa<br>• 4–15 dias: 25% de multa<br>• 16–30 dias: 50% de multa<br>• Após 30 dias: sem reembolso';
+                aviso.style.color = '#ef4444';
+            } else {
+                aviso.innerHTML = 'Tem certeza que deseja cancelar este projeto? O fornecedor será notificado.';
+                aviso.style.color = 'var(--text-muted)';
+            }
+            openModal('modalCancelar');
+        }
+
+        function abrirEscolher(servicoId, propostaId, nome, valor) {
+            document.getElementById('hidEscolherServicoId').value = servicoId;
+            document.getElementById('hidEscolherPropostaId').value = propostaId;
+            document.getElementById('escolherNome').textContent = nome;
+            document.getElementById('escolherValor').textContent = valor;
+            openModal('modalEscolher');
+        }
+
+        (function () {
+            const tabs = document.querySelectorAll('.filtro-tab');
+            const cards = document.querySelectorAll('#listaServicos [data-filtro]');
+            const active = 'background:var(--brown);color:#fff;';
+            const idle = 'background:var(--surface);color:var(--text)';
+
+            function filtrar(grupo) {
+                tabs.forEach(t => t.style.cssText = t.dataset.filtro === group ? active : idle);
+                cards.forEach(c => {
+                    c.style.display = (grupo === 'todos' || c.dataset.filtro === grupo) ? '' : 'none';
+                });
+
+                const lista = document.getElementById('listaServicos');
+                if (!lista) return;
+
+                const visivel = [...cards].some(c => c.style.display !== 'none');
+                let sem = document.getElementById('semResultados');
+                if (!visivel) {
+                    if (!sem) {
+                        sem = document.createElement('p');
+                        sem.id = 'semResultados';
+                        sem.className = 'text-center py-10 text-sm';
+                        sem.style.color = 'var(--text-muted)';
+                        sem.textContent = 'Nenhum projeto nesta categoria.';
+                        lista.appendChild(sem);
+                    }
+                } else {
+                    if (sem) sem.remove();
+                }
+            }
+            window.filtrar = filtrar;
+            filtrar('todos');
+        })();
+
+        async function enviarMudancaChat() {
+            const form = document.getElementById('formMudancaChat');
+            if (!form) return;
+            
+            const formData = new FormData(form);
+            const response = await fetch('/Client/SolicitarMudanca', {
+                method: 'POST',
+                body: formData
+            });
+
+            if (response.ok) {
+                closeModal('modalMudancaChat');
+                window.location.reload();
+            } else {
+                const erroDiv = document.getElementById('erroMudancaChat');
+                if (erroDiv) {
+                    erroDiv.textContent = "Erro ao enviar a solicitação de mudança.";
+                    erroDiv.classList.remove('hidden');
+                }
+            }
+        }
+
+        function abrirAvaliar(id) {
+            document.getElementById('hidAvaliarId').value = id;
+            document.getElementById('hidEstrelasFornecedor').value = '0';
+            document.getElementById('btnProximo').disabled = true;
+            document.querySelectorAll('.star-forn').forEach(b => b.style.color = 'var(--text-muted)');
+            
+            document.getElementById('hidEstrelasSistema').value = '0';
+            document.getElementById('btnEnviarCompleto').disabled = true;
+            document.querySelectorAll('.star-sist').forEach(b => b.style.color = 'var(--text-muted)');
+            
+            document.getElementById('stepFornecedor').classList.remove('hidden');
+            document.getElementById('stepSistema').classList.add('hidden');
+            openModal('modalAvaliar');
+        }
+
+        function selecionarEstrelaFornecedor(val) {
+            document.getElementById('hidEstrelasFornecedor').value = val;
+            document.getElementById('btnProximo').disabled = false;
+            document.querySelectorAll('.star-forn').forEach(b => {
+                b.style.color = parseInt(b.dataset.val) <= val ? 'var(--brown)' : 'var(--text-muted)';
+            });
+        }
+
+        function selecionarEstrelasSistema(val) {
+            document.getElementById('hidEstrelasSistema').value = val;
+            document.getElementById('btnEnviarCompleto').disabled = false;
+            document.querySelectorAll('.star-sist').forEach(b => {
+                b.style.color = parseInt(b.dataset.val) <= val ? 'var(--brown)' : 'var(--text-muted)';
+            });
+        }
+
+        function irParaSistema() {
+            document.getElementById('stepFornecedor').classList.add('hidden');
+            document.getElementById('stepSistema').classList.remove('hidden');
+        }
+
+        function voltarParaFornecedor() {
+            document.getElementById('stepSistema').classList.add('hidden');
+            document.getElementById('stepFornecedor').classList.remove('hidden');
+        }
+    </script>
+}

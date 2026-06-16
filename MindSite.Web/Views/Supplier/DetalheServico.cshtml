@@ -1,0 +1,277 @@
+﻿@model MindSite.Entities.Servico
+@{
+    ViewData["Title"] = "Detalhe do Serviço";
+    Layout = "_LayoutSupplier";
+}
+
+@* MODAL DE CONFIRMAÇÃO REUTILIZÁVEL (Substitui o confirm nativo) *@
+<div id="modalConfirmSupplier" class="modal-overlay hidden fixed inset-0 z-50 flex items-center justify-center" aria-modal="true" role="dialog">
+    <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" onclick="closeModal('modalConfirmSupplier')"></div>
+    <div class="modal-box relative ms-card p-6 w-full max-w-sm mx-4 z-10 text-center" style="background:var(--surface)">
+        <div class="w-12 h-12 rounded-full mx-auto mb-3 flex items-center justify-center text-xl font-bold shadow-inner" style="background:var(--error-bg); color:rgb(239,68,68)">
+            !
+        </div>
+        <h3 id="confirmTitle" class="font-inria text-xl font-bold mb-2" style="color:var(--text)">Confirmar Ação</h3>
+        <p id="confirmMessage" class="text-xs mb-6 leading-relaxed" style="color:var(--text-muted)">Tem certeza que deseja realizar esta operação?</p>
+        
+        <div class="flex gap-3">
+            <button onclick="closeModal('modalConfirmSupplier')" class="btn-ghost flex-1 py-2 text-xs">Cancelar</button>
+            <button id="btnConfirmarSubmit" class="bg-red-500 hover:bg-red-600 flex-1 py-2 text-xs font-bold text-white rounded-xl transition-colors">Confirmar</button>
+        </div>
+    </div>
+</div>
+
+@* Modal aceitar *@
+<div id="modalAceitar" class="modal-overlay hidden fixed inset-0 z-50 flex items-center justify-center" aria-modal="true" role="dialog">
+    <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" onclick="closeModal('modalAceitar')"></div>
+    <div class="modal-box relative ms-card p-8 w-full max-w-md mx-4 z-10">
+        <button onclick="closeModal('modalAceitar')" class="absolute top-4 right-4" style="color:var(--text-muted)" aria-label="Fechar">
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+        <h3 class="font-inria text-2xl font-bold mb-6" style="color:var(--text)">Proposta de Serviço</h3>
+        @{
+            var prazoTexto = Model.PrazoCliente switch {
+                MindSite.Enums.PrazoTipo.Meses1a3    => "1 a 3 meses",
+                MindSite.Enums.PrazoTipo.Ate6Meses   => "Até 6 meses",
+                MindSite.Enums.PrazoTipo.Ate1Ano     => "Até 1 ano",
+                MindSite.Enums.PrazoTipo.MaisDeUmAno => "Mais de 1 ano",
+                MindSite.Enums.PrazoTipo.NaoSei      => "A definir pelo fornecedor",
+                MindSite.Enums.PrazoTipo.DataEspecifica => Model.DataPrazoCliente.HasValue
+                    ? Model.DataPrazoCliente.Value.ToString("dd/MM/yyyy")
+                    : "Data específica",
+                _ => "Não informado"
+            };
+        }
+        @if (Model.PrazoCliente.HasValue)
+        {
+            <div class="rounded-xl px-4 py-3 mb-4 text-sm" style="background:var(--bg2); color:var(--text-muted)">
+                <span class="font-semibold" style="color:var(--brown)">Prazo do cliente:</span>
+                @prazoTexto
+                @if (Model.PrazoCliente == MindSite.Enums.PrazoTipo.NaoSei)
+                {
+                    <span class="ml-1 text-xs">(você deve definir a data abaixo)</span>
+                }
+            </div>
+        }
+        <form asp-controller="Supplier" asp-action="AceitarServico" method="post" class="flex flex-col gap-4">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="id" value="@Model.Id"/>
+            <div>
+                <label class="text-xs font-semibold uppercase tracking-wider mb-1 block" style="color:var(--text-muted)">Valor (R$)</label>
+                <input type="number" name="valor" step="0.01" min="0.01" class="ms-input" required placeholder="1500.00"/>
+            </div>
+            @if (Model.PrazoCliente == null || Model.PrazoCliente == MindSite.Enums.PrazoTipo.NaoSei)
+            {
+                <div>
+                    <label class="text-xs font-semibold uppercase tracking-wider mb-1 block" style="color:var(--text-muted)">
+                        Data de Entrega @(Model.PrazoCliente == MindSite.Enums.PrazoTipo.NaoSei ? "*" : "")
+                    </label>
+                    <input type="date" name="dataEntrega" class="ms-input"
+                           min="@DateTime.Today.AddDays(1).ToString("yyyy-MM-dd")"
+                           @(Model.PrazoCliente == MindSite.Enums.PrazoTipo.NaoSei ? "required" : "")/>
+                </div>
+            }
+            <div>
+                <label class="text-xs font-semibold uppercase tracking-wider mb-1 block" style="color:var(--text-muted)">Observações</label>
+                <textarea name="observacoes" class="ms-textarea" rows="3">@Model.Observacoes</textarea>
+            </div>
+            <div class="flex gap-3 mt-2">
+                <button type="button" onclick="closeModal('modalAceitar')" class="btn-ghost flex-1">Cancelar</button>
+                <button type="submit" class="btn-primary flex-1">Confirmar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="container mx-auto px-6 py-10 max-w-4xl">
+    <a asp-controller="Supplier" asp-action="Servicos" class="flex items-center gap-2 text-sm mb-6 hover:underline" style="color:var(--text-muted)">
+        ← Voltar para Serviços
+    </a>
+
+    <div class="ms-card p-8 mb-6">
+        <div class="flex flex-wrap items-start justify-between gap-4 mb-6">
+            <div>
+                <h1 class="font-inria text-4xl font-bold" style="color:var(--text)">@Model.Tipo.ToString()</h1>
+                <div class="flex items-center gap-3 mt-2 flex-wrap">
+                    @{
+                        var (badgeClass, label) = Model.Status switch {
+                            ServicoStatus.Ativo             => ("badge-green", "Ativo"),
+                            ServicoStatus.Pendente          => ("badge-amber", "Aguardando"),
+                            ServicoStatus.MudancaSolicitada => ("badge-blue",  "Mudança Solicitada"),
+                            ServicoStatus.Concluido         => ("badge-green", "Concluído"),
+                            _                               => ("badge-red",   Model.Status.ToString())
+                        };
+                    }
+                    <span class="badge @badgeClass">@label</span>
+                    @if (Model.Valor.HasValue) { <span class="badge badge-green">R$ @Model.Valor.Value.ToString("N2")</span> }
+                </div>
+            </div>
+            @if (Model.Status == ServicoStatus.Pendente && Model.FornecedorId == null)
+            {
+                <div class="flex gap-3">
+                    <button onclick="openModal('modalAceitar')" class="btn-primary">Aceitar</button>
+                    <form id="formRecusarServico" asp-controller="Supplier" asp-action="RecusarServico" method="post" class="inline">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="id" value="@Model.Id"/>
+                        <button type="button" class="btn-danger" 
+                                onclick="confirmarRecusarCustom('formRecusarServico', 'Recusar Serviço', 'Tem certeza que deseja recusar esta proposta de serviço de @(Model.Cliente?.NomeCompleto ?? "Cliente")?')">
+                            Recusar
+                        </button>
+                    </form>
+                </div>
+            }
+        </div>
+
+        @* Info *@
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+            <div class="p-4 rounded-xl" style="background:var(--bg2)">
+                <p class="text-xs font-bold uppercase tracking-wider mb-1" style="color:var(--text-muted)">Cliente</p>
+                <p class="font-semibold text-sm" style="color:var(--text)">@(Model.Cliente?.NomeCompleto ?? "—")</p>
+            </div>
+            <div class="p-4 rounded-xl" style="background:var(--bg2)">
+                <p class="text-xs font-bold uppercase tracking-wider mb-1" style="color:var(--text-muted)">Solicitado em</p>
+                <p class="font-semibold text-sm" style="color:var(--text)">@Model.CriadoEm.ToLocalTime().ToString("dd/MM/yyyy")</p>
+            </div>
+            @if (Model.DataEntrega.HasValue)
+            {
+                <div class="p-4 rounded-xl" style="background:var(--bg2)">
+                    <p class="text-xs font-bold uppercase tracking-wider mb-1" style="color:var(--text-muted)">Entrega</p>
+                    <p class="font-semibold text-sm" style="color:var(--text)">@Model.DataEntrega.Value.ToString("dd/MM/yyyy")</p>
+                </div>
+            }
+            @if (Model.PrazoCliente.HasValue)
+            {
+                <div class="p-4 rounded-xl" style="background:var(--bg2)">
+                    <p class="text-xs font-bold uppercase tracking-wider mb-1" style="color:var(--text-muted)">Prazo cliente</p>
+                    <p class="font-semibold text-sm" style="color:var(--text)">@prazoTexto</p>
+                </div>
+            }
+            <div class="p-4 rounded-xl" style="background:var(--bg2)">
+                <p class="text-xs font-bold uppercase tracking-wider mb-1" style="color:var(--text-muted)">Orçamento</p>
+                @if (Model.OrcamentoCliente.HasValue)
+                {
+                    <p class="font-semibold text-sm" style="color:var(--brown)">R$ @Model.OrcamentoCliente.Value.ToString("N2")</p>
+                }
+                else
+                {
+                    <p class="font-semibold text-sm" style="color:var(--text-muted)">A definir</p>
+                }
+            </div>
+        </div>
+
+        @* Requisitos (JSON) *@
+        @if (!string.IsNullOrEmpty(Model.Requisitos))
+        {
+            <div>
+                <h3 class="font-bold text-base mb-3" style="color:var(--text)">Requisitos do Cliente</h3>
+                <div class="p-5 rounded-xl text-sm space-y-2" style="background:var(--bg2)">
+                    @{
+                        try {
+                            var reqs = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string,string>>(Model.Requisitos);
+                            foreach (var kv in reqs ?? new()) {
+                                <div class="flex gap-2">
+                                    <span class="font-semibold capitalize" style="color:var(--brown)">@kv.Key:</span>
+                                    <span style="color:var(--text)">@kv.Value</span>
+                                </div>
+                            }
+                        } catch {
+                            <p style="color:var(--text)">@Model.Requisitos</p>
+                        }
+                    }
+                </div>
+            </div>
+        }
+
+        @* Observações *@
+        @if (!string.IsNullOrEmpty(Model.Observacoes))
+        {
+            <div class="mt-4">
+                <h3 class="font-bold text-base mb-2" style="color:var(--text)">Suas Observações</h3>
+                <p class="text-sm p-4 rounded-xl" style="background:var(--bg2);color:var(--text-muted)">@Model.Observacoes</p>
+            </div>
+        }
+
+        @* Botão Chat — só disponível após pagamento inicial confirmado *@
+        @if (Model.ClienteId > 0 && Model.PagamentoInicialFeito)
+        {
+            <div class="mt-6">
+                <a asp-controller="Supplier" asp-action="Chat" asp-route-contatoId="@Model.ClienteId"
+                   class="btn-secondary inline-flex items-center gap-2 text-sm px-5 py-3">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+                    Falar com o cliente
+                </a>
+            </div>
+        }
+
+    </div>
+
+    @* Solicitações de mudança *@
+    @if (Model.Mudancas.Any())
+    {
+        <div class="ms-card p-8">
+            <h2 class="font-inria text-2xl font-bold mb-6" style="color:var(--text)">Solicitações de Mudança</h2>
+            <div class="flex flex-col gap-4">
+                @foreach (var m in Model.Mudancas)
+                {
+                    <div class="p-5 rounded-xl border" style="border-color:var(--border);background:var(--bg2)">
+                        <div class="flex justify-between items-start gap-4 flex-wrap">
+                            <div class="flex-1">
+                                <p class="text-sm font-medium" style="color:var(--text)">@m.Descricao</p>
+                                <p class="text-xs mt-1" style="color:var(--text-muted)">@m.CriadaEm.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</p>
+                                @if (!string.IsNullOrEmpty(m.RespostaFornecedor))
+                                {
+                                    <p class="text-xs mt-2 italic" style="color:var(--text-muted)">Resposta: @m.RespostaFornecedor</p>
+                                }
+                            </div>
+                            @if (!m.Aceita && !m.Recusada)
+                            {
+                                <div class="flex gap-2">
+                                    <form asp-controller="Supplier" asp-action="ResponderMudanca" method="post" class="flex gap-2">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="mudancaId" value="@m.Id"/>
+                                        <input type="hidden" name="aceitar" value="true"/>
+                                        <button type="submit" class="btn-primary text-xs px-3 py-1.5">Aceitar</button>
+                                    </form>
+                                    <form asp-controller="Supplier" asp-action="ResponderMudanca" method="post" class="flex gap-2">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="mudancaId" value="@m.Id"/>
+                                        <input type="hidden" name="aceitar" value="false"/>
+                                        <button type="submit" class="btn-danger text-xs px-3 py-1.5">Recusar</button>
+                                    </form>
+                                </div>
+                            }
+                            else
+                            {
+                                <span class="badge @(m.Aceita ? "badge-green" : "badge-red")">@(m.Aceita ? "Aceita" : "Recusada")</span>
+                            }
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+</div>
+
+@section Scripts {
+<script>
+// Intercepta a intenção de recusa e exibe o modal customizado
+function confirmarRecusarCustom(formId, titulo, mensagem) {
+    document.getElementById('confirmTitle').textContent = titulo;
+    document.getElementById('confirmMessage').textContent = mensagem;
+    
+    const btnConfirmar = document.getElementById('btnConfirmarSubmit');
+    
+    // Evita acumular múltiplos event listeners clonando o botão principal
+    const novoBtn = btnConfirmar.cloneNode(true);
+    btnConfirmar.parentNode.replaceChild(novoBtn, btnConfirmar);
+    
+    // Vincula a ação de submissão ao formulário correto
+    novoBtn.addEventListener('click', () => {
+        const form = document.getElementById(formId);
+        if (form) form.submit();
+    });
+    
+    openModal('modalConfirmSupplier');
+}
+</script>
+}

@@ -1,0 +1,123 @@
+﻿@model MindSite.ViewModels.VirarFornecedorViewModel
+@{
+    ViewData["Title"] = "Virar Fornecedor";
+    Layout = "_LayoutClient";
+}
+
+@* Modal termo de autorização *@
+<div id="modalTermo" class="modal-overlay hidden fixed inset-0 z-50 flex items-center justify-center" aria-modal="true" role="dialog" aria-labelledby="tituloTermo">
+    <div class="absolute inset-0 bg-black/40 backdrop-blur-sm"></div>
+    <div class="modal-box relative ms-card p-8 w-full max-w-lg mx-4 z-10">
+        <button onclick="closeModal('modalTermo')" class="absolute top-4 right-4" style="color:var(--text-muted)" aria-label="Fechar">
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+        <h3 id="tituloTermo" class="font-inria text-2xl font-bold mb-4" style="color:var(--text)">Termo de Autorização!</h3>
+        <p class="text-sm leading-relaxed mb-4" style="color:var(--text-muted)">
+            Ao solicitar virar Fornecedor, você concorda que seus dados serão analisados pela equipe MindSite.
+            A aprovação pode levar até 3 dias úteis. Você será notificado na plataforma.
+        </p>
+        <div class="flex flex-col gap-3 mb-6">
+            <label class="flex items-center gap-2 cursor-pointer text-sm" style="color:var(--text)">
+                <input type="checkbox" id="check1" class="w-4 h-4 accent-[color:var(--brown)]"/>
+                Concordo com os <a asp-controller="Home" asp-action="Termos" target="_blank" class="underline" style="color:var(--brown)">Termos de Uso</a> e a <a asp-controller="Home" asp-action="Privacidade" target="_blank" class="underline" style="color:var(--brown)">Política de Privacidade</a> da plataforma MindSite.
+            </label>
+            <label class="flex items-center gap-2 cursor-pointer text-sm" style="color:var(--text)">
+                <input type="checkbox" id="check2" class="w-4 h-4 accent-[color:var(--brown)]"/>
+                Confirmo que as informações fornecidas são verdadeiras.
+            </label>
+        </div>
+        <button onclick="confirmarEnvio()" class="btn-primary w-full text-center">Aceitar e Enviar Pedido</button>
+    </div>
+</div>
+
+<div class="container mx-auto px-6 py-16 mt-8 max-w-5xl">
+    <div class="flex flex-col lg:flex-row gap-12 items-start">
+
+        @* Seção de apresentação dos benefícios de ser fornecedor *@
+        <div class="flex-[1.4] flex flex-col gap-8">
+            <div class="rounded-[30px] px-8 py-5 self-start shadow-sm" style="background:var(--bg2)">
+                <h2 class="font-inria text-4xl font-bold" style="color:var(--text)">Junte-se ao time</h2>
+            </div>
+            <div class="flex flex-col gap-4 text-base leading-relaxed max-w-xl" style="color:var(--text)">
+                <p>Quer oferecer seus serviços de web design para nossos clientes? Torne-se um Fornecedor MindSite e acesse projetos qualificados diretamente na plataforma.</p>
+                <p>Após o envio, nossa equipe analisará sua solicitação e você será notificado em breve.</p>
+            </div>
+            <div class="flex flex-col gap-3">
+                @foreach (var item in new[]{ "Acesso a clientes qualificados da plataforma", "Gestão de projetos e entregas centralizadas", "Pagamentos seguros e transparentes" })
+                {
+                    <div class="flex items-center gap-3">
+                        <span class="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0" style="background:var(--brown)">
+                            <svg class="h-3.5 w-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+                        </span>
+                        <span class="text-sm font-medium" style="color:var(--text)">@item</span>
+                    </div>
+                }
+            </div>
+        </div>
+
+        @* Formulário de dados profissionais para solicitação de fornecedor *@
+        <div class="flex-1">
+            <form id="formFornecedor" asp-controller="Account" asp-action="VirarFornecedor" method="post" class="ms-card p-8 flex flex-col gap-4">
+                @Html.AntiForgeryToken()
+                <h3 class="font-inria text-2xl font-bold mb-2" style="color:var(--text)">Seus dados profissionais</h3>
+
+                <div asp-validation-summary="ModelOnly" class="text-red-500 text-sm rounded-lg p-3" style="background:var(--error-bg)"></div>
+
+                <div>
+                    <label class="text-xs font-semibold uppercase tracking-wider mb-1 block" style="color:var(--text-muted)">LinkedIn *</label>
+                    <input asp-for="LinkedInUrl" type="url" class="ms-input" placeholder="https://linkedin.com/in/seu-perfil"/>
+                    <span asp-validation-for="LinkedInUrl" class="text-red-500 text-xs"></span>
+                </div>
+
+                <div>
+                    <label class="text-xs font-semibold uppercase tracking-wider mb-1 block" style="color:var(--text-muted)">WhatsApp *</label>
+                    <input asp-for="WhatsAppNumero" type="tel" class="ms-input" placeholder="(11) 99999-9999"
+                           data-mask="tel" maxlength="16"/>
+                    <span asp-validation-for="WhatsAppNumero" class="text-red-500 text-xs"></span>
+                </div>
+
+                <div>
+                    <label class="text-xs font-semibold uppercase tracking-wider mb-1 block" style="color:var(--text-muted)">CPF</label>
+                    <input asp-for="CPF" class="ms-input" placeholder="000.000.000-00" maxlength="14"
+                           data-mask="cpf"/>
+                </div>
+
+                <div class="ms-card p-6" style="background:var(--bg2)">
+                    <p class="text-xs font-bold uppercase tracking-wider mb-2" style="color:var(--text-muted)">Sobre você</p>
+                    <div class="w-full h-px mb-3" style="background: repeating-linear-gradient(90deg,var(--text-muted) 0,var(--text-muted) 6px,transparent 6px,transparent 12px)"></div>
+                    <textarea asp-for="SobreVoce" class="ms-textarea w-full" rows="5"
+                              placeholder="Conte um pouco sobre sua experiência, portfólio e especialidades..."></textarea>
+                </div>
+
+                <div class="flex gap-3 mt-2">
+                    <a asp-controller="Client" asp-action="Index" class="btn-ghost flex-1 text-center">Cancelar</a>
+                    <button type="button" onclick="openModal('modalTermo')" class="btn-secondary flex-1 text-center">Enviar pedido</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+// Valida os checkboxes do termo e envia o formulário de solicitação
+function confirmarEnvio() {
+    const c1 = document.getElementById('check1').checked;
+    const c2 = document.getElementById('check2').checked;
+    if (!c1 || !c2) {
+        const msg = document.getElementById('checkErro') || (() => {
+            const s = document.createElement('p'); s.id='checkErro';
+            s.className='field-error text-center mt-2';
+            document.getElementById('check2').closest('div.flex-col').after(s);
+            return s;
+        })();
+        msg.textContent = 'Marque todas as caixas para continuar.';
+        return;
+    }
+    const err = document.getElementById('checkErro');
+    if (err) err.remove();
+    closeModal('modalTermo');
+    document.getElementById('formFornecedor').submit();
+}
+</script>
+}

@@ -1,0 +1,90 @@
+@{
+    ViewData["Title"] = "Recuperar Senha";
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="pt-BR" class="scroll-smooth">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Recuperar Senha — MindSite</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inria+Serif:wght@400;700&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="~/css/site.css"/>
+    <script>tailwind.config={theme:{extend:{fontFamily:{inria:['"Inria Serif"','serif'],sans:['Poppins','sans-serif']}}}}</script>
+</head>
+<body class="min-h-screen flex items-center justify-center px-4" style="background:var(--bg)">
+
+<div class="w-full max-w-md">
+
+    <div class="text-center mb-8">
+        <a href="/" class="inline-flex items-center gap-1 text-3xl font-inria" style="color:var(--brown)">
+            Mind
+            <svg width="32" height="32" viewBox="0 0 36 36" fill="none" aria-hidden="true">
+                <circle cx="18" cy="18" r="15" stroke="currentColor" stroke-width="2.2" fill="none"/>
+                <ellipse cx="18" cy="18" rx="6" ry="15" stroke="currentColor" stroke-width="2.2" fill="none"/>
+                <line x1="3" y1="18" x2="33" y2="18" stroke="currentColor" stroke-width="2.2"/>
+                <line x1="6" y1="11" x2="30" y2="11" stroke="currentColor" stroke-width="1.4"/>
+                <line x1="6" y1="25" x2="30" y2="25" stroke="currentColor" stroke-width="1.4"/>
+            </svg>
+            Site
+        </a>
+        <p class="text-sm mt-1" style="color:var(--text-muted)">Recuperação de senha</p>
+    </div>
+
+    @* Cartão principal de recuperação de senha *@
+    <div class="ms-card p-8">
+
+        @if (TempData["Erro"] is string erro)
+        {
+            <div class="mb-5 rounded-xl px-4 py-3 text-sm font-medium" style="background:var(--badge-red-bg);color:var(--badge-red-fg)">
+                @erro
+            </div>
+        }
+
+        @if (TempData["Success"] is string ok)
+        {
+            <div class="mb-5 rounded-xl px-4 py-4 text-sm" style="background:var(--badge-green-bg);color:var(--badge-green-fg)">
+                <p class="font-bold mb-1">E-mail enviado!</p>
+                <p>@ok</p>
+                
+                @* O link só aparece aqui se o Resend falhar localmente (Ambiente de Desenvolvimento) *@
+                @if (TempData["ResetLink"] is string link)
+                {
+                    <div class="mt-4 pt-3 border-t border-black/10">
+                        <p class="text-xs font-semibold uppercase tracking-wider mb-1 opacity-75">Fallback de Desenvolvimento:</p>
+                        <a href="@link" class="block break-all font-mono text-xs p-2 rounded bg-black/5 underline">@link</a>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <h1 class="font-inria text-2xl font-bold mb-2" style="color:var(--text)">Esqueci minha senha</h1>
+            <p class="text-sm mb-6" style="color:var(--text-muted)">Informe seu e-mail cadastrado para receber o link de redefinição.</p>
+
+            @* Formulário para envio do link de recuperação *@
+            <form asp-controller="Account" asp-action="RecuperarSenha" method="post" class="flex flex-col gap-4">
+                @Html.AntiForgeryToken()
+                <div>
+                    <label class="text-xs font-semibold uppercase tracking-wider mb-1 block" style="color:var(--text-muted)">E-mail</label>
+                    <input type="email" name="email" required autocomplete="email" placeholder="seu@email.com"
+                           class="ms-input"/>
+                </div>
+                <button type="submit" class="btn-primary w-full py-3">
+                    Enviar link de redefinição
+                </button>
+            </form>
+        }
+
+        <div class="mt-6 text-center">
+            <a asp-controller="Account" asp-action="Login" class="text-sm hover:underline" style="color:var(--text-muted)">
+                ← Voltar para o login
+            </a>
+        </div>
+        
+    </div>
+</div>
+
+</body>
+</html>

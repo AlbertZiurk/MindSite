@@ -1,0 +1,463 @@
+﻿@model List<MindSite.Entities.Servico>
+@{
+    ViewData["Title"] = "Pedidos";
+    Layout = "_LayoutAdmin";
+
+    var tipoNome = new Dictionary<MindSite.Enums.TipoServico, string> {
+        { MindSite.Enums.TipoServico.Ecommerce,         "E-commerce" },
+        { MindSite.Enums.TipoServico.Blog,              "Blog" },
+        { MindSite.Enums.TipoServico.Designing,         "Web Design" },
+        { MindSite.Enums.TipoServico.Marketing,         "Marketing" },
+        { MindSite.Enums.TipoServico.SiteInstitucional, "Sites Institucionais" },
+        { MindSite.Enums.TipoServico.LandingPage,       "Landing Pages" },
+        { MindSite.Enums.TipoServico.OnePage,           "One-Page Sites" },
+        { MindSite.Enums.TipoServico.Portfolio,         "Portfólios Digitais" },
+        { MindSite.Enums.TipoServico.BlogPortal,        "Blogs e Portais" },
+        { MindSite.Enums.TipoServico.PlataformaEAD,     "Plataformas EAD" },
+        { MindSite.Enums.TipoServico.LinkBio,           "Links para Bio" },
+        { MindSite.Enums.TipoServico.SistemaWeb,        "Sistemas Web" },
+        { MindSite.Enums.TipoServico.Agendamento,       "Agendamento" },
+        { MindSite.Enums.TipoServico.MultiIdioma,       "Multi-idiomas" },
+        { MindSite.Enums.TipoServico.Redesign,          "Redesign" },
+        { MindSite.Enums.TipoServico.Manutencao,        "Manutenção" },
+        { MindSite.Enums.TipoServico.SEO,               "SEO & Performance" },
+        { MindSite.Enums.TipoServico.Migracao,          "Migração" }
+    };
+}
+
+
+@* MODAL DE CONFIRMAÇÃO REUTILIZÁVEL (Substitui o confirm nativo) *@
+<div id="modalConfirmAdmin" class="modal-overlay hidden fixed inset-0 z-50 flex items-center justify-center" aria-modal="true" role="dialog">
+    <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" onclick="closeModal('modalConfirmAdmin')"></div>
+    <div class="modal-box relative ms-card p-6 w-full max-w-sm mx-4 z-10 text-center" style="background:var(--surface)">
+        <div class="w-12 h-12 rounded-full mx-auto mb-3 flex items-center justify-center text-xl font-bold shadow-inner" style="background:var(--brown-bg); color:var(--brown)">
+            ?
+        </div>
+        <h3 id="confirmTitle" class="font-inria text-xl font-bold mb-2" style="color:var(--text)">Confirmar Ação</h3>
+        <p id="confirmMessage" class="text-xs mb-6 leading-relaxed" style="color:var(--text-muted)">Você tem certeza que deseja prosseguir com esta operação?</p>
+        
+        <div class="flex gap-3">
+            <button onclick="closeModal('modalConfirmAdmin')" class="btn-ghost flex-1 py-2 text-xs">Cancelar</button>
+            <button id="btnConfirmarSubmit" class="btn-primary flex-1 py-2 text-xs font-bold text-white">Confirmar</button>
+        </div>
+    </div>
+</div>
+
+@* MODAL VISUALIZAR MUDANÇA (admin) *@
+<div id="modalMudancaAdmin" class="modal-overlay hidden fixed inset-0 z-50 flex items-center justify-center" aria-modal="true" role="dialog">
+    <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" onclick="closeModal('modalMudancaAdmin')"></div>
+    <div class="modal-box relative ms-card p-8 w-full max-w-lg mx-4 z-10 overflow-y-auto" style="max-height:90vh">
+        <button onclick="closeModal('modalMudancaAdmin')" class="absolute top-4 right-4" style="color:var(--text-muted)" aria-label="Fechar">
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+        <h3 class="font-inria text-2xl font-bold mb-4" style="color:var(--text)">Mudança Solicitada</h3>
+        <div id="maDiff" class="flex flex-col gap-3 mb-5"></div>
+        <div class="border-t pt-5" style="border-color:var(--border)">
+            <p class="text-sm font-semibold mb-3" style="color:var(--text)">Processar Valor Adicional</p>
+            <form id="formAdicionarValor" asp-controller="Admin" asp-action="AdicionarValorMudanca" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" id="maHidMudancaId" name="mudancaId"/>
+                <input type="hidden" id="maValorHidden" name="valorAdicional" value=""/>
+                <div class="flex items-center gap-3">
+                    <input type="number" id="maValorInput" step="0.01" min="0.01" class="ms-input flex-1"
+                           placeholder="Valor adicional (R$)" oninput="toggleAdicionarBtn(this)"/>
+                    <button type="button" id="btnAdicionarValor" disabled onclick="submitComValor()"
+                            class="btn-primary px-4 py-2 text-sm">Adicionar</button>
+                </div>
+                <button type="button" onclick="submitSemValor()" class="btn-ghost w-full mt-3 text-sm">
+                    Sem Valor Adicional
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+@* Modal detalhes do serviço *@
+<div id="modalDetalhes" class="modal-overlay hidden fixed inset-0 z-50 flex items-center justify-center" aria-modal="true" role="dialog">
+    <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" onclick="closeModal('modalDetalhes')"></div>
+    <div class="modal-box relative ms-card p-8 w-full max-w-lg mx-4 z-10 overflow-y-auto" style="max-height:90vh">
+        <button onclick="closeModal('modalDetalhes')" class="absolute top-4 right-4" style="color:var(--text-muted)" aria-label="Fechar">
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+        <h3 class="font-inria text-2xl font-bold mb-4" style="color:var(--text)">Detalhes do Projeto</h3>
+        <div id="detConteudo" class="flex flex-col gap-3 text-sm" style="color:var(--text)"></div>
+        <button onclick="closeModal('modalDetalhes')" class="btn-ghost w-full mt-6">Fechar</button>
+    </div>
+</div>
+
+@* Form oculto: definir orçamento pelo admin *@
+<form id="formDefinirOrcamento" asp-controller="Admin" asp-action="DefinirOrcamento" method="post" class="hidden">
+    @Html.AntiForgeryToken()
+    <input type="hidden" id="hidOrcServicoId" name="id"/>
+    <input type="hidden" id="hidOrcValor"     name="orcamento"/>
+</form>
+
+@* Form oculto: enviar para fornecedores (taxa fixa 4%) *@
+<form id="formEnviar" asp-controller="Admin" asp-action="EnviarParaFornecedores" method="post" class="hidden">
+    @Html.AntiForgeryToken()
+    <input type="hidden" id="hidEnviarId"   name="id"/>
+    <input type="hidden" name="taxaPlataforma" value="4"/>
+</form>
+
+<div class="container mx-auto px-6 py-10">
+    <div class="mb-8">
+        <h1 class="font-inria text-4xl font-bold" style="color:var(--text)">Pedidos</h1>
+        <p class="text-sm mt-1" style="color:var(--text-muted)">Gerencie o fluxo de projetos em andamento</p>
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="ms-card p-16 text-center">
+            <svg class="w-16 h-16 mx-auto mb-4 opacity-30" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="color:var(--text-muted)">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+            </svg>
+            <p class="text-lg font-medium" style="color:var(--text-muted)">Nenhum pedido ativo no momento</p>
+        </div>
+    }
+    else
+    {
+        <div class="flex flex-col gap-6">
+            @foreach (var s in Model)
+            {
+                var (badgeClass, badgeLabel) = s.Status switch {
+                    ServicoStatus.Pendente               => ("badge-amber", "Aguardando revisão"),
+                    ServicoStatus.AguardandoPropostas    => ("badge-blue",  "Aguardando propostas"),
+                    ServicoStatus.AguardandoEscolha      => ("badge-blue",  "Cliente escolhendo"),
+                    ServicoStatus.Ativo                  => ("badge-green", "Em andamento"),
+                    ServicoStatus.MudancaSolicitada      => ("badge-blue",  "Mudança solicitada"),
+                    ServicoStatus.AguardandoPagamentoFinal => ("badge-amber","Aguardando pgto. final"),
+                    _                                    => ("badge-red",   s.Status.ToString())
+                };
+
+                <div class="ms-card p-6">
+                    <div class="flex flex-wrap items-start justify-between gap-4 mb-4">
+                        <div class="flex-1">
+                            <div class="flex items-center gap-3 flex-wrap mb-1">
+                                <h3 class="font-bold text-lg" style="color:var(--text)">
+                                    @(string.IsNullOrEmpty(s.NomeProjeto) ? tipoNome[s.Tipo] : s.NomeProjeto)
+                                </h3>
+                                <span class="badge badge-amber text-[10px]">@tipoNome[s.Tipo]</span>
+                                <span class="badge @badgeClass">@badgeLabel</span>
+                                @if (s.Status == ServicoStatus.Ativo && !s.PagamentoInicialFeito)
+                                {
+                                    @if (s.PagamentoInicialEm.HasValue)
+                                    {
+                                        <span class="badge badge-amber text-[10px]">Confirmar pagamento</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge badge-red text-[10px]">Aguardando pagamento</span>
+                                    }
+                                }
+                            </div>
+                            <div class="flex flex-wrap gap-4 mt-1 text-xs" style="color:var(--text-muted)">
+                                <span>Cliente: <strong>@(s.Cliente?.NomeCompleto ?? "—")</strong></span>
+                                <span>Solicitado em @s.CriadoEm.ToLocalTime().ToString("dd/MM/yyyy")</span>
+                                @if (s.TaxaPlataforma.HasValue) { <span>Taxa: @s.TaxaPlataforma.Value.ToString("N1")%</span> }
+                                @if (s.Valor.HasValue)
+                                {
+                                    var valorComTaxa = s.TaxaPlataforma.HasValue
+                                        ? s.Valor.Value * (1 + s.TaxaPlataforma.Value / 100)
+                                        : s.Valor.Value;
+                                    <span>Valor fornecedor: R$ @s.Valor.Value.ToString("N2") → Cliente: R$ @valorComTaxa.ToString("N2")</span>
+                                }
+                                @if (s.DataEntrega.HasValue) { <span>Entrega: @s.DataEntrega.Value.ToString("dd/MM/yyyy")</span> }
+                                @if (s.Fornecedor != null) { <span>Fornecedor: <strong>@s.Fornecedor.NomeCompleto</strong></span> }
+                            </div>
+                        </div>
+
+                        <div class="flex gap-2 flex-wrap w-full sm:w-auto border-t sm:border-t-0 pt-3 sm:pt-0 mt-2 sm:mt-0" style="border-color:var(--border)">
+                            @* Ver Detalhes *@
+                            <button data-id="@s.Id"
+                                    data-nome="@(s.NomeProjeto ?? tipoNome[s.Tipo])"
+                                    data-requisitos="@(s.Requisitos ?? "")"
+                                    data-observacoes="@(s.Observacoes ?? "")"
+                                    data-orcamento="@(s.OrcamentoCliente.HasValue ? s.OrcamentoCliente.Value.ToString("F2", System.Globalization.CultureInfo.InvariantCulture) : "")"
+                                    onclick="abrirDetalhesEl(this)"
+                                    class="btn-ghost text-xs px-3 py-1.5">Ver Detalhes</button>
+
+                            @* Chat com cliente *@
+                            <a asp-controller="Admin" asp-action="Chat" asp-route-contatoId="@s.ClienteId"
+                               class="btn-ghost text-xs px-3 py-1.5">Chat cliente</a>
+
+                            @if (s.Status == ServicoStatus.Pendente)
+                            {
+                                bool semOrcamento = !s.OrcamentoCliente.HasValue;
+                                <button onclick="abrirEnviar(@s.Id)"
+                                        class="btn-primary text-xs px-3 py-1.5 @(semOrcamento ? "opacity-40 cursor-not-allowed" : "")"
+                                        @(semOrcamento ? "disabled title=\"Defina o orçamento em 'Ver Detalhes' antes de enviar\"" : "")>
+                                    Enviar para fornecedores
+                                </button>
+                            }
+
+                            @if (s.Status == ServicoStatus.Ativo && s.PagamentoInicialEm.HasValue && !s.PagamentoInicialFeito)
+                            {
+                                <form id="formPgtoInicial-@s.Id" asp-controller="Admin" asp-action="ConfirmarPagamentoInicial" method="post" class="inline">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="id" value="@s.Id"/>
+                                    <button type="button" class="btn-primary text-xs px-3 py-1.5"
+                                            onclick="confirmarAcaoCustom('formPgtoInicial-@s.Id', 'Confirmar Recebimento', 'Deseja confirmar o recebimento do pagamento inicial deste serviço?')">
+                                        Confirmar Pagamento
+                                    </button>
+                                </form>
+                            }
+
+                            @if (s.Status == ServicoStatus.AguardandoPagamentoFinal && s.PagamentoFinalEm.HasValue && !s.PagamentoFinalFeito)
+                            {
+                                <form id="formPgtoFinal-@s.Id" asp-controller="Admin" asp-action="ConfirmarPagamentoFinal" method="post" class="inline">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="id" value="@s.Id"/>
+                                    <button type="button" class="btn-primary text-xs px-3 py-1.5"
+                                            onclick="confirmarAcaoCustom('formPgtoFinal-@s.Id', 'Confirmar Recebimento', 'Deseja confirmar o recebimento do pagamento final deste serviço?')">
+                                        Confirmar Pagamento
+                                    </button>
+                                </form>
+                            }
+                        </div>
+                    </div>
+
+                    @* Propostas recebidas *@
+                    @if (s.Propostas.Any())
+                    {
+                        <div class="mt-3 pt-3" style="border-top:1px solid var(--border)">
+                            <p class="text-xs font-semibold uppercase tracking-wider mb-2" style="color:var(--text-muted)">
+                                Propostas (@s.Propostas.Count/3)
+                            </p>
+                            <div class="flex flex-col gap-2">
+                                @foreach (var p in s.Propostas.OrderBy(p => p.Valor))
+                                {
+                                    var (pBadge, pLabel) = p.Status switch {
+                                        PropostaStatus.Aceita   => ("badge-green", "Aceita"),
+                                        PropostaStatus.Recusada => ("badge-red",   "Recusada"),
+                                        _                       => ("badge-amber",  "Pendente")
+                                    };
+                                    <div class="flex flex-wrap items-center gap-2 px-3 py-2 rounded-lg text-xs" style="background:var(--bg2)">
+                                        <span class="font-bold flex-1 min-w-0" style="color:var(--text)">@p.Fornecedor?.NomeCompleto</span>
+                                        <span class="flex-shrink-0" style="color:var(--text)">R$ @p.Valor.ToString("N2")</span>
+                                        <span class="flex-shrink-0 w-full sm:w-auto" style="color:var(--text-muted)">Entrega: @p.DataEntrega.ToString("dd/MM/yyyy")</span>
+                                        <span class="badge @pBadge text-[10px] flex-shrink-0">@pLabel</span>
+                                        @if (p.FechadaPeloAdmin)
+                                        {
+                                            <span class="badge badge-blue text-[10px] flex-shrink-0">Enviada ao cliente</span>
+                                        }
+                                        else if (s.Status == ServicoStatus.AguardandoPropostas || s.Status == ServicoStatus.AguardandoEscolha)
+                                        {
+                                            <form id="formFecharProp-@p.Id" asp-controller="Admin" asp-action="FecharPropostaUnica" method="post" class="inline flex-shrink-0">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="id" value="@p.Id"/>
+                                                <button type="button" class="btn-secondary text-[10px] px-2 py-1"
+                                                        onclick="confirmarAcaoCustom('formFecharProp-@p.Id', 'Fechar Proposta', 'Tem certeza que deseja fechar esta proposta e enviá-la para o cliente?')">
+                                                    Fechar proposta
+                                                </button>
+                                            </form>
+                                        }
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    }
+
+                    @* Mudanças aceitas aguardando processamento do admin *@
+                    @{
+                        var mudancasPendentes = s.Mudancas.Where(m => m.Aceita && m.ValorAdicional == null).ToList();
+                    }
+                    @if (mudancasPendentes.Any())
+                    {
+                        <div class="mt-3 pt-3" style="border-top:1px solid var(--border)">
+                            <p class="text-xs font-semibold uppercase tracking-wider mb-2" style="color:var(--brown)">
+                                Mudanças para processar (@mudancasPendentes.Count)
+                            </p>
+                            @foreach (var mud in mudancasPendentes)
+                            {
+                                <div class="msg-card msg-card-mudanca flex items-center justify-between gap-4">
+                                    <p class="text-xs" style="color:var(--text)">
+                                        Mudança aceita pelo fornecedor — aguardando valor adicional
+                                    </p>
+                                    <button data-mudanca-id="@mud.Id"
+                                            data-descricao="@(mud.Descricao ?? "[]")"
+                                            onclick="abrirMudancaAdminEl(this)"
+                                            class="btn-secondary text-xs px-3 py-1.5 flex-shrink-0">
+                                        Visualizar Mudança
+                                    </button>
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    }
+
+    @* Paginação *@
+    @{ int pedPage = ViewBag.Page ?? 1; int pedTotal = ViewBag.TotalPages ?? 1; }
+    @if (pedTotal > 1)
+    {
+        <div class="flex items-center justify-center gap-2 mt-6 flex-wrap">
+            @if (pedPage > 1)
+            {
+                <a asp-controller="Admin" asp-action="Pedidos" asp-route-page="@(pedPage - 1)"
+                   class="px-3 py-2 rounded-xl text-sm" style="background:var(--surface);color:var(--text)">← Anterior</a>
+            }
+            @for (int p = Math.Max(1, pedPage - 2); p <= Math.Min(pedTotal, pedPage + 2); p++)
+            {
+                <a asp-controller="Admin" asp-action="Pedidos" asp-route-page="@p"
+                   class="px-3 py-2 rounded-xl text-sm font-bold"
+                   style="@(p == pedPage ? "background:var(--brown);color:#fff;" : "background:var(--surface);color:var(--text)")">@p</a>
+            }
+            @if (pedPage < pedTotal)
+            {
+                <a asp-controller="Admin" asp-action="Pedidos" asp-route-page="@(pedPage + 1)"
+                   class="px-3 py-2 rounded-xl text-sm" style="background:var(--surface);color:var(--text)">Próxima →</a>
+            }
+        </div>
+    }
+</div>
+
+@section Scripts {
+<script>
+// Intercepta e gerencia os confirms através do modal customizado
+function confirmarAcaoCustom(formId, titulo, mensagem) {
+    document.getElementById('confirmTitle').textContent = titulo;
+    document.getElementById('confirmMessage').textContent = mensagem;
+    
+    const btnConfirmar = document.getElementById('btnConfirmarSubmit');
+    
+    // Clona e substitui o botão para limpar event listeners antigos acumulados
+    const novoBtn = btnConfirmar.cloneNode(true);
+    btnConfirmar.parentNode.replaceChild(novoBtn, btnConfirmar);
+    
+    novoBtn.addEventListener('click', () => {
+        const form = document.getElementById(formId);
+        if (form) form.submit();
+    });
+    
+    openModal('modalConfirmAdmin');
+}
+
+// Abre o modal confirm específico para o envio aos fornecedores
+function abrirEnviar(id) {
+    document.getElementById('hidEnviarId').value = id;
+    confirmarAcaoCustom('formEnviar', 'Enviar para Fornecedores', 'Deseja publicar e enviar este projeto para a rede de fornecedores cadastrados?');
+}
+
+// Abre o modal de mudança usando os dados do botão clicado
+function abrirMudancaAdminEl(btn) {
+    const mudancaId   = btn.dataset.mudancaId;
+    const descricao   = btn.dataset.descricao;
+    document.getElementById('maHidMudancaId').value = mudancaId;
+    document.getElementById('maValorInput').value   = '';
+    document.getElementById('maValorHidden').value  = '';
+    document.getElementById('btnAdicionarValor').disabled = true;
+    const el = document.getElementById('maDiff');
+    let campos = [];
+    try { campos = JSON.parse(descricao || '[]'); } catch(e) {}
+    let html = '';
+    if (Array.isArray(campos) && campos.length) {
+        campos.forEach(c => {
+            html += `<div class="rounded-xl p-3" style="background:var(--bg2);border:1px solid var(--border)">
+              <p class="text-xs font-bold uppercase tracking-wider mb-1" style="color:var(--text-muted)">${esc(c.campo || '')}</p>
+              ${c.de ? `<p class="text-xs line-through mb-0.5" style="color:var(--text-muted)">${esc(c.de)}</p>` : ''}
+              <p class="text-sm" style="color:var(--text)">${esc(c.para || '')}</p>
+            </div>`;
+        });
+    } else {
+        html = `<p class="text-sm" style="color:var(--text)">${esc(descricao)}</p>`;
+    }
+    el.innerHTML = html;
+    openModal('modalMudancaAdmin');
+}
+
+// Extrai os dados do botão e delega para abrirDetalhes
+function abrirDetalhesEl(btn) {
+    abrirDetalhes(btn.dataset.id, btn.dataset.nome, btn.dataset.requisitos, btn.dataset.observacoes, btn.dataset.orcamento);
+}
+
+// Monta e exibe o painel de detalhes do serviço, incluindo campo de orçamento se ausente
+function abrirDetalhes(servicoId, nome, requisitos, observacoes, orcamento) {
+    let html = `<div class="rounded-xl p-3" style="background:var(--bg2);border:1px solid var(--border)">
+        <p class="text-xs font-bold uppercase tracking-wider mb-1" style="color:var(--text-muted)">Projeto</p>
+        <p class="text-sm" style="color:var(--text)">${esc(nome)}</p>
+    </div>`;
+    if (requisitos) {
+        html += `<div class="rounded-xl p-3" style="background:var(--bg2);border:1px solid var(--border)">
+            <p class="text-xs font-bold uppercase tracking-wider mb-1" style="color:var(--text-muted)">Requisitos</p>
+            <pre class="text-sm whitespace-pre-wrap" style="color:var(--text);font-family:inherit">${esc(requisitos)}</pre>
+        </div>`;
+    }
+    if (orcamento) {
+        html += `<div class="rounded-xl p-3" style="background:var(--bg2);border:1px solid var(--border)">
+            <p class="text-xs font-bold uppercase tracking-wider mb-1" style="color:var(--text-muted)">Orçamento do Cliente</p>
+            <p class="text-sm font-semibold" style="color:var(--brown)">R$ ${parseFloat(orcamento).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})}</p>
+        </div>`;
+    } else {
+        html += `<div class="rounded-xl p-4 flex flex-col gap-3" style="background:var(--bg2);border:1px solid var(--border)">
+            <div>
+                <p class="text-xs font-bold uppercase tracking-wider mb-1" style="color:var(--text-muted)">Orçamento do Projeto</p>
+                <p class="text-xs" style="color:var(--text-muted)">O cliente não definiu um orçamento. Defina o valor abaixo:</p>
+            </div>
+            <div class="flex items-center gap-3">
+                <div class="relative flex-1 max-w-[180px]">
+                    <span class="absolute left-3 top-1/2 -translate-y-1/2 text-sm font-semibold select-none" style="color:var(--text-muted)">R$</span>
+                    <input type="number" id="detInputOrcamento" class="ms-input pl-10 w-full" min="1" step="0.01" placeholder="0,00"
+                           oninput="document.getElementById('btnSalvarOrc').disabled = !(parseFloat(this.value)>0)"/>
+                </div>
+                <button id="btnSalvarOrc" disabled onclick="salvarOrcamento(${servicoId})"
+                        class="btn-primary text-sm px-4 py-2" style="white-space:nowrap">Salvar</button>
+            </div>
+        </div>`;
+    }
+    if (observacoes) {
+        html += `<div class="rounded-xl p-3" style="background:var(--bg2);border:1px solid var(--border)">
+            <p class="text-xs font-bold uppercase tracking-wider mb-1" style="color:var(--text-muted)">Observações</p>
+            <p class="text-sm" style="color:var(--text)">${esc(observacoes)}</p>
+        </div>`;
+    }
+    document.getElementById('detConteudo').innerHTML = html;
+    openModal('modalDetalhes');
+}
+
+// Submete o formulário oculto para salvar o orçamento definido pelo admin
+function salvarOrcamento(id) {
+    const val = parseFloat(document.getElementById('detInputOrcamento').value);
+    if (isNaN(val) || val <= 0) return;
+    document.getElementById('hidOrcServicoId').value = id;
+    document.getElementById('hidOrcValor').value     = val;
+    document.getElementById('formDefinirOrcamento').submit();
+}
+
+// Habilita ou desabilita o botão de adicionar valor conforme o input
+function toggleAdicionarBtn(input) {
+    const v = parseFloat(input.value);
+    document.getElementById('btnAdicionarValor').disabled = isNaN(v) || v <= 0;
+}
+
+// Submete a mudança sem valor adicional
+function submitSemValor() {
+    document.getElementById('maValorHidden').value = '0';
+    document.getElementById('formAdicionarValor').submit();
+}
+
+// Submete a mudança com o valor adicional informado
+function submitComValor() {
+    const v = document.getElementById('maValorInput').value;
+    if (!v || parseFloat(v) <= 0) return;
+    document.getElementById('maValorHidden').value = v;
+    document.getElementById('formAdicionarValor').submit();
+}
+
+// Escapa caracteres especiais para exibição segura no HTML
+function esc(s) {
+    if (!s) return '';
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// Abre automaticamente o modal de mudança ao redirecionar de uma notificação
+const autoMudancaId = @Html.Raw(ViewBag.MudancaId?.ToString() ?? "null");
+if (autoMudancaId) {
+    document.addEventListener('DOMContentLoaded', () => {
+        const btn = document.querySelector(`[data-mudanca-id="${autoMudancaId}"]`);
+        if (btn) btn.click();
+    });
+}
+</script>
+}

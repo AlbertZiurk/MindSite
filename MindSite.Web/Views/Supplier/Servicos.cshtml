@@ -1,0 +1,539 @@
+﻿@model List<MindSite.Entities.Servico>
+@{
+    ViewData["Title"] = "Serviços";
+    Layout = "_LayoutSupplier";
+    string filtro = ViewBag.Filtro ?? "disponiveis";
+    int userId = (int)(ViewBag.UserId ?? 0);
+
+    var tipoNome = new Dictionary<MindSite.Enums.TipoServico, string> {
+        { MindSite.Enums.TipoServico.Ecommerce,         "E-commerce" },
+        { MindSite.Enums.TipoServico.Blog,              "Blog" },
+        { MindSite.Enums.TipoServico.Designing,         "Web Design" },
+        { MindSite.Enums.TipoServico.Marketing,         "Marketing" },
+        { MindSite.Enums.TipoServico.SiteInstitucional, "Sites Institucionais" },
+        { MindSite.Enums.TipoServico.LandingPage,       "Landing Pages" },
+        { MindSite.Enums.TipoServico.OnePage,           "One-Page Sites" },
+        { MindSite.Enums.TipoServico.Portfolio,         "Portfólios Digitais" },
+        { MindSite.Enums.TipoServico.BlogPortal,        "Blogs e Portais" },
+        { MindSite.Enums.TipoServico.PlataformaEAD,     "Plataformas EAD" },
+        { MindSite.Enums.TipoServico.LinkBio,           "Links para Bio" },
+        { MindSite.Enums.TipoServico.SistemaWeb,        "Sistemas Web" },
+        { MindSite.Enums.TipoServico.Agendamento,       "Agendamento" },
+        { MindSite.Enums.TipoServico.MultiIdioma,       "Multi-idiomas" },
+        { MindSite.Enums.TipoServico.Redesign,          "Redesign" },
+        { MindSite.Enums.TipoServico.Manutencao,        "Manutenção" },
+        { MindSite.Enums.TipoServico.SEO,               "SEO & Performance" },
+        { MindSite.Enums.TipoServico.Migracao,          "Migração" }
+    };
+}
+
+@* Modal contrato do fornecedor *@
+<div id="modalContratoFornecedor" class="modal-overlay hidden fixed inset-0 z-[60] flex items-center justify-center" aria-modal="true" role="dialog" aria-labelledby="contratoFornecedorTitulo">
+    <div class="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
+    <div class="modal-box relative ms-card w-full max-w-2xl mx-4 z-10 flex flex-col" style="max-height:90vh">
+        <div class="px-8 py-5 border-b flex items-center justify-between flex-shrink-0" style="border-color:var(--border);background:var(--bg2)">
+            <div>
+                <h3 id="contratoFornecedorTitulo" class="font-inria font-bold text-xl" style="color:var(--text)">Termo de Compromisso</h3>
+                <p class="text-xs mt-0.5" style="color:var(--text-muted)">Leia com atenção antes de prosseguir</p>
+            </div>
+            <svg class="w-7 h-7 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="color:var(--brown)" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+            </svg>
+        </div>
+
+        <div class="flex-1 overflow-y-auto px-8 py-6 text-sm leading-relaxed" style="color:var(--text)">
+            <p class="font-bold text-base mb-5" style="color:var(--brown)">CONTRATO FORNECEDOR</p>
+            <div class="flex flex-col gap-5">
+                <div>
+                    <p class="font-semibold mb-2" style="color:var(--text)">Responsabilidades</p>
+                    <ul class="flex flex-col gap-1 pl-1" style="color:var(--text-muted)">
+                        <li class="flex gap-2"><span>●</span><span>Cumprir prazos;</span></li>
+                        <li class="flex gap-2"><span>●</span><span>Entregar conforme escopo;</span></li>
+                        <li class="flex gap-2"><span>●</span><span>Manter comunicação profissional;</span></li>
+                        <li class="flex gap-2"><span>●</span><span>Respeitar direitos autorais;</span></li>
+                        <li class="flex gap-2"><span>●</span><span>Manter sigilo das informações.</span></li>
+                    </ul>
+                </div>
+                <div>
+                    <p class="font-semibold mb-2" style="color:var(--text)">Pagamento</p>
+                    <ul class="flex flex-col gap-1 pl-1" style="color:var(--text-muted)">
+                        <li class="flex gap-2"><span>●</span><span>Liberação parcial conforme política da plataforma;</span></li>
+                        <li class="flex gap-2"><span>●</span><span>Pagamento final após aprovação do cliente;</span></li>
+                        <li class="flex gap-2"><span>●</span><span>Taxas da plataforma poderão ser descontadas.</span></li>
+                    </ul>
+                </div>
+                <div>
+                    <p class="font-semibold mb-2" style="color:var(--text)">Não é permitido</p>
+                    <ul class="flex flex-col gap-1 pl-1" style="color:var(--text-muted)">
+                        <li class="flex gap-2"><span>●</span><span>Abandonar projetos;</span></li>
+                        <li class="flex gap-2"><span>●</span><span>Solicitar pagamentos externos;</span></li>
+                        <li class="flex gap-2"><span>●</span><span>Compartilhar dados confidenciais;</span></li>
+                        <li class="flex gap-2"><span>●</span><span>Utilizar materiais ilegais.</span></li>
+                    </ul>
+                </div>
+                <div>
+                    <p class="font-semibold mb-2" style="color:var(--text)">Cancelamento</p>
+                    <p class="mb-2" style="color:var(--text-muted)">O abandono injustificado poderá gerar:</p>
+                    <ul class="flex flex-col gap-1 pl-1" style="color:var(--text-muted)">
+                        <li class="flex gap-2"><span>●</span><span>bloqueio da conta;</span></li>
+                        <li class="flex gap-2"><span>●</span><span>perda de valores;</span></li>
+                        <li class="flex gap-2"><span>●</span><span>avaliações negativas;</span></li>
+                        <li class="flex gap-2"><span>●</span><span>responsabilização judicial.</span></li>
+                    </ul>
+                </div>
+                <div>
+                    <p class="font-semibold mb-2" style="color:var(--text)">Direitos do Projeto</p>
+                    <p style="color:var(--text-muted)">Os direitos autorais são transferidos ao cliente após pagamento integral.</p>
+                </div>
+                <div class="border-t pt-4" style="border-color:var(--border)">
+                    <p class="font-semibold mb-3" style="color:var(--text)">Assinatura de Consentimento</p>
+                    <div class="flex flex-col gap-3">
+                        <div>
+                            <label class="text-xs font-bold uppercase tracking-wider mb-1 block" style="color:var(--text-muted)">Nome</label>
+                            <input type="text" id="contratoFornecedorNome" class="ms-input" placeholder="Seu nome completo"
+                                   value="@(ViewBag.NomeCompleto ?? "")" maxlength="100"
+                                   oninput="filtrarNome(this);verificarCamposFornecedor()"/>
+                        </div>
+                        <div>
+                            <label class="text-xs font-bold uppercase tracking-wider mb-1 block" style="color:var(--text-muted)">CPF</label>
+                            <input type="text" id="contratoFornecedorCPF" class="ms-input" placeholder="000.000.000-00"
+                                   value="@(ViewBag.CPF ?? "")" inputmode="numeric" maxlength="14"
+                                   oninput="mascararCpfCnpj(this);verificarCamposFornecedor()"/>
+                        </div>
+                        <div>
+                            <label class="text-xs font-bold uppercase tracking-wider mb-1 block" style="color:var(--text-muted)">Data</label>
+                            <input type="date" id="contratoFornecedorData" class="ms-input" oninput="verificarCamposFornecedor()" readonly/>
+                        </div>
+                    </div>
+                    <label class="flex items-start gap-3 cursor-pointer pt-3 mt-1 border-t" style="border-color:var(--border)">
+                        <input type="checkbox" id="checkContratoFornecedor" class="w-5 h-5 mt-0.5 flex-shrink-0 accent-[color:var(--brown)]"
+                               onchange="verificarCamposFornecedor()"/>
+                        <span class="text-sm" style="color:var(--text)">Li e concordo com todos os termos do contrato acima e me comprometo a cumprir as obrigações descritas na prestação deste serviço.</span>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <div class="px-8 py-5 border-t flex-shrink-0" style="border-color:var(--border);background:var(--bg2)">
+            <div class="flex gap-3">
+                <button type="button" onclick="closeModal('modalContratoFornecedor')" class="btn-ghost flex-1">Cancelar</button>
+                <button type="button" id="btnAceitarContratoFornecedor" disabled
+                        onclick="confirmarContratoFornecedor()"
+                        class="btn-primary flex-1 disabled:opacity-40 disabled:cursor-not-allowed">
+                    Aceitar Contrato
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@* Modal submeter proposta *@
+<div id="modalProposta" class="modal-overlay hidden fixed inset-0 z-50 flex items-center justify-center" aria-modal="true" role="dialog">
+    <div class="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
+    <div class="modal-box relative ms-card p-8 w-full max-w-md mx-4 z-10">
+        <button onclick="closeModal('modalProposta')" class="absolute top-4 right-4" style="color:var(--text-muted)" aria-label="Fechar">
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+        <h3 class="font-inria text-2xl font-bold mb-1" style="color:var(--text)">Aceitar fazer</h3>
+        <p class="text-xs mb-5" style="color:var(--text-muted)">Ao confirmar, você se compromete a realizar este projeto pelo orçamento definido.</p>
+        <form id="formProposta" asp-controller="Supplier" asp-action="SubmeterProposta" method="post" class="flex flex-col gap-4">
+            @Html.AntiForgeryToken()
+            <input type="hidden" id="hidPropostaId" name="ServicoId"/>
+            <input type="hidden" id="propValor"     name="Valor" value="0"/>
+
+            @* Orçamento (somente leitura) *@
+            <div class="rounded-xl px-4 py-3" style="background:var(--bg2)">
+                <p class="text-xs font-bold uppercase tracking-wider mb-0.5" style="color:var(--text-muted)">Orçamento do projeto</p>
+                <p id="propOrcamentoVal" class="font-semibold text-base" style="color:var(--brown)">—</p>
+            </div>
+
+            @* Data de entrega — só visível quando o cliente não definiu prazo *@
+            <div id="propDataSection">
+                <label class="text-xs font-semibold uppercase tracking-wider mb-1 block" style="color:var(--text-muted)">Prazo de entrega *</label>
+                <div id="propDataWrap" class="relative">
+                    <span class="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" style="color:var(--text-muted)">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                        </svg>
+                    </span>
+                    <input id="propData" type="date" name="DataEntrega" class="ms-input pl-10"/>
+                </div>
+            </div>
+
+            <div>
+                <label class="text-xs font-semibold uppercase tracking-wider mb-1 block" style="color:var(--text-muted)">Mensagem ao cliente</label>
+                <textarea name="Mensagem" class="ms-textarea" rows="3" placeholder="Apresente sua abordagem para o projeto..."></textarea>
+            </div>
+            <div class="flex gap-3 mt-2">
+                <button type="button" onclick="closeModal('modalProposta')" class="btn-ghost flex-1">Cancelar</button>
+                <button type="submit" class="btn-primary flex-1">Aceitar fazer</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@* MODAL AVALIAR PLATAFORMA (fornecedor) *@
+<div id="modalAvaliarSistemaForn" class="modal-overlay hidden fixed inset-0 z-50 flex items-center justify-center" aria-modal="true" role="dialog">
+    <div class="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
+    <div class="modal-box relative ms-card p-8 w-full max-w-sm mx-4 z-10">
+        <button onclick="closeModal('modalAvaliarSistemaForn')" class="absolute top-4 right-4" style="color:var(--text-muted)" aria-label="Fechar">
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+        <h3 class="font-inria text-2xl font-bold mb-1" style="color:var(--text)">Avaliar a Plataforma</h3>
+        <p class="text-sm mb-5" style="color:var(--text-muted)">Como foi sua experiência com o MindSite neste projeto?</p>
+        <form asp-controller="Supplier" asp-action="AvaliarSistema" method="post" class="flex flex-col gap-4">
+            @Html.AntiForgeryToken()
+            <input type="hidden" id="hidSistemaFornId" name="ServicoId"/>
+            <div>
+                <label class="text-xs font-semibold uppercase tracking-wider mb-2 block" style="color:var(--text-muted)">Estrelas</label>
+                <div class="flex gap-2" id="starsFornSist">
+                    @for (int i = 1; i <= 5; i++)
+                    {
+                        <button type="button" data-val="@i" class="star-forn-sist text-3xl transition-colors" style="color:var(--text-muted)" onclick="selecionarStarsFornSist(@i)">★</button>
+                    }
+                </div>
+                <input type="hidden" name="Estrelas" id="hidEstrelasFornSist" value="0"/>
+            </div>
+            <div>
+                <label class="text-xs font-semibold uppercase tracking-wider mb-1 block" style="color:var(--text-muted)">Comentário (opcional)</label>
+                <textarea name="Comentario" class="ms-textarea" rows="3" placeholder="Descreva sua experiência com a plataforma..."></textarea>
+            </div>
+            <div class="flex gap-3">
+                <button type="button" onclick="closeModal('modalAvaliarSistemaForn')" class="btn-ghost flex-1">Cancelar</button>
+                <button type="submit" id="btnSubmitFornSist" class="btn-primary flex-1" disabled>Enviar</button>
+            </div>
+        </form>
+    </div>
+</div>
+  @* MODAL FINANCEIRO DE REPASSE (Disparado pela Notificação)  *@
+                                    <div id="modalFinancasRepasse" class="modal-overlay hidden fixed inset-0 z-50 flex items-center justify-center" aria-modal="true" role="dialog">
+                                        <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" onclick="closeModal('modalFinancasRepasse')"></div>
+                                        <div class="modal-box relative ms-card p-8 w-full max-w-md mx-4 z-10">
+
+                                            <button onclick="closeModal('modalFinancasRepasse')" class="absolute top-4 right-4" style="color:var(--text-muted)" aria-label="Fechar">
+                                                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                                            </button>
+
+                                            <div class="text-center">
+                                                <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100 mb-4">
+                                                    <svg class="h-6 w-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+                                                </div>
+
+                                                <h3 class="font-inria text-2xl font-bold mb-1" style="color:var(--text)">Saldo Liberado!</h3>
+                                                <p class="text-xs mb-6" style="color:var(--text-muted)">Referente ao Projeto <span id="financasProjetoId" class="font-bold"></span></p>
+
+                                                <div class="bg-stone-50 rounded-xl p-4 mb-6 border border-dashed" style="border-color:var(--border)">
+                                                    <span class="text-xs uppercase tracking-wider block font-semibold mb-1" style="color:var(--text-muted)">Seu Valor Líquido</span>
+                                                    <span id="financasValorRepasse" class="text-3xl font-bold font-inria" style="color:var(--brown)">R$ 0,00</span>
+                                                </div>
+
+                                                <p id="financasDescricao" class="text-xs mb-6 px-2" style="color:var(--text-muted)"></p>
+
+                                                <div class="flex gap-3">
+                                                    <button type="button" onclick="closeModal('modalFinancasRepasse')" class="btn-ghost flex-1">Fechar</button>
+                                                    <button type="button" class="btn-secondary flex-1 font-semibold text-sm">Solicitar Transferência</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+
+<div class="container mx-auto px-6 py-10">
+    <div class="flex flex-wrap items-center justify-between gap-4 mb-8">
+        <div>
+            <h1 class="font-inria text-4xl font-bold" style="color:var(--text)">
+                @(filtro == "meus" ? "Meus Projetos" : "Serviços Disponíveis")
+            </h1>
+            <p class="text-sm mt-1" style="color:var(--text-muted)">
+                @(filtro == "meus" ? "Projetos que você está atendendo" : "Solicitações abertas para proposta")
+            </p>
+        </div>
+        <div class="flex gap-2">
+            <a asp-controller="Supplier" asp-action="Servicos" asp-route-filtro="disponiveis"
+               class="px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all"
+               style="@(filtro == "disponiveis" ? "background:var(--brown);color:#fff;" : "background:var(--bg2);color:var(--text)")">
+                Disponíveis
+            </a>
+            <a asp-controller="Supplier" asp-action="Servicos" asp-route-filtro="meus"
+               class="px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all"
+               style="@(filtro == "meus" ? "background:var(--brown);color:#fff;" : "background:var(--bg2);color:var(--text)")">
+                Meus Projetos
+            </a>
+        </div>
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="ms-card p-16 text-center">
+            <svg class="w-16 h-16 mx-auto mb-4 opacity-30" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="color:var(--text-muted)" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+            </svg>
+            <p class="text-lg font-medium" style="color:var(--text-muted)">
+                @(filtro == "meus" ? "Nenhum projeto em andamento" : "Nenhum serviço disponível no momento")
+            </p>
+        </div>
+    }
+    else
+    {
+        <div class="flex flex-col gap-4">
+            @foreach (var s in Model)
+            {
+                var (badgeClass, label) = s.Status switch {
+                    ServicoStatus.Ativo                  => ("badge-green", "Ativo"),
+                    ServicoStatus.AguardandoPropostas    => ("badge-blue",  "Aguardando propostas"),
+                    ServicoStatus.MudancaSolicitada      => ("badge-blue",  "Mudança Solicitada"),
+                    ServicoStatus.Concluido              => ("badge-green", "Concluído"),
+                    ServicoStatus.AguardandoPagamentoFinal => ("badge-amber","Aguardando pgto. final"),
+                    _                                    => ("badge-red",   s.Status.ToString())
+                };
+                bool jaEnviouProposta = s.Propostas.Any(p => p.FornecedorId == userId);
+                bool naoSabe = s.PrazoCliente == null || s.PrazoCliente == MindSite.Enums.PrazoTipo.NaoSei;
+                int diasSug  = s.PrazoCliente switch {
+                    MindSite.Enums.PrazoTipo.Meses1a3    => 45,
+                    MindSite.Enums.PrazoTipo.Ate6Meses   => 120,
+                    MindSite.Enums.PrazoTipo.Ate1Ano     => 270,
+                    MindSite.Enums.PrazoTipo.MaisDeUmAno => 400,
+                    MindSite.Enums.PrazoTipo.DataEspecifica => s.DataPrazoCliente.HasValue
+                        ? (int)(s.DataPrazoCliente.Value.Date - DateTime.Today).TotalDays
+                        : 30,
+                    _ => 30
+                };
+                string orcStr = s.OrcamentoCliente.HasValue
+                    ? s.OrcamentoCliente.Value.ToString("F2", System.Globalization.CultureInfo.InvariantCulture)
+                    : "";
+
+                <div class="ms-card p-6">
+                    <div class="flex flex-wrap items-start justify-between gap-4">
+                        <div class="flex-1">
+                            <div class="flex items-center gap-3 flex-wrap mb-2">
+                                <h3 class="font-bold text-lg" style="color:var(--text)">
+                                    @(string.IsNullOrEmpty(s.NomeProjeto) ? tipoNome[s.Tipo] : s.NomeProjeto)
+                                </h3>
+                                <span class="badge badge-amber text-[10px]">@tipoNome[s.Tipo]</span>
+                                <span class="badge @badgeClass">@label</span>
+                                @if (filtro == "disponiveis")
+                                {
+                                    <span class="badge badge-amber text-[10px]">@s.Propostas.Count/3 propostas</span>
+                                }
+                            </div>
+                            <div class="flex flex-wrap gap-4 text-xs mt-1" style="color:var(--text-muted)">
+                                <span>Solicitado em @s.CriadoEm.ToLocalTime().ToString("dd/MM/yyyy")</span>
+                                @if (filtro == "disponiveis")
+                                {
+                                    @if (s.OrcamentoCliente.HasValue)
+                                    {
+                                        <span class="font-semibold" style="color:var(--brown)">Orçamento: R$ @s.OrcamentoCliente.Value.ToString("N2")</span>
+                                    }
+                                    else
+                                    {
+                                        <span>Orçamento: a definir</span>
+                                    }
+                                }
+                                @if (filtro == "meus")
+                                {
+                                    <span>Cliente: @(s.Cliente?.NomeCompleto ?? "—")</span>
+                                    @if (s.Valor.HasValue) { <span>R$ @s.Valor.Value.ToString("N2")</span> }
+                                    @if (s.DataEntrega.HasValue) { <span>Entrega: @s.DataEntrega.Value.ToString("dd/MM/yyyy")</span> }
+                                    @if (s.Status == ServicoStatus.Ativo && !s.PagamentoInicialFeito)
+                                    {
+                                        <span class="badge badge-red text-[10px]">Aguardando confirmação de pagamento inicial</span>
+                                    }
+                                }
+                            </div>
+                            @if (!string.IsNullOrEmpty(s.Observacoes) && filtro == "meus")
+                            {
+                                <p class="text-xs mt-2 italic" style="color:var(--text-muted)">@s.Observacoes</p>
+                            }
+                        </div>
+                        <div class="flex flex-wrap gap-2 w-full sm:w-auto border-t sm:border-t-0 pt-3 sm:pt-0 mt-2 sm:mt-0" style="border-color:var(--border)">
+                            <a asp-controller="Supplier" asp-action="DetalheServico" asp-route-id="@s.Id"
+                               class="btn-ghost text-xs px-3 py-1.5">Ver detalhes</a>
+                            @if (filtro == "disponiveis")
+                            {
+                                @if (!jaEnviouProposta)
+                                {
+                                    <button onclick="abrirProposta(@s.Id, @(naoSabe ? "true" : "false"), @diasSug, '@orcStr')" class="btn-primary text-xs px-3 py-1.5">Aceitar fazer</button>
+                                }
+                                else
+                                {
+                                    <span class="text-xs px-3 py-1.5 rounded-lg font-medium" style="background:var(--bg2);color:var(--text-muted)">Proposta enviada</span>
+                                }
+                            }
+                            @if (filtro == "meus" && s.ClienteId > 0 && s.PagamentoInicialFeito)
+                            {
+                                <a asp-controller="Supplier" asp-action="Chat" asp-route-contatoId="@s.ClienteId"
+                                   class="btn-secondary text-xs px-3 py-1.5">Chat</a>
+                            }
+                        </div>
+                    </div>
+
+                    @* Avaliação da plataforma (só em "meus" e Concluído) *@
+                    @if (filtro == "meus" && s.Status == ServicoStatus.Concluido)
+                    {
+                        bool avSistForn = s.AvaliacoesSistema.Any(a => a.UsuarioId == userId);
+                        var  avSistObj  = s.AvaliacoesSistema.FirstOrDefault(a => a.UsuarioId == userId);
+                        <div class="mt-4 pt-4 flex flex-wrap gap-3 items-center" style="border-top:1px solid var(--border)">
+                            @if (!avSistForn)
+                            {
+                                <button type="button" class="btn-secondary text-xs px-4 py-2"
+                                        onclick="abrirSistemaForn(@s.Id)">
+                                    ★ Avaliar a Plataforma
+                                </button>
+                            }
+                            else if (avSistObj != null)
+                            {
+                                <p class="text-xs" style="color:var(--text-muted)">
+                                    <span class="font-semibold" style="color:var(--text)">Plataforma avaliada:</span>
+                                    <strong style="color:var(--brown)">@(new string('★', avSistObj.Estrelas))@(new string('☆', 5 - avSistObj.Estrelas))</strong>
+                                </p>
+                            }
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    }
+
+    @* Paginação *@
+    @{ int srvPage = ViewBag.Page ?? 1; int srvTotal = ViewBag.TotalPages ?? 1; string srvFiltro = ViewBag.Filtro ?? "disponiveis"; }
+    @if (srvTotal > 1)
+    {
+        <div class="flex items-center justify-center gap-2 mt-6 flex-wrap">
+            @if (srvPage > 1)
+            {
+                <a asp-controller="Supplier" asp-action="Servicos" asp-route-filtro="@srvFiltro" asp-route-page="@(srvPage - 1)"
+                   class="px-3 py-2 rounded-xl text-sm" style="background:var(--surface);color:var(--text)">← Anterior</a>
+            }
+            @for (int p = Math.Max(1, srvPage - 2); p <= Math.Min(srvTotal, srvPage + 2); p++)
+            {
+                <a asp-controller="Supplier" asp-action="Servicos" asp-route-filtro="@srvFiltro" asp-route-page="@p"
+                   class="px-3 py-2 rounded-xl text-sm font-bold"
+                   style="@(p == srvPage ? "background:var(--brown);color:#fff;" : "background:var(--surface);color:var(--text)")">@p</a>
+            }
+            @if (srvPage < srvTotal)
+            {
+                <a asp-controller="Supplier" asp-action="Servicos" asp-route-filtro="@srvFiltro" asp-route-page="@(srvPage + 1)"
+                   class="px-3 py-2 rounded-xl text-sm" style="background:var(--surface);color:var(--text)">Próxima →</a>
+            }
+        </div>
+    }
+</div>
+
+@section Scripts {
+@if (TempData["Erro"] != null){<script>showToast(@Json.Serialize(TempData["Erro"]!.ToString()),'erro');</script>}
+<script>
+let _propostaIdPendente = null;
+let _clienteNaoSabe   = true;
+let _diasSugeridos    = 30;
+let _orcamentoServico = '';
+
+// Abre o modal do contrato do fornecedor para aceitar e enviar proposta
+function abrirProposta(id, naoSabe, dias, orcamento) {
+    _propostaIdPendente = id;
+    _clienteNaoSabe = (naoSabe === true || naoSabe === 'true');
+    _diasSugeridos  = parseInt(dias) || 30;
+    _orcamentoServico = orcamento || '';
+    document.getElementById('checkContratoFornecedor').checked = false;
+    const fornDataField = document.getElementById('contratoFornecedorData');
+    const hoje = new Date().toISOString().split('T')[0];
+    if (fornDataField) { fornDataField.max = hoje; if (!fornDataField.value) fornDataField.value = hoje; }
+    const fornCpfField = document.getElementById('contratoFornecedorCPF');
+    if (fornCpfField && fornCpfField.value) mascararCpfCnpj(fornCpfField);
+    verificarCamposFornecedor();
+    openModal('modalContratoFornecedor');
+}
+
+// Remove caracteres inválidos do campo de nome no contrato do fornecedor
+function filtrarNome(el) {
+    const pos = el.selectionStart;
+    const cleaned = el.value.replace(/[^a-zA-ZÀ-ÿ\s''-]/g, '');
+    if (cleaned !== el.value) { el.value = cleaned; el.setSelectionRange(pos - 1, pos - 1); }
+}
+
+// Aplica máscara de CPF ao campo durante digitação
+function mascararCpfCnpj(el) {
+    const d = el.value.replace(/\D/g, '').slice(0, 11);
+    const n = d.length;
+    let m = '';
+    if      (n <= 3)  m = d;
+    else if (n <= 6)  m = d.slice(0,3) + '.' + d.slice(3);
+    else if (n <= 9)  m = d.slice(0,3) + '.' + d.slice(3,6) + '.' + d.slice(6);
+    else              m = d.slice(0,3) + '.' + d.slice(3,6) + '.' + d.slice(6,9) + '-' + d.slice(9);
+    el.value = m;
+}
+
+// Habilita o botão de aceitar contrato quando todos os campos obrigatórios estão preenchidos
+function verificarCamposFornecedor() {
+    const nome  = document.getElementById('contratoFornecedorNome')?.value.trim();
+    const cpf   = document.getElementById('contratoFornecedorCPF')?.value.trim();
+    const data  = document.getElementById('contratoFornecedorData')?.value.trim();
+    const check = document.getElementById('checkContratoFornecedor')?.checked;
+    const nomeValido = nome  && nome.split(/\s+/).filter(w => w.length > 0).length >= 2;
+    const digits     = cpf ? cpf.replace(/\D/g, '') : '';
+    const cpfValido  = digits.length === 11;
+    document.getElementById('btnAceitarContratoFornecedor').disabled = !(nomeValido && cpfValido && data && check);
+}
+
+// Fecha o contrato e abre o modal de envio de proposta com os dados preenchidos
+function confirmarContratoFornecedor() {
+    closeModal('modalContratoFornecedor');
+    if (_propostaIdPendente === null) return;
+
+    document.getElementById('hidPropostaId').value = _propostaIdPendente;
+    const msgArea = document.querySelector('#formProposta textarea[name="Mensagem"]');
+    if (msgArea) msgArea.value = '';
+
+    // Orçamento — exibir valor ou fallback
+    const orcEl  = document.getElementById('propOrcamentoVal');
+    const orcHid = document.getElementById('propValor');
+    if (_orcamentoServico && parseFloat(_orcamentoServico) > 0) {
+        const v = parseFloat(_orcamentoServico);
+        orcEl.textContent  = `R$ ${v.toLocaleString('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2})}`;
+        orcHid.value = _orcamentoServico;
+    } else {
+        orcEl.textContent = 'A definir';
+        orcHid.value = '0';
+    }
+
+    // Data de entrega — só mostra se o cliente não definiu prazo
+    const propDataSection = document.getElementById('propDataSection');
+    const propData        = document.getElementById('propData');
+    const amanha = new Date(); amanha.setDate(amanha.getDate() + 1);
+    propData.min = amanha.toISOString().split('T')[0];
+
+    if (_clienteNaoSabe) {
+        propData.value    = '';
+        propData.required = true;
+        propDataSection.classList.remove('hidden');
+    } else {
+        propData.required = false;
+        propData.value    = '';
+        propDataSection.classList.add('hidden');
+    }
+
+    MsVal.limpar(document.getElementById('formProposta'));
+    openModal('modalProposta');
+}
+
+document.getElementById('formProposta')?.addEventListener('submit', function(e) {
+    if (!MsVal.form(this)) e.preventDefault();
+});
+
+
+// Abre o modal de avaliação da plataforma para o fornecedor
+function abrirSistemaForn(id) {
+    document.getElementById('hidSistemaFornId').value = id;
+    document.getElementById('hidEstrelasFornSist').value = '0';
+    document.getElementById('btnSubmitFornSist').disabled = true;
+    document.querySelectorAll('.star-forn-sist').forEach(b => b.style.color = 'var(--text-muted)');
+    openModal('modalAvaliarSistemaForn');
+}
+function selecionarStarsFornSist(val) {
+    document.getElementById('hidEstrelasFornSist').value = val;
+    document.getElementById('btnSubmitFornSist').disabled = false;
+    document.querySelectorAll('.star-forn-sist').forEach(b => {
+        b.style.color = parseInt(b.dataset.val) <= val ? 'var(--brown)' : 'var(--text-muted)';
+    });
+}
+</script>
+}

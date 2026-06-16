@@ -1,0 +1,281 @@
+﻿@model List<MindSite.Entities.Usuario>
+@{
+    ViewData["Title"] = "Gerenciamento de Usuários";
+    Layout = "_LayoutAdmin";
+    string tipo = ViewBag.Tipo ?? "Todos";
+    var selecionado = ViewBag.Selecionado as MindSite.Entities.Usuario;
+}
+
+@* Modal confirmação genérica *@
+<div id="modalConfirmar" class="modal-overlay hidden fixed inset-0 z-[60] flex items-center justify-center" aria-modal="true" role="dialog">
+    <div class="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
+    <div class="relative w-full max-w-sm mx-4 z-10 rounded-2xl overflow-hidden shadow-2xl" style="background:var(--bg2)">
+        <div class="px-6 py-4 text-center" style="background:var(--brown)">
+            <h3 id="modalConfTitle" class="font-bold text-white text-base"></h3>
+        </div>
+        <div class="px-6 py-5 text-center">
+            <p id="modalConfMsg" class="text-sm" style="color:var(--text-muted)"></p>
+        </div>
+        <form id="modalConfForm" method="post">
+            @Html.AntiForgeryToken()
+            <input type="hidden" id="modalConfId" name="id"/>
+            <div class="px-6 pb-6 flex gap-3">
+                <button type="button" onclick="closeModal('modalConfirmar')" class="flex-1 py-2.5 rounded-xl font-semibold border-2 transition hover:opacity-80" style="border-color:var(--brown);color:var(--brown);background:transparent">Cancelar</button>
+                <button type="submit" id="modalConfBtn" class="flex-1 py-2.5 rounded-xl font-bold text-white transition hover:opacity-90" style="background:var(--brown)">Confirmar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@* Modal detalhe do usuário *@
+<div id="modalDetalheUser" class="modal-overlay hidden fixed inset-0 z-50 flex items-center justify-center" aria-modal="true" role="dialog" aria-labelledby="tituloDetalhe">
+    <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" onclick="closeModal('modalDetalheUser')"></div>
+    <div class="modal-box relative ms-card p-0 w-full max-w-md mx-4 z-10 overflow-hidden" style="background:var(--surface); max-height:85vh">
+        
+        @* Cabeçalho adaptável com borda sutil em vez de fundo escuro fixo *@
+        <div class="px-6 py-4 border-b flex items-center justify-between gap-4" style="border-color:var(--border); background:var(--bg2)">
+            <h3 id="tituloDetalhe" class="font-inria font-bold text-lg truncate" style="color:var(--text)">...</h3>
+            <button onclick="closeModal('modalDetalheUser')" class="text-xs font-semibold hover:underline" style="color:var(--text-muted)" aria-label="Fechar">
+                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+        </div>
+        
+        @* Corpo do modal respeitando as cores de texto e fundo do tema atual *@
+        <div class="px-6 py-5 overflow-y-auto" style="max-height:55vh">
+            <div class="flex flex-col gap-3 text-sm" id="modalInfos" style="color:var(--text)">
+                <div class="flex items-center justify-center py-6">
+                    <svg class="w-8 h-8 animate-spin" fill="none" viewBox="0 0 24 24" style="color:var(--brown)" aria-hidden="true">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                    </svg>
+                </div>
+            </div>
+        </div>
+        
+        @* Rodapé dinâmico de ações *@
+        <div class="px-6 pb-6 flex flex-col gap-2" id="modalAcoes"></div>
+    </div>
+</div>
+
+<div class="container mx-auto px-6 py-8">
+    <div class="flex flex-wrap items-center justify-between gap-4 mb-8">
+        <div>
+            <h1 class="font-inria text-3xl font-bold" style="color:var(--text)">Gerenciamento de Usuários</h1>
+            <p class="text-sm mt-1" style="color:var(--text-muted)">Total: @(ViewBag.Total ?? Model.Count) usuário(s)</p>
+        </div>
+    </div>
+
+    @* Filtros *@
+    <div class="ms-card p-4 mb-6 flex flex-col sm:flex-row gap-4 items-center justify-between" style="background:var(--bg2)">
+        <div class="flex gap-2 flex-wrap">
+            @foreach (var t in new[]{ "Todos", "Clientes", "Fornecedores", "Admins" })
+            {
+                <a asp-controller="Admin" asp-action="Usuarios" asp-route-tipo="@t" asp-route-busca="@ViewBag.Busca"
+                   class="px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all"
+                   style="@(tipo == t ? "background:var(--brown);color:#fff;" : "background:var(--surface);color:var(--text)")">
+                    @t
+                </a>
+            }
+        </div>
+        <form asp-controller="Admin" asp-action="Usuarios" method="get" class="w-full sm:w-64">
+            <input type="hidden" name="tipo" value="@tipo"/>
+            <input type="text" name="busca" value="@ViewBag.Busca" placeholder="Buscar por nome ou e-mail..."
+                   class="ms-input text-xs" style="border-radius:.75rem" aria-label="Buscar usuário"/>
+        </form>
+    </div>
+
+    @* Tabela *@
+    @{ int page = ViewBag.Page ?? 1; int totalPages = ViewBag.TotalPages ?? 1; int total = ViewBag.Total ?? Model.Count; }
+    <div class="ms-card overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm ms-table">
+                <thead>
+                    <tr>
+                        <th class="text-left" style="color:var(--text-muted)">Nome</th>
+                        <th class="text-left hidden sm:table-cell" style="color:var(--text-muted)">E-mail</th>
+                        <th class="text-left" style="color:var(--text-muted)">Tipo</th>
+                        <th class="text-left" style="color:var(--text-muted)">Status</th>
+                        <th class="text-left hidden md:table-cell" style="color:var(--text-muted)">Cadastro</th>
+                        <th class="text-right" style="color:var(--text-muted)">Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (!Model.Any())
+                    {
+                        <tr><td colspan="6" class="text-center py-10" style="color:var(--text-muted)">Nenhum usuário encontrado.</td></tr>
+                    }
+                    @foreach (var u in Model)
+                    {
+                        <tr data-user-id="@u.Id">
+                            <td>
+                                <span class="font-semibold" style="color:var(--brown)">@u.NomeCompleto</span>
+                                @if (u.IsOnline) { <span class="ml-1 text-xs text-green-600">● online</span> }
+                            </td>
+                            <td class="hidden sm:table-cell" style="color:var(--text-muted)">@u.Email</td>
+                            <td>
+                                <span class="badge @(u.Role == UserRole.Admin ? "badge-red" : u.Role == UserRole.Fornecedor ? "badge-amber" : "badge-blue")">
+                                    @u.Role
+                                </span>
+                            </td>
+                            <td>
+                                @{
+                                    var (sc, sl) = u.Status switch {
+                                        UserStatus.Ativo     => ("badge-green", "Ativo"),
+                                        UserStatus.Pendente  => ("badge-amber", "Pendente"),
+                                        UserStatus.Bloqueado => ("badge-red",   "Bloqueado"),
+                                        _                    => ("badge-amber", "Inativo")
+                                    };
+                                }
+                                <span class="badge @sc">@sl</span>
+                            </td>
+                            <td class="hidden md:table-cell" style="color:var(--text-muted)">@u.CriadoEm.ToLocalTime().ToString("dd/MM/yyyy")</td>
+                            <td class="text-right">
+                                <div class="flex gap-2 justify-end">
+                                    <button type="button" class="text-xs font-semibold hover:underline" style="color:var(--brown)"
+                                            onclick="verDetalhe(@u.Id)">
+                                        Detalhe
+                                    </button>
+                                    @if (u.Role != UserRole.Admin)
+                                    {
+                                        var bloqLabel = u.Status == UserStatus.Bloqueado ? "Desbloquear" : "Bloquear";
+                                        var bloqMsg   = u.Status == UserStatus.Bloqueado
+                                            ? $"Desbloquear {u.NomeCompleto}?"
+                                            : $"Bloquear {u.NomeCompleto}?";
+                                        <button type="button" class="text-xs font-semibold hover:underline @(u.Status == UserStatus.Bloqueado ? "text-green-600" : "text-red-600")"
+                                                onclick="abrirConfirmar('@bloqLabel','@Html.Raw(bloqMsg.Replace("'","\\'")):','/Admin/ToggleBloqueio',@u.Id,@(u.Status == UserStatus.Bloqueado ? "false" : "true"))">
+                                            @bloqLabel
+                                        </button>
+                                    }
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    @* Paginação *@
+    @if (totalPages > 1)
+    {
+        <div class="flex items-center justify-center gap-2 mt-6 flex-wrap">
+            @if (page > 1)
+            {
+                <a asp-controller="Admin" asp-action="Usuarios" asp-route-tipo="@ViewBag.Tipo" asp-route-busca="@ViewBag.Busca" asp-route-page="@(page - 1)"
+                   class="px-3 py-2 rounded-xl text-sm" style="background:var(--surface);color:var(--text)">← Anterior</a>
+            }
+            @for (int p = Math.Max(1, page - 2); p <= Math.Min(totalPages, page + 2); p++)
+            {
+                <a asp-controller="Admin" asp-action="Usuarios" asp-route-tipo="@ViewBag.Tipo" asp-route-busca="@ViewBag.Busca" asp-route-page="@p"
+                   class="px-3 py-2 rounded-xl text-sm font-bold"
+                   style="@(p == page ? "background:var(--brown);color:#fff;" : "background:var(--surface);color:var(--text)")">@p</a>
+            }
+            @if (page < totalPages)
+            {
+                <a asp-controller="Admin" asp-action="Usuarios" asp-route-tipo="@ViewBag.Tipo" asp-route-busca="@ViewBag.Busca" asp-route-page="@(page + 1)"
+                   class="px-3 py-2 rounded-xl text-sm" style="background:var(--surface);color:var(--text)">Próxima →</a>
+            }
+        </div>
+    }
+</div>
+
+@section Scripts {
+<script>
+// Busca e exibe os detalhes de um usuário no modal
+async function verDetalhe(id) {
+    document.getElementById('tituloDetalhe').textContent = '';
+    document.getElementById('modalInfos').innerHTML = `
+        <div class="flex items-center justify-center py-6">
+            <svg class="w-8 h-8 animate-spin" fill="none" viewBox="0 0 24 24" style="color:var(--brown)" aria-hidden="true">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+            </svg>
+        </div>`;
+    document.getElementById('modalAcoes').innerHTML = '';
+    openModal('modalDetalheUser');
+
+    let u;
+    try {
+        const res = await fetch('/Admin/GetUsuarioApi?id=' + id);
+        if (!res.ok) throw new Error();
+        u = await res.json();
+    } catch {
+        document.getElementById('modalInfos').innerHTML = '<p class="text-sm text-red-500">Erro ao carregar dados.</p>';
+        return;
+    }
+
+    document.getElementById('tituloDetalhe').textContent = u.nomeCompleto;
+
+    const roleBadge  = u.role  === 'Admin'      ? 'badge-red'
+                     : u.role  === 'Fornecedor'  ? 'badge-amber' : 'badge-blue';
+    const statBadge  = u.status === 'Ativo'     ? 'badge-green'
+                     : u.status === 'Pendente'  ? 'badge-amber'  : 'badge-red';
+
+    let infosHtml = `
+        <div class="flex justify-between"><span style="color:var(--text-muted)">E-mail:</span><span style="color:var(--text)">${esc(u.email)}</span></div>
+        <div class="flex justify-between"><span style="color:var(--text-muted)">Telefone:</span><span style="color:var(--text)">${esc(u.telefone)}</span></div>
+        <div class="flex justify-between"><span style="color:var(--text-muted)">Tipo:</span><span class="badge ${roleBadge}">${esc(u.role)}</span></div>
+        <div class="flex justify-between"><span style="color:var(--text-muted)">Status:</span><span class="badge ${statBadge}">${esc(u.status)}</span></div>
+        <div class="flex justify-between"><span style="color:var(--text-muted)">Cadastro:</span><span style="color:var(--text)">${esc(u.criadoEm)}</span></div>`;
+    if (u.linkedInUrl) infosHtml += `<div class="flex justify-between"><span style="color:var(--text-muted)">LinkedIn:</span><a href="${esc(u.linkedInUrl)}" target="_blank" class="text-blue-500 hover:underline truncate max-w-[200px]">${esc(u.linkedInUrl)}</a></div>`;
+    if (u.whatsAppNumero) infosHtml += `<div class="flex justify-between"><span style="color:var(--text-muted)">WhatsApp:</span><span style="color:var(--text)">${esc(u.whatsAppNumero)}</span></div>`;
+    if (u.cpf) infosHtml += `<div class="flex justify-between"><span style="color:var(--text-muted)">CPF:</span><span style="color:var(--text)">${esc(u.cpf)}</span></div>`;
+    if (u.sobreVoce) infosHtml += `<div class="flex flex-col gap-1"><span style="color:var(--text-muted)">Sobre:</span><p class="text-xs leading-relaxed" style="color:var(--text)">${esc(u.sobreVoce)}</p></div>`;
+    document.getElementById('modalInfos').innerHTML = infosHtml;
+
+    const btnFechar = `<button onclick="closeModal('modalDetalheUser')" class="flex-1 py-2.5 rounded-xl font-semibold border-2 transition hover:opacity-80 text-sm" style="border-color:var(--brown);color:var(--brown);background:transparent">Fechar</button>`;
+    let acoesHtml = '';
+
+    if (u.status === 'Pendente' && u.role === 'Fornecedor') {
+        acoesHtml += `<div class="flex gap-2">
+            <button type="button" class="btn-primary flex-1 text-sm" onclick="abrirConfirmar('Aprovar Fornecedor','Confirmar aprovação: a conta ficará ativa.','/Admin/AceitarFornecedor',${u.id},false)">Aprovar</button>
+            <button type="button" class="btn-danger flex-1 text-sm" onclick="abrirConfirmar('Recusar Solicitação','O usuário voltará a ser Cliente.','/Admin/RecusarFornecedor',${u.id},true)">Recusar</button>
+        </div>`;
+    }
+
+    if (u.role !== 'Admin') {
+        const isBloq  = u.status === 'Bloqueado';
+        const lblBloq = isBloq ? 'Desbloquear' : 'Bloquear';
+        const msgBloq = isBloq ? 'A conta voltará a funcionar normalmente.' : 'O usuário perderá o acesso imediatamente.';
+        const clsBloq = isBloq ? 'btn-primary' : 'btn-danger';
+        acoesHtml += `<button type="button" class="${clsBloq} w-full text-sm" onclick="abrirConfirmar('${lblBloq}','${msgBloq}','/Admin/ToggleBloqueio',${u.id},${isBloq ? 'false' : 'true'})">${lblBloq}</button>`;
+        if (isBloq) {
+            acoesHtml += `<button type="button" class="w-full text-sm py-2.5 rounded-xl font-semibold border-2 transition hover:opacity-80" style="border-color:#ef4444;color:#ef4444;background:transparent" onclick="excluirContaUI(${u.id})">Excluir Conta</button>`;
+        }
+        acoesHtml += `<div class="flex gap-2">
+            <a href="/Admin/Chat?grupoSuporte=true&threadUserId=${u.id}" class="btn-secondary flex-1 text-sm text-center">Enviar Mensagem</a>
+            ${btnFechar}
+        </div>`;
+    } else {
+        acoesHtml += `<div class="flex gap-2">${btnFechar}</div>`;
+    }
+
+    document.getElementById('modalAcoes').innerHTML = acoesHtml;
+}
+
+// Remove a linha do usuário da tabela (UI only — dados permanecem no banco)
+function excluirContaUI(id) {
+    if (!confirm('Remover este usuário da lista? Os dados continuarão no banco de dados.')) return;
+    const row = document.querySelector(`tr[data-user-id="${id}"]`);
+    if (row) row.remove();
+    closeModal('modalDetalheUser');
+}
+
+// Escapa caracteres especiais para exibição segura no HTML
+function esc(s) {
+    if (s == null) return '';
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// Abre o modal de confirmação genérico configurando título, mensagem e ação
+function abrirConfirmar(titulo, mensagem, url, id, danger) {
+    document.getElementById('modalConfTitle').textContent = titulo;
+    document.getElementById('modalConfMsg').textContent  = mensagem;
+    document.getElementById('modalConfForm').action      = url;
+    document.getElementById('modalConfId').value         = id;
+    const btn = document.getElementById('modalConfBtn');
+    if (btn) btn.className = danger ? 'flex-1 py-2.5 rounded-xl font-bold text-white transition hover:opacity-90 bg-red-600' : 'flex-1 py-2.5 rounded-xl font-bold text-white transition hover:opacity-90' ;
+    openModal('modalConfirmar');
+}
+</script>
+}

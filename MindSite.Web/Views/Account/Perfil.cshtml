@@ -1,0 +1,536 @@
+﻿@model MindSite.ViewModels.PerfilPageViewModel
+@{
+    ViewData["Title"] = "Meu Perfil";
+    var u = Model.Usuario;
+    bool isFornecedor = u.Role == UserRole.Fornecedor;
+    bool isCliente    = u.Role == UserRole.Cliente;
+    Layout = u.Role == UserRole.Admin ? "_LayoutAdmin"
+           : isFornecedor ? "_LayoutSupplier"
+           : "_LayoutClient";
+    string ini = string.Join("", u.NomeCompleto.Split(' ').Take(2).Select(p => p[0])).ToUpper();
+    int    fullStars  = isFornecedor ? (int)Math.Floor(Model.MediaEstrelas) : 0;
+    bool   halfStar   = isFornecedor && (Model.MediaEstrelas - fullStars) >= 0.5;
+    int    emptyStars = isFornecedor ? (5 - fullStars - (halfStar ? 1 : 0)) : 5;
+}
+
+@section Styles {
+<style>
+.toggle-sw { position:relative; display:inline-block; width:44px; height:24px; flex-shrink:0; }
+.toggle-sw input { opacity:0; width:0; height:0; }
+.toggle-sl { position:absolute; cursor:pointer; top:0; left:0; right:0; bottom:0; background:var(--chat-scrollbar); border-radius:24px; transition:.3s; }
+.toggle-sl:before { position:absolute; content:""; height:18px; width:18px; left:3px; bottom:3px; background:white; border-radius:50%; transition:.3s; }
+input:checked + .toggle-sl { background:#5a3e28; }
+input:checked + .toggle-sl:before { transform:translateX(20px); }
+.perfil-card { background:var(--bg); border:1px solid var(--border); border-radius:1rem; padding:1.75rem; }
+.eye-btn { position:absolute; right:.75rem; top:50%; transform:translateY(-50%); color:var(--text-muted); background:none; border:none; cursor:pointer; padding:.25rem; }
+.star-filled { color:#C9A94A; }
+.star-empty  { color:#d1d5db; }
+.pf-label { font-size:.65rem; font-weight:700; text-transform:uppercase; letter-spacing:.08em; color:var(--brown); margin-bottom:.25rem; display:block; }
+.pf-val   { font-size:.9rem; font-weight:600; color:var(--text); }
+.field-label { font-size:.7rem; font-weight:700; text-transform:uppercase; letter-spacing:.07em; color:var(--text-muted); margin-bottom:.3rem; display:block; }
+</style>
+}
+
+@* Modal confirmar deletar conta *@
+<div id="modalDeletar" class="modal-overlay hidden fixed inset-0 z-50 flex items-center justify-center" aria-modal="true" role="dialog">
+    <div class="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
+    <div class="relative w-full max-w-sm mx-4 z-10 rounded-2xl overflow-hidden shadow-2xl" style="background:var(--bg2)">
+        <div class="px-6 py-4 text-center" style="background:var(--brown)">
+            <h3 class="font-bold text-white text-base">Deletar conta?</h3>
+        </div>
+        <div class="px-6 py-5 text-center">
+            <p class="text-sm leading-relaxed" style="color:var(--text-muted)">Esta ação é permanente. Todos os seus dados serão removidos.</p>
+        </div>
+        <div class="px-6 pb-6 flex gap-3">
+            <button onclick="closeModal('modalDeletar')" class="flex-1 py-2.5 rounded-xl font-semibold border-2 transition hover:opacity-80" style="border-color:var(--brown);color:var(--brown);background:transparent">Cancelar</button>
+            <form asp-controller="Account" asp-action="DeleteConta" method="post" class="flex-1">
+                @Html.AntiForgeryToken()
+                <button type="submit" class="w-full py-2.5 rounded-xl font-bold text-white transition hover:opacity-90" style="background:#ef4444">Sim, deletar</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+@* Formulário oculto para upload de foto de perfil *@
+<input type="file" id="fotoInput" class="hidden" accept="image/jpeg,image/png,image/webp" />
+<form id="fotoForm" class="hidden" asp-controller="Account" asp-action="UploadFotoPerfil" method="post" enctype="multipart/form-data">
+    @Html.AntiForgeryToken()
+    <input type="file" name="foto" id="fotoFormFile" />
+</form>
+
+<div class="container mx-auto px-4 py-8 max-w-6xl">
+
+    @* Cabeçalho *@
+    <div class="flex flex-wrap items-center gap-5 mb-8">
+        <div class="relative cursor-pointer group flex-shrink-0" onclick="document.getElementById('fotoInput').click()" title="Alterar foto de perfil">
+            @if (!string.IsNullOrEmpty(u.FotoPerfilUrl))
+            {
+                <img id="perfilFoto" src="@u.FotoPerfilUrl" alt="Foto de perfil"
+                     class="w-20 h-20 rounded-full object-cover shadow-lg border-2" style="border-color:var(--brown)" />
+            }
+            else
+            {
+                <div id="perfilFoto" class="w-20 h-20 rounded-full flex items-center justify-center shadow-lg border-2" style="background:var(--brown);color:#fff;border-color:var(--brown)">
+                    <svg class="h-10 w-10" fill="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                </div>
+            }
+            <div class="absolute inset-0 rounded-full bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                <svg class="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+            </div>
+        </div>
+
+        <div class="flex-1 min-w-0">
+        <h1 class="font-inria text-3xl font-bold" style="color:var(--text)">@u.NomeCompleto</h1>
+        
+        @if (isFornecedor)
+        {
+            <p class="text-sm font-semibold mt-0.5" style="color:#16a34a">● Fornecedor @(u.Status == UserStatus.Ativo ? "Ativo" : u.Status.ToString())</p>
+            
+            <div class="flex items-center gap-1 mt-1">
+                @* Estrelas Preenchidas *@
+                @for (int i = 0; i < fullStars; i++) 
+                { 
+                    <span class="star-filled text-lg">★</span> 
+                }
+
+                @* Meia Estrela *@
+                @if (halfStar) 
+                { 
+                    <span class="star-filled text-lg">★</span> 
+                }
+
+                @* Estrelas Vazias (Corrigido para o caractere '☆') *@
+                @for (int i = 0; i < emptyStars; i++) 
+                { 
+                    <span class="star-empty text-lg">☆</span> 
+                }
+
+                <span class="text-sm ml-1" style="color:var(--text-muted)">
+                    @Model.MediaEstrelas.ToString("F1") (@Model.TotalAvaliacoes avaliações)
+                </span>
+            </div>
+        }
+        else
+        {
+            <p class="text-sm mt-0.5" style="color:var(--text-muted)">● @(u.IsOnline ? "Online" : "Offline")</p>
+        }
+    </div>
+
+        <div class="flex items-center gap-3 w-full sm:w-auto sm:ml-auto flex-wrap justify-end border-t sm:border-t-0 pt-3 sm:pt-0 mt-1 sm:mt-0" style="border-color:var(--border)">
+            <button onclick="openModal('modalDeletar')" title="Deletar conta" class="p-2 rounded-full hover:opacity-70 transition-opacity" style="color:#ef4444;opacity:.6">
+                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+            </button>
+            <a href="/Account/Logout" class="flex items-center gap-2 text-sm font-semibold px-4 py-2 rounded-xl hover:opacity-80 transition-opacity" style="background:var(--bg2);color:var(--text-muted);border:1px solid var(--border)">
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+                Sair
+            </a>
+        </div>
+    </div>
+
+
+    @* MAIN GRID: sidebar + dados *@
+    <div class="grid grid-cols-1 md:grid-cols-[300px_1fr] gap-6 mb-6">
+
+        @* Coluna esquerda *@
+        <div class="flex flex-col gap-6">
+
+            @* Troca de Senha *@
+            <div class="perfil-card">
+                <h2 class="font-inria text-xl font-bold text-center mb-5" style="color:var(--brown)">Troca de Senha</h2>
+                <form asp-controller="Account" asp-action="TrocarSenha" method="post" class="flex flex-col gap-3" onsubmit="return validarSenha(this)">
+                    @Html.AntiForgeryToken()
+                    <div>
+                        <label class="field-label" for="fSenhaAtual">Senha Atual</label>
+                        <div class="relative">
+                            <input id="fSenhaAtual" type="text" name="SenhaAtual" class="ms-input pr-10" placeholder="Digite sua senha atual" required autocomplete="current-password" />
+                            <button type="button" class="eye-btn" onclick="togglePwd('fSenhaAtual',this)" tabindex="-1">
+                                <svg class="w-5 h-5 eye-off hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88"/></svg>
+                                <svg class="w-5 h-5 eye-on" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.964-7.178z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                            </button>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="field-label" for="fNovaSenha">Nova Senha <span class="normal-case font-normal">(mín. 6 caracteres)</span></label>
+                        <div class="relative">
+                            <input id="fNovaSenha" type="text" name="NovaSenha" class="ms-input pr-10" placeholder="Nova senha" minlength="6" required autocomplete="new-password" />
+                            <button type="button" class="eye-btn" onclick="togglePwd('fNovaSenha',this)" tabindex="-1">
+                                <svg class="w-5 h-5 eye-off hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88"/></svg>
+                                <svg class="w-5 h-5 eye-on" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.964-7.178z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                            </button>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="field-label" for="fConfirmarSenha">Confirmar Nova Senha</label>
+                        <div class="relative">
+                            <input id="fConfirmarSenha" type="text" name="ConfirmarSenha" class="ms-input pr-10" placeholder="Repetir nova senha" required autocomplete="new-password" />
+                            <button type="button" class="eye-btn" onclick="togglePwd('fConfirmarSenha',this)" tabindex="-1">
+                                <svg class="w-5 h-5 eye-off hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88"/></svg>
+                                <svg class="w-5 h-5 eye-on" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.964-7.178z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                            </button>
+                        </div>
+                        <p id="senhaMatchErr" class="hidden text-xs mt-1.5" style="color:#ef4444">As senhas não conferem</p>
+                    </div>
+                    <button type="submit" class="btn-primary mt-2 w-full" style="border-radius:9999px">Salvar Senha</button>
+                </form>
+            </div>
+
+            @* Info/Stats (por role) *@
+            @if (isCliente)
+            {
+                <div class="perfil-card flex flex-col gap-5">
+                    <div class="rounded-xl p-4" style="background:var(--bg2)">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <span class="pf-label">Conta criada</span>
+                                <p class="pf-val">@u.CriadoEm.ToLocalTime().ToString("dd/MM/yyyy")</p>
+                            </div>
+                            <div>
+                                <span class="pf-label">Status</span>
+                                <span class="badge @(u.Status == UserStatus.Ativo ? "badge-green" : "badge-amber") text-xs">@u.Status.ToString().ToUpper()</span>
+                            </div>
+                            <div class="col-span-2">
+                                <span class="pf-label">Tipo de Conta</span>
+                                <p class="pf-val">Cliente</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h3 class="font-inria text-base font-bold mb-3" style="color:var(--text)">Preferências</h3>
+                        <div class="flex flex-col gap-3">
+                            <label class="flex items-center justify-between gap-3 cursor-pointer">
+                                <span class="text-sm" style="color:var(--text)">Notificações por Email</span>
+                                <label class="toggle-sw">
+                                    <input type="checkbox" id="togEmail" @(u.NotificacoesEmail ? "checked" : "") onchange="salvarPref()" />
+                                    <span class="toggle-sl"></span>
+                                </label>
+                            </label>
+                            <label class="flex items-center justify-between gap-3 cursor-pointer">
+                                <span class="text-sm" style="color:var(--text)">Notificações de Chat</span>
+                                <label class="toggle-sw">
+                                    <input type="checkbox" id="togChat" @(u.NotificacoesChat ? "checked" : "") onchange="salvarPref()" />
+                                    <span class="toggle-sl"></span>
+                                </label>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="w-full h-px" style="background:var(--border)"></div>
+                    <a href="/Account/VirarFornecedor"
+                       class="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl font-bold text-sm hover:opacity-80 transition-opacity"
+                       style="background:var(--bg2);color:var(--brown);border:1px solid var(--border)">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                        Tornar-se Fornecedor
+                    </a>
+                </div>
+            }
+            else if (isFornecedor)
+            {
+                <div class="perfil-card flex flex-col gap-5">
+
+                    @* Cabeçalho do painel *@
+                    <div class="flex items-center gap-3">
+                        <div class="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0" style="background:var(--brown-bg)">
+                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="color:var(--brown)"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                        </div>
+                        <div>
+                            <h2 class="font-inria text-lg font-bold leading-tight" style="color:var(--brown)">Painel do Fornecedor</h2>
+                            <p class="text-[11px]" style="color:var(--text-muted)">Sua atividade na plataforma</p>
+                        </div>
+                    </div>
+
+                    @* Stats *@
+                    <div class="grid grid-cols-3 gap-2">
+                        <div class="rounded-xl p-3 text-center flex flex-col items-center gap-1" style="background:var(--bg2);border:1px solid var(--border)">
+                            <p class="text-2xl font-bold leading-none" style="color:var(--brown)">@Model.TotalServicos</p>
+                            <p class="text-[11px] font-medium" style="color:var(--text-muted)">Serviços</p>
+                        </div>
+                        <div class="rounded-xl p-3 text-center flex flex-col items-center gap-1" style="background:var(--bg2);border:1px solid var(--border)">
+                            <p class="text-2xl font-bold leading-none" style="color:var(--brown)">@Model.TotalAvaliacoes</p>
+                            <p class="text-[11px] font-medium" style="color:var(--text-muted)">Avaliações</p>
+                        </div>
+                        <div class="rounded-xl p-3 text-center flex flex-col items-center gap-1" style="background:var(--bg2);border:1px solid var(--border)">
+                            <p class="text-2xl font-bold leading-none" style="color:var(--brown)">@Model.MediaEstrelas.ToString("F1")</p>
+                            <p class="text-[11px] font-medium" style="color:var(--text-muted)">★ Média</p>
+                        </div>
+                    </div>
+
+                    @* Info *@
+                    <div class="rounded-xl p-4" style="background:var(--bg2)">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <span class="pf-label">Conta criada</span>
+                                <p class="pf-val">@u.CriadoEm.ToLocalTime().ToString("dd/MM/yyyy")</p>
+                            </div>
+                            <div>
+                                <span class="pf-label">Status</span>
+                                <span class="badge @(u.Status == UserStatus.Ativo ? "badge-green" : u.Status == UserStatus.Pendente ? "badge-amber" : "badge-red") text-xs">@u.Status.ToString().ToUpper()</span>
+                            </div>
+                            <div class="col-span-2">
+                                <span class="pf-label">Tipo de Conta</span>
+                                <p class="pf-val">Fornecedor</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    @* Preferências *@
+                    <div>
+                        <h3 class="font-inria text-base font-bold mb-3" style="color:var(--text)">Preferências</h3>
+                        <div class="flex flex-col gap-3">
+                            <label class="flex items-center justify-between gap-3 cursor-pointer">
+                                <span class="text-sm" style="color:var(--text)">Notificações por Email</span>
+                                <label class="toggle-sw">
+                                    <input type="checkbox" id="togEmail" @(u.NotificacoesEmail ? "checked" : "") onchange="salvarPref()" />
+                                    <span class="toggle-sl"></span>
+                                </label>
+                            </label>
+                            <label class="flex items-center justify-between gap-3 cursor-pointer">
+                                <span class="text-sm" style="color:var(--text)">Notificações de Chat</span>
+                                <label class="toggle-sw">
+                                    <input type="checkbox" id="togChat" @(u.NotificacoesChat ? "checked" : "") onchange="salvarPref()" />
+                                    <span class="toggle-sl"></span>
+                                </label>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            }
+            else
+            {
+                @* Admin info *@
+                <div class="perfil-card">
+                    <h2 class="font-inria text-lg font-bold mb-4" style="color:var(--brown)">Informações da Conta</h2>
+                    <div class="rounded-xl p-4" style="background:var(--bg2)">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <span class="pf-label">Função</span>
+                                <p class="pf-val">Administrador</p>
+                            </div>
+                            <div>
+                                <span class="pf-label">Status</span>
+                                <span class="badge badge-green text-xs">ATIVO</span>
+                            </div>
+                            <div class="col-span-2">
+                                <span class="pf-label">Membro desde</span>
+                                <p class="pf-val">@u.CriadoEm.ToLocalTime().ToString("dd/MM/yyyy")</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+
+        @* Coluna direita: dados *@
+        <div class="perfil-card">
+            <h2 class="font-inria text-xl font-bold mb-6" style="color:var(--brown)">
+                @(isFornecedor ? "Dados Profissionais" : "Dados Pessoais")
+            </h2>
+            <form asp-controller="Account" asp-action="EditarDados" method="post"
+                  onsubmit="return MsVal.form(this)" class="flex flex-col gap-5">
+                @Html.AntiForgeryToken()
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-5 gap-y-4">
+
+                    @* Nome: linha inteira *@
+                    <div class="sm:col-span-2">
+                        <label class="field-label" for="dNome">Nome Completo</label>
+                        <input id="dNome" type="text" name="NomeCompleto" value="@u.NomeCompleto"
+                               class="ms-input" required minlength="2" autocomplete="name"
+                               placeholder="Seu nome completo" />
+                    </div>
+
+                    @* E-mail: linha inteira, somente leitura *@
+                    <div class="sm:col-span-2">
+                        <label class="field-label">
+                            E-mail
+                            <span class="normal-case font-normal text-[10px]" style="opacity:.55">(não editável)</span>
+                        </label>
+                        <input type="email" value="@u.Email" class="ms-input" disabled
+                               style="opacity:.6;cursor:not-allowed" autocomplete="email" />
+                    </div>
+
+                    @* Telefone *@
+                    <div>
+                        <label class="field-label" for="dTel">Telefone</label>
+                        <input id="dTel" type="tel" name="Telefone" value="@u.Telefone"
+                               class="ms-input" data-mask="tel" maxlength="16"
+                               placeholder="(11) 99999-9999" autocomplete="tel" />
+                    </div>
+
+                    @if (isCliente)
+                    {
+                        @* Endereço ao lado do telefone *@
+                        <div>
+                            <label class="field-label" for="dEndereco">Endereço</label>
+                            <input id="dEndereco" type="text" name="Endereco" value="@u.Endereco"
+                                   class="ms-input" placeholder="Rua, número, cidade..."
+                                   autocomplete="street-address" />
+                        </div>
+                    }
+
+                    @if (isFornecedor)
+                    {
+                        @* WhatsApp ao lado do telefone *@
+                        <div>
+                            <label class="field-label" for="dWhats">WhatsApp</label>
+                            <input id="dWhats" type="tel" name="WhatsAppNumero" value="@u.WhatsAppNumero"
+                                   class="ms-input" data-mask="tel" maxlength="16"
+                                   placeholder="(11) 99999-9999" autocomplete="tel" />
+                        </div>
+
+                        @* LinkedIn: linha inteira *@
+                        <div class="sm:col-span-2">
+                            <label class="field-label" for="dLinkedin">LinkedIn</label>
+                            <input id="dLinkedin" type="url" name="LinkedInUrl" value="@u.LinkedInUrl"
+                                   class="ms-input" placeholder="https://linkedin.com/in/..."
+                                   autocomplete="url" />
+                        </div>
+
+                        @* CPF: meia coluna *@
+                        <div>
+                            <label class="field-label" for="dCPF">CPF</label>
+                            <input id="dCPF" type="text" name="CPF" value="@u.CPF"
+                                   class="ms-input" data-mask="cpf" maxlength="14"
+                                   placeholder="000.000.000-00" />
+                        </div>
+
+                        @* Separador visual + Sobre você *@
+                        <div class="sm:col-span-2 pt-1">
+                            <div class="w-full h-px mb-4" style="background:var(--border)"></div>
+                            <label class="field-label" for="dSobre">Sobre você</label>
+                            <textarea id="dSobre" name="SobreVoce" class="ms-textarea" rows="5"
+                                      placeholder="Descreva sua experiência, especialidades e diferenciais...">@u.SobreVoce</textarea>
+                        </div>
+                    }
+                </div>
+
+                <div class="flex justify-end pt-2">
+                    <button type="submit" class="btn-primary px-8" style="border-radius:9999px">Salvar Dados</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    @* MEUS PROJETOS (cliente) *@
+    @if (isCliente)
+    {
+        <div class="perfil-card mb-6">
+            <h2 class="font-inria text-xl font-bold mb-5" style="color:var(--text)">Meus Projetos</h2>
+            @if (Model.MeusProjetos.Any())
+            {
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm">
+                        <thead>
+                            <tr class="border-b" style="border-color:var(--border)">
+                                <th class="text-left py-2 pb-3 text-xs font-bold uppercase tracking-widest" style="color:var(--brown)">Projeto</th>
+                                <th class="text-left py-2 pb-3 text-xs font-bold uppercase tracking-widest hidden sm:table-cell" style="color:var(--brown)">Fornecedor</th>
+                                <th class="text-left py-2 pb-3 text-xs font-bold uppercase tracking-widest hidden md:table-cell" style="color:var(--brown)">Início</th>
+                                <th class="text-left py-2 pb-3 text-xs font-bold uppercase tracking-widest" style="color:var(--brown)">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var p in Model.MeusProjetos)
+                            {
+                                <tr class="border-b hover:opacity-80 transition-opacity" style="border-color:var(--border)">
+                                    <td class="py-3" style="color:var(--text)">@p.NomeProjeto</td>
+                                    <td class="py-3 hidden sm:table-cell" style="color:var(--text-muted)">@p.NomeFornecedor</td>
+                                    <td class="py-3 hidden md:table-cell" style="color:var(--text-muted)">@p.Inicio?.ToLocalTime().ToString("dd/MM/yyyy")</td>
+                                    <td class="py-3"><span class="badge @p.StatusClass text-xs">@p.Status</span></td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <p class="text-sm text-center py-6" style="color:var(--text-muted)">Nenhum projeto encontrado.</p>
+            }
+        </div>
+    }
+
+</div>
+
+@section Scripts {
+<script>
+// Funções de abertura e fechamento de modais
+function openModal(id)  { document.getElementById(id)?.classList.remove('hidden'); }
+function closeModal(id) { document.getElementById(id)?.classList.add('hidden'); }
+
+// Alterna visibilidade dos campos de senha
+function togglePwd(id, btn) {
+    const inp = document.getElementById(id);
+    if (!inp) return;
+    const isVisible = inp.type === 'text';
+    inp.type = isVisible ? 'password' : 'text';
+    if (btn) {
+        btn.querySelector('.eye-off').classList.toggle('hidden', !isVisible);
+        btn.querySelector('.eye-on').classList.toggle('hidden', isVisible);
+    }
+}
+
+
+// Valida o formulário de troca de senha
+function validarSenha(form) {
+    let ok = MsVal.form(form);
+    const nova      = document.getElementById('fNovaSenha');
+    const confirmar = document.getElementById('fConfirmarSenha');
+    const err       = document.getElementById('senhaMatchErr');
+    if (nova?.value && confirmar?.value && nova.value !== confirmar.value) {
+        err?.classList.remove('hidden');
+        confirmar.focus();
+        ok = false;
+    } else {
+        err?.classList.add('hidden');
+    }
+    return ok;
+}
+
+document.getElementById('fConfirmarSenha')?.addEventListener('input', function() {
+    const nova = document.getElementById('fNovaSenha');
+    const err  = document.getElementById('senhaMatchErr');
+    if (this.value && this.value !== nova?.value) err?.classList.remove('hidden');
+    else err?.classList.add('hidden');
+});
+
+// Salva preferências de notificação via fetch
+async function salvarPref() {
+    const email = document.getElementById('togEmail')?.checked ?? true;
+    const chat  = document.getElementById('togChat')?.checked  ?? true;
+    await fetch(`/Account/SalvarPreferencias?notificacoesEmail=${email}&notificacoesChat=${chat}`, { method: 'POST' });
+}
+
+// Envia a nova foto de perfil ao servidor e atualiza a imagem na tela
+document.getElementById('fotoInput')?.addEventListener('change', async function() {
+    const file = this.files?.[0];
+    if (!file) return;
+    const fd = new FormData();
+    fd.append('foto', file);
+    const token = document.querySelector('input[name="__RequestVerificationToken"]')?.value;
+    if (token) fd.append('__RequestVerificationToken', token);
+    try {
+        const res  = await fetch('/Account/UploadFotoPerfil', { method: 'POST', body: fd });
+        const data = await res.json();
+        if (data.ok) {
+            const el = document.getElementById('perfilFoto');
+            if (el && el.tagName === 'IMG') {
+                el.src = data.url;
+            } else if (el) {
+                const img = document.createElement('img');
+                img.id        = 'perfilFoto';
+                img.src       = data.url;
+                img.alt       = 'Foto de perfil';
+                img.className = 'w-20 h-20 rounded-full object-cover shadow-lg border-2';
+                img.style.borderColor = 'var(--brown)';
+                el.replaceWith(img);
+            }
+        }
+    } catch(e) { console.error(e); }
+    this.value = '';
+});
+@if (TempData["ErroPerfil"] != null)
+{
+    @:showToast(@Json.Serialize(TempData["ErroPerfil"]!.ToString()), 'erro');
+}
+</script>
+}

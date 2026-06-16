@@ -1,0 +1,73 @@
+services:
+  db:
+    image: mysql:8.0
+    container_name: mindsite-mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: mindsite_db
+      MYSQL_USER: minduser
+      MYSQL_PASSWORD: mindpass
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    command: --default-authentication-plugin=mysql_native_password
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: mindsite-web
+    restart: always
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Server=db;Port=3306;Database=mindsite_db;Uid=minduser;Pwd=mindpass;CharSet=utf8mb4;
+
+      # ─── CONFIGURAÇÕES DO STRIPE ──────────────────────────────────────────
+      # - Stripe__WebhookSecret=whsec_placeholder
+      - Stripe__WebhookSecret=WH_KEY
+      - Stripe__SecretKey=SK_KEY
+      # - Stripe__SecretKey=sua_sk_test_aqui
+      # - Stripe__WebhookSecret=sua_wb_test_aqui
+
+      # ─── CONFIGURAÇÕES DO GOOGLE OAUTH 2.0 ────────────────────────────────
+      - Authentication__Google__ClientId=ID_CLIENT
+      # - Authentication__Google__ClientId=seu_client_id_do_google_aqui
+      - Authentication__Google__ClientSecret=SECRET_GOGOLE
+      # - Authentication__Google__ClientSecret=seu_client_secret_do_google_aqui
+
+      # ─── CONFIGURAÇÃO DO RESEND EMAIL ─────────────────────────────────────
+      # Mapeia diretamente para o builder.Configuration["Resend"] utilizado no seu HttpClient
+      - Resend=RE_KEY
+      # - Resend=sua_api_key_do_resend_aqui
+
+      # ─── CONFIGURAÇÃO DO AZURE BLOB STORAGE (PRODUÇÃO / TESTE) ────────────
+      # Necessário se você alternar o ASPNETCORE_ENVIRONMENT para "Production"
+      # - Azure__BlobStorage__ConnectionString=sua_connection_string_da_azure_aqui
+
+      # ─── NOVO SERVIÇO AUTOMATIZADO DO STRIPE CLI ──────────────────────────────
+  stripe-cli:
+    image: stripe/stripe-cli
+    container_name: mindsite-stripe-cli
+    restart: always
+    depends_on:
+      - web
+    environment:
+      - STRIPE_API_KEY=sk_test_51Tbw3IPSRJxfsNE1tcvylFE59R5aHjI6e5VnN7pFlLRYlf1NJlbvbTyWGbA04qhcKDmune9Nx0QRI8DSyh3iOW0q00CR18XbFd # Usa a mesma chave secreta para se autenticar
+      # - STRIPE_API_KEY=sk_test_COLE_SUA_CHAVE_AQUI # Usa a mesma chave secreta para se autenticar
+    # O comando abaixo escuta os eventos e joga para a rota interna da sua aplicação web dockerizada
+    command: listen --forward-to http://web:8080/webhook/stripe --events checkout.session.completed,checkout.session.async_payment_succeeded
+
+volumes:
+  mysql_data:
