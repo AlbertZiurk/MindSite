@@ -1,8 +1,665 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Início";
+    Layout = "_Layout";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<style>
+    /* Section backgrounds */
+    #home, #fornecedor { background: #F4F3EE; }
+    #sobrenos          { background: #F9F8F3; }
+    #servicos          { background: #ffffff; }
+
+    [data-theme="dark"]          #home,
+    [data-theme="dark"]          #fornecedor { background: var(--bg);  }
+    [data-theme="dark"]          #sobrenos   { background: var(--bg2); }
+    [data-theme="dark"]          #servicos   { background: var(--bg);  }
+    [data-theme="dark"]          .ms-svc-card { background: #1A1410; }
+
+    [data-access="alto-contraste"] #home,
+    [data-access="alto-contraste"] #sobrenos,
+    [data-access="alto-contraste"] #fornecedor,
+    [data-access="alto-contraste"] #servicos   { background: var(--bg); }
+
+    /* Sobre Nós */
+    .ms-sobre-card {
+        background: var(--bg2);
+        border-radius: 40px;
+        padding: 2.5rem;
+    }
+    .ms-sobre-float-blob {
+        background: var(--brown);
+        border-radius: 30px;
+        box-shadow: 0 10px 30px var(--shadow);
+    }
+    .ms-sobre-float-card {
+        background: var(--surface);
+        border-radius: 30px;
+        box-shadow: 0 20px 50px var(--shadow);
+    }
+
+    /* Floating card (Hero & Fornecedor) */
+    .ms-float-wrap {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+    }
+    .ms-float-blob { display: none; }
+    .ms-float-card {
+        background: var(--surface);
+        border-radius: 30px;
+        box-shadow: 0 20px 60px var(--shadow);
+        padding: 1.5rem;
+        display: flex;
+        flex-direction: column;
+        gap: 1.25rem;
+        width: 100%;
+        max-width: 360px;
+        position: relative;
+        z-index: 1;
+    }
+    .ms-float-img {
+        width: 100%;
+        height: 200px;
+        border-radius: 25px;
+        overflow: hidden;
+        box-shadow: inset 0 2px 8px rgba(0,0,0,.12);
+    }
+    @@media (min-width: 768px) {
+        .ms-float-wrap  { width: 520px; min-height: 540px; }
+        .ms-float-blob  {
+            display: block;
+            position: absolute;
+            width: 480px; height: 280px;
+            background: var(--brown);
+            border-radius: 30px;
+            box-shadow: 0 10px 30px var(--shadow);
+            top: 50%; left: 50%;
+            transform: translate(-50%, 5%);
+        }
+        .ms-float-card  {
+            position: absolute;
+            width: 400px; height: 500px;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -60%);
+            padding: 2rem;
+            gap: 1.5rem;
+            max-width: none;
+        }
+        .ms-float-img   { height: 280px; }
+    }
+
+    /* Service cards (horizontal) */
+    .ms-svc-card {
+        background: var(--bg2);
+        transition: transform .2s, box-shadow .2s;
+        box-shadow: 0 2px 10px rgba(0,0,0,.06);
+    }
+    .ms-svc-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 28px rgba(0,0,0,.1);
+    }
+    [data-theme="dark"] .ms-svc-card { background: #1A1410; }
+    .ms-svc-icon {
+        background: color-mix(in srgb, var(--brown) 12%, transparent);
+    }
+    .ms-svc-btn {
+        background: var(--brown); color: #fff; cursor: pointer; border: none;
+        transition: background .2s, transform .1s;
+        text-decoration: none; display: inline-block;
+    }
+    .ms-svc-btn:hover  { background: var(--brown-dark); }
+    .ms-svc-btn:active { transform: scale(.95); }
+    .ms-ver-mais-btn {
+        display: flex; align-items: center; gap: .5rem;
+        padding: .7rem 2rem; border-radius: 10px;
+        font-weight: 700; font-size: .875rem;
+        border: 1.5px solid var(--brown);
+        color: var(--brown); background: transparent;
+        cursor: pointer; transition: background .2s, color .2s;
+    }
+    .ms-ver-mais-btn:hover { background: var(--brown); color: #fff; }
+    #svc-ver-mais-icon { transition: transform .3s; }
+
+    /* Index buttons */
+    .ms-idx-primary {
+        display: block; width: 100%; text-align: center;
+        background: var(--brown); color: #fff;
+        font-weight: 700; border-radius: .5rem;
+        padding: .75rem 1rem;
+        transition: background .2s, transform .1s;
+    }
+    .ms-idx-primary:hover  { background: var(--brown-dark); }
+    .ms-idx-primary:active { transform: scale(.98); }
+
+    .ms-idx-secondary {
+        display: block; width: 100%; text-align: center;
+        background: var(--bg2); color: var(--text);
+        font-weight: 700; border-radius: .5rem;
+        padding: .75rem 1rem;
+        transition: filter .2s;
+    }
+    .ms-idx-secondary:hover { filter: brightness(.95); }
+
+    /* Benefício check */
+    .ms-check { background: var(--brown-dark); }
+    [data-theme="dark"] .ms-check svg,
+    [data-access="alto-contraste"] .ms-check svg { color: #1A1410; }
+
+    /* Eyebrow badge */
+    .ms-eyebrow {
+        display: inline-flex; align-items: center; gap: .4rem;
+        background: color-mix(in srgb, var(--brown) 10%, transparent);
+        color: var(--brown);
+        border: 1px solid color-mix(in srgb, var(--brown) 25%, transparent);
+        border-radius: 999px;
+        padding: .3rem .9rem;
+        font-size: .7rem; font-weight: 700;
+        letter-spacing: .06em; text-transform: uppercase;
+    }
+
+    /* Stat chips */
+    .ms-stat-chip {
+        display: inline-flex; align-items: center; gap: .4rem;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 999px;
+        padding: .35rem .85rem;
+        font-size: .78rem; font-weight: 500;
+        color: var(--text-muted);
+        box-shadow: 0 1px 4px var(--shadow);
+    }
+    .ms-stat-chip svg { color: var(--brown); flex-shrink: 0; }
+
+    /* Sobre Nós highlights */
+    .ms-sobre-hl {
+        display: flex; align-items: flex-start; gap: .875rem;
+        padding: .875rem 1.1rem;
+        background: var(--surface);
+        border-radius: 14px;
+        border: 1px solid var(--border);
+    }
+    .ms-sobre-hl-icon {
+        width: 2rem; height: 2rem; border-radius: 8px; flex-shrink: 0;
+        display: flex; align-items: center; justify-content: center;
+        background: color-mix(in srgb, var(--brown) 12%, transparent);
+    }
+
+    /* Fornecedor benefit list */
+    .ms-benefit {
+        display: flex; align-items: center; gap: .75rem;
+        padding: .55rem 0;
+        border-bottom: 1px solid var(--border);
+    }
+    .ms-benefit:last-child { border-bottom: none; }
+    .ms-benefit-tick {
+        width: 1.4rem; height: 1.4rem; border-radius: 50%; flex-shrink: 0;
+        display: flex; align-items: center; justify-content: center;
+        background: color-mix(in srgb, var(--brown) 15%, transparent);
+    }
+</style>
+
+@* Page content *@
+<div class="flex flex-col w-full">
+
+    @* Home *@
+    <section id="home" class="scroll-mt-20 min-h-screen flex items-center">
+        <div class="container mx-auto px-6 py-20 mt-16 md:mt-20 flex flex-col md:flex-row items-center justify-between gap-10 md:gap-16 w-full">
+
+            <div class="flex-1 flex flex-col items-start gap-6 md:gap-8">
+                <span class="ms-eyebrow">
+                    <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                    Plataforma de Desenvolvimento Web
+                </span>
+                <h1 class="font-inria text-5xl sm:text-6xl md:text-7xl font-bold leading-tight" style="color:var(--text)">
+                    O futuro do Desenvolvimento Web chegou!
+                </h1>
+                <p class="text-base md:text-xl max-w-2xl leading-relaxed" style="color:var(--text-muted)">
+                    Conectamos você aos melhores desenvolvedores de soluções Web. Solicite, acompanhe e gerencie seus projetos digitais em um só lugar.
+                </p>
+                <div class="flex flex-wrap gap-2">
+                    <span class="ms-stat-chip">
+                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/></svg>
+                        15 serviços disponíveis
+                    </span>
+                    <span class="ms-stat-chip">
+                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                        Fornecedores especializados
+                    </span>
+                    <span class="ms-stat-chip">
+                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064"/></svg>
+                        100% online
+                    </span>
+                </div>
+            </div>
+
+            <div class="flex-1 flex items-center justify-center w-full mt-4 md:mt-0">
+                <div class="ms-float-wrap">
+                    <div class="ms-float-blob"></div>
+                    <div class="ms-float-card">
+                        <div class="ms-float-img">
+                            <img src="~/img/corporacao.png" alt="Sede MindSite" class="w-full h-full object-cover">
+                        </div>
+                        <div class="flex flex-col gap-3 md:gap-4">
+                            <a href="/#sobrenos" class="ms-idx-secondary text-base md:text-lg">
+                                Sobre a MindSite
+                            </a>
+                            <a href="/#servicos" class="ms-idx-primary text-base md:text-lg shadow-md">
+                                Conhecer serviços
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    @* Sobre Nós *@
+    <section id="sobrenos" class="scroll-mt-20 min-h-screen flex items-center">
+        <div class="container mx-auto px-6 py-20 flex flex-col lg:flex-row gap-12 items-start">
+
+            @* Coluna esquerda: texto + foto *@
+            <div class="flex-[1.5] flex flex-col gap-8">
+                <div class="ms-sobre-card shadow-sm">
+                    <h2 class="font-inria text-5xl font-bold mb-4" style="color:var(--text)">Nossa História e Missão</h2>
+                    <p class="text-lg leading-relaxed mb-6" style="color:var(--text-muted)">
+                        A MindSite nasceu da visão de tornar o web design profissional acessível a qualquer empresa. Nossa plataforma conecta clientes a fornecedores especializados, eliminando barreiras e simplificando cada etapa — da solicitação à entrega final do projeto.
+                    </p>
+                    <div class="flex flex-col gap-3">
+                        <div class="ms-sobre-hl">
+                            <div class="ms-sobre-hl-icon">
+                                <svg class="w-4 h-4" style="color:var(--brown)" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                            </div>
+                            <div>
+                                <p class="text-sm font-semibold" style="color:var(--text)">Conexão direta e sem intermediários</p>
+                                <p class="text-xs mt-0.5" style="color:var(--text-muted)">Clientes e fornecedores em um único ecossistema digital</p>
+                            </div>
+                        </div>
+                        <div class="ms-sobre-hl">
+                            <div class="ms-sobre-hl-icon">
+                                <svg class="w-4 h-4" style="color:var(--brown)" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+                            </div>
+                            <div>
+                                <p class="text-sm font-semibold" style="color:var(--text)">Gerenciamento ágil de projetos</p>
+                                <p class="text-xs mt-0.5" style="color:var(--text-muted)">Acompanhe cada etapa do seu projeto em tempo real</p>
+                            </div>
+                        </div>
+                        <div class="ms-sobre-hl">
+                            <div class="ms-sobre-hl-icon">
+                                <svg class="w-4 h-4" style="color:var(--brown)" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                            </div>
+                            <div>
+                                <p class="text-sm font-semibold" style="color:var(--text)">Plataforma segura e transparente</p>
+                                <p class="text-xs mt-0.5" style="color:var(--text-muted)">Seus dados e projetos protegidos do início ao fim</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="w-full h-[420px] rounded-[40px] overflow-hidden shadow-lg border-4 border-white">
+                    <img src="~/img/predio.png" alt="Sede Corporativa MindSite" class="w-full h-full object-cover">
+                </div>
+            </div>
+
+            @* Coluna direita: mapa flutuante + botão *@
+            <div class="flex-1 flex flex-col gap-8 items-center lg:pt-10">
+
+                <div class="relative flex items-center justify-center w-full min-h-[420px]">
+                    <div class="ms-sobre-float-blob absolute w-[280px] h-[200px]" style="bottom:0;left:50%;transform:translateX(-50%) translateY(10%)"></div>
+                    <div class="ms-sobre-float-card relative z-10 w-full max-w-[420px] p-5 flex flex-col gap-4" style="margin-top:0">
+                        <div class="w-full h-[220px] rounded-[20px] overflow-hidden border" style="border-color:var(--border)">
+                            <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2513.0492301068216!2d-46.735069421154854!3d-23.527892430912853!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x94cef8b811e8e3a1%3A0xa7564bb4c78f41b3!2sSenai%20Vila%20Leopoldina%20-%20Mariano%20Ferraz!5e0!3m2!1spt-BR!2sbr!4v1778180945751!5m2!1spt-BR!2sbr"
+                                    width="600" height="450" style="border:0;width:100%;height:100%"
+                                    allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                        </div>
+                        <a href="https://maps.app.goo.gl/HGtj6xRkAvy9UN1m6"
+                           target="_blank" rel="noopener noreferrer"
+                           class="w-full py-3 rounded-xl font-bold text-sm text-center block shadow-sm transition-opacity hover:opacity-80"
+                           style="background:var(--bg2);color:var(--text);border:1px solid var(--border)">
+                            Ver no Maps
+                        </a>
+                    </div>
+                </div>
+
+                <div class="w-full max-w-[420px]">
+                    <a href="#servicos"
+                       class="ms-idx-primary block py-4 rounded-xl font-bold text-lg shadow-md">
+                        Entre em contato conosco
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    @* Serviços *@
+    <section id="servicos" class="scroll-mt-20">
+        <div class="container mx-auto px-6 py-16 md:py-20 flex flex-col lg:flex-row gap-12 lg:gap-20 items-start">
+
+            @* Coluna esquerda — título, descrição e botão *@
+            <div class="w-full lg:w-80 lg:flex-shrink-0 lg:sticky lg:top-28 flex flex-col gap-6 md:gap-8">
+                <h1 class="font-inria text-5xl md:text-6xl font-bold" style="color:var(--text)">Serviços</h1>
+                <div class="flex flex-col gap-4 text-base leading-relaxed" style="color:var(--text-muted)">
+                    <p>Oferecemos soluções completas em desenvolvimento web para cada etapa da sua presença digital — do primeiro site até sistemas complexos sob medida.</p>
+                    <p>Cada projeto é desenvolvido com atenção aos detalhes e foco em resultados reais para o seu negócio.</p>
+                </div>
+                <a asp-controller="Account" asp-action="Register"
+                   class="ms-idx-primary font-bold text-base rounded-xl shadow-sm"
+                   style="display:inline-block;width:auto;padding:.7rem 1.75rem;text-align:center">
+                    Criar conta
+                </a>
+            </div>
+
+            @* Coluna direita — cards *@
+            <div class="flex-1 w-full flex flex-col gap-5 md:gap-6">
+
+            @* 4 cards visíveis *@
+
+                @* 1. Sites Institucionais *@
+                <div class="ms-svc-card rounded-l-[44px] rounded-r-[60px] flex items-stretch overflow-hidden relative">
+                    <div class="ms-svc-icon w-28 sm:w-36 rounded-[44px] p-4 sm:p-5 flex flex-col justify-center items-center shrink-0 gap-2">
+                        <svg class="w-12 h-12 sm:w-14 sm:h-14" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="6" y="10" width="52" height="38" rx="4" stroke="var(--brown)" stroke-width="3" fill="none"/>
+                            <path d="M6 18h52" stroke="var(--brown)" stroke-width="3"/>
+                            <circle cx="13" cy="14" r="2" fill="var(--brown)"/><circle cx="20" cy="14" r="2" fill="var(--brown)"/><circle cx="27" cy="14" r="2" fill="var(--brown)"/>
+                            <rect x="14" y="26" width="16" height="14" rx="2" fill="var(--brown)" opacity=".3"/>
+                            <rect x="34" y="26" width="16" height="6" rx="2" fill="var(--brown)" opacity=".3"/>
+                            <rect x="34" y="35" width="10" height="5" rx="2" fill="var(--brown)" opacity=".3"/>
+                            <path d="M24 48v6M40 48v6M18 54h28" stroke="var(--brown)" stroke-width="3" stroke-linecap="round"/>
+                        </svg>
+                        <span class="font-inria text-xs sm:text-sm font-bold text-center leading-tight" style="color:var(--text)">Sites Institucionais</span>
+                    </div>
+                    <div class="flex-1 p-5 sm:p-6 md:p-7 pb-14 sm:pb-16">
+                        <p class="text-sm sm:text-base leading-relaxed" style="color:var(--text-muted)">Sites profissionais que representam a identidade da sua empresa online. Apresentamos sua história, serviços e diferenciais com design moderno e responsivo, gerando contatos qualificados e transmitindo credibilidade ao seu público desde o primeiro acesso.</p>
+                    </div>
+                    <a asp-controller="Account" asp-action="Login" class="ms-svc-btn absolute bottom-0 right-0 text-xs sm:text-sm font-bold px-8 sm:px-10 py-3 sm:py-3.5 rounded-tl-[50px]">Solicitar serviço</a>
+                </div>
+
+                @* 2. Landing Pages *@
+                <div class="ms-svc-card rounded-l-[44px] rounded-r-[60px] flex items-stretch overflow-hidden relative">
+                    <div class="ms-svc-icon w-28 sm:w-36 rounded-[44px] p-4 sm:p-5 flex flex-col justify-center items-center shrink-0 gap-2">
+                        <svg class="w-12 h-12 sm:w-14 sm:h-14" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="8" y="8" width="48" height="48" rx="4" stroke="var(--brown)" stroke-width="3" fill="none"/>
+                            <path d="M8 22h48" stroke="var(--brown)" stroke-width="3"/>
+                            <rect x="16" y="30" width="32" height="4" rx="2" fill="var(--brown)" opacity=".4"/>
+                            <rect x="20" y="38" width="24" height="3" rx="1.5" fill="var(--brown)" opacity=".25"/>
+                            <rect x="22" y="44" width="20" height="3" rx="1.5" fill="var(--brown)" opacity=".15"/>
+                            <circle cx="32" cy="16" r="3" fill="var(--brown)"/>
+                        </svg>
+                        <span class="font-inria text-xs sm:text-sm font-bold text-center leading-tight" style="color:var(--text)">Landing Pages</span>
+                    </div>
+                    <div class="flex-1 p-5 sm:p-6 md:p-7 pb-14 sm:pb-16">
+                        <p class="text-sm sm:text-base leading-relaxed" style="color:var(--text-muted)">Páginas estratégicas de alta conversão criadas especificamente para campanhas e lançamentos. Cada elemento é pensado para capturar a atenção do visitante e transformá-lo em lead ou cliente de forma rápida, direta e eficiente.</p>
+                    </div>
+                    <a asp-controller="Account" asp-action="Login" class="ms-svc-btn absolute bottom-0 right-0 text-xs sm:text-sm font-bold px-8 sm:px-10 py-3 sm:py-3.5 rounded-tl-[50px]">Solicitar serviço</a>
+                </div>
+
+                @* 3. One-Page Sites *@
+                <div class="ms-svc-card rounded-l-[44px] rounded-r-[60px] flex items-stretch overflow-hidden relative">
+                    <div class="ms-svc-icon w-28 sm:w-36 rounded-[44px] p-4 sm:p-5 flex flex-col justify-center items-center shrink-0 gap-2">
+                        <svg class="w-12 h-12 sm:w-14 sm:h-14" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="14" y="4" width="36" height="56" rx="4" stroke="var(--brown)" stroke-width="3" fill="none"/>
+                            <rect x="20" y="12" width="24" height="3" rx="1.5" fill="var(--brown)" opacity=".4"/>
+                            <rect x="20" y="19" width="18" height="3" rx="1.5" fill="var(--brown)" opacity=".25"/>
+                            <rect x="20" y="26" width="22" height="3" rx="1.5" fill="var(--brown)" opacity=".25"/>
+                            <rect x="20" y="33" width="16" height="3" rx="1.5" fill="var(--brown)" opacity=".2"/>
+                            <circle cx="32" cy="48" r="3" fill="var(--brown)" opacity=".5"/>
+                        </svg>
+                        <span class="font-inria text-xs sm:text-sm font-bold text-center leading-tight" style="color:var(--text)">One-Page Sites</span>
+                    </div>
+                    <div class="flex-1 p-5 sm:p-6 md:p-7 pb-14 sm:pb-16">
+                        <p class="text-sm sm:text-base leading-relaxed" style="color:var(--text-muted)">Sites elegantes em uma única página com navegação por rolagem fluida. Ideais para profissionais autônomos, eventos e startups que querem transmitir sua mensagem de forma objetiva, impactante e sem distrações desnecessárias.</p>
+                    </div>
+                    <a asp-controller="Account" asp-action="Login" class="ms-svc-btn absolute bottom-0 right-0 text-xs sm:text-sm font-bold px-8 sm:px-10 py-3 sm:py-3.5 rounded-tl-[50px]">Solicitar serviço</a>
+                </div>
+
+                @* 4. Portfólios Digitais *@
+                <div class="ms-svc-card rounded-l-[44px] rounded-r-[60px] flex items-stretch overflow-hidden relative">
+                    <div class="ms-svc-icon w-28 sm:w-36 rounded-[44px] p-4 sm:p-5 flex flex-col justify-center items-center shrink-0 gap-2">
+                        <svg class="w-12 h-12 sm:w-14 sm:h-14" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="8" y="16" width="48" height="36" rx="4" stroke="var(--brown)" stroke-width="3" fill="none"/>
+                            <path d="M20 16V10a4 4 0 0 1 4-4h16a4 4 0 0 1 4 4v6" stroke="var(--brown)" stroke-width="3"/>
+                            <rect x="16" y="26" width="14" height="14" rx="2" fill="var(--brown)" opacity=".3"/>
+                            <rect x="34" y="26" width="14" height="6" rx="2" fill="var(--brown)" opacity=".2"/>
+                            <rect x="34" y="35" width="10" height="5" rx="2" fill="var(--brown)" opacity=".15"/>
+                        </svg>
+                        <span class="font-inria text-xs sm:text-sm font-bold text-center leading-tight" style="color:var(--text)">Portfólios Digitais</span>
+                    </div>
+                    <div class="flex-1 p-5 sm:p-6 md:p-7 pb-14 sm:pb-16">
+                        <p class="text-sm sm:text-base leading-relaxed" style="color:var(--text-muted)">Vitrines digitais personalizadas para fotógrafos, designers, arquitetos e profissionais criativos. Destaque seus melhores trabalhos em galerias modernas e conquiste novos clientes com uma apresentação que reflete seu estilo único.</p>
+                    </div>
+                    <a asp-controller="Account" asp-action="Login" class="ms-svc-btn absolute bottom-0 right-0 text-xs sm:text-sm font-bold px-8 sm:px-10 py-3 sm:py-3.5 rounded-tl-[50px]">Solicitar serviço</a>
+                </div>
+
+            @* Grade de serviços extras ocultos, exibida ao clicar em Ver mais *@
+            <div id="svc-extra" style="display:none" class="flex flex-col gap-5 md:gap-6">
+
+                @* 5. Blogs e Portais *@
+                <div class="ms-svc-card rounded-l-[44px] rounded-r-[60px] flex items-stretch overflow-hidden relative">
+                    <div class="ms-svc-icon w-28 sm:w-36 rounded-[44px] p-4 sm:p-5 flex flex-col justify-center items-center shrink-0 gap-2">
+                        <svg class="w-12 h-12 sm:w-14 sm:h-14" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="8" y="8" width="48" height="48" rx="4" stroke="var(--brown)" stroke-width="3" fill="none"/>
+                            <path d="M8 20h48" stroke="var(--brown)" stroke-width="2" opacity=".4"/>
+                            <rect x="14" y="27" width="20" height="14" rx="2" fill="var(--brown)" opacity=".25"/>
+                            <rect x="38" y="27" width="14" height="4" rx="2" fill="var(--brown)" opacity=".2"/>
+                            <rect x="38" y="34" width="10" height="3" rx="1.5" fill="var(--brown)" opacity=".15"/>
+                            <rect x="14" y="44" width="36" height="3" rx="1.5" fill="var(--brown)" opacity=".1"/>
+                        </svg>
+                        <span class="font-inria text-xs sm:text-sm font-bold text-center leading-tight" style="color:var(--text)">Blogs e Portais</span>
+                    </div>
+                    <div class="flex-1 p-5 sm:p-6 md:p-7 pb-14 sm:pb-16">
+                        <p class="text-sm sm:text-base leading-relaxed" style="color:var(--text-muted)">Plataformas de conteúdo otimizadas para SEO com editor intuitivo, categorias, tags e integração com redes sociais. Construa autoridade no seu nicho publicando artigos que atraem visitantes orgânicos e posicionam sua marca no Google.</p>
+                    </div>
+                    <a asp-controller="Account" asp-action="Login" class="ms-svc-btn absolute bottom-0 right-0 text-xs sm:text-sm font-bold px-8 sm:px-10 py-3 sm:py-3.5 rounded-tl-[50px]">Solicitar serviço</a>
+                </div>
+
+                @* 6. E-commerce *@
+                <div class="ms-svc-card rounded-l-[44px] rounded-r-[60px] flex items-stretch overflow-hidden relative">
+                    <div class="ms-svc-icon w-28 sm:w-36 rounded-[44px] p-4 sm:p-5 flex flex-col justify-center items-center shrink-0 gap-2">
+                        <svg class="w-12 h-12 sm:w-14 sm:h-14" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M8 10h6l8 28h28l6-20H18" stroke="var(--brown)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                            <circle cx="28" cy="52" r="4" fill="var(--brown)" opacity=".5"/>
+                            <circle cx="44" cy="52" r="4" fill="var(--brown)" opacity=".5"/>
+                            <path d="M26 30l4 4 8-8" stroke="var(--brown)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        <span class="font-inria text-xs sm:text-sm font-bold text-center leading-tight" style="color:var(--text)">E-commerce</span>
+                    </div>
+                    <div class="flex-1 p-5 sm:p-6 md:p-7 pb-14 sm:pb-16">
+                        <p class="text-sm sm:text-base leading-relaxed" style="color:var(--text-muted)">Lojas virtuais completas, seguras e escaláveis com catálogo de produtos, carrinho de compras, integração com múltiplos meios de pagamento e painel administrativo intuitivo para gerenciar pedidos, estoque e clientes com facilidade.</p>
+                    </div>
+                    <a asp-controller="Account" asp-action="Login" class="ms-svc-btn absolute bottom-0 right-0 text-xs sm:text-sm font-bold px-8 sm:px-10 py-3 sm:py-3.5 rounded-tl-[50px]">Solicitar serviço</a>
+                </div>
+
+                @* 7. Plataformas EAD *@
+                <div class="ms-svc-card rounded-l-[44px] rounded-r-[60px] flex items-stretch overflow-hidden relative">
+                    <div class="ms-svc-icon w-28 sm:w-36 rounded-[44px] p-4 sm:p-5 flex flex-col justify-center items-center shrink-0 gap-2">
+                        <svg class="w-12 h-12 sm:w-14 sm:h-14" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="6" y="10" width="52" height="34" rx="4" stroke="var(--brown)" stroke-width="3" fill="none"/>
+                            <path d="M6 18h52" stroke="var(--brown)" stroke-width="2" opacity=".4"/>
+                            <polygon points="26,24 26,38 42,31" fill="var(--brown)" opacity=".4"/>
+                            <path d="M20 48v4M44 48v4M14 52h36" stroke="var(--brown)" stroke-width="3" stroke-linecap="round"/>
+                        </svg>
+                        <span class="font-inria text-xs sm:text-sm font-bold text-center leading-tight" style="color:var(--text)">Plataformas EAD</span>
+                    </div>
+                    <div class="flex-1 p-5 sm:p-6 md:p-7 pb-14 sm:pb-16">
+                        <p class="text-sm sm:text-base leading-relaxed" style="color:var(--text-muted)">Ambientes de ensino online completos com módulos de aula, upload de vídeos e materiais, área do aluno, emissão de certificados e controle de progresso. Ideal para escolas, instrutores e empresas que oferecem treinamentos.</p>
+                    </div>
+                    <a asp-controller="Account" asp-action="Login" class="ms-svc-btn absolute bottom-0 right-0 text-xs sm:text-sm font-bold px-8 sm:px-10 py-3 sm:py-3.5 rounded-tl-[50px]">Solicitar serviço</a>
+                </div>
+
+                @* 8. Links para Bio *@
+                <div class="ms-svc-card rounded-l-[44px] rounded-r-[60px] flex items-stretch overflow-hidden relative">
+                    <div class="ms-svc-icon w-28 sm:w-36 rounded-[44px] p-4 sm:p-5 flex flex-col justify-center items-center shrink-0 gap-2">
+                        <svg class="w-12 h-12 sm:w-14 sm:h-14" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="18" y="4" width="28" height="56" rx="6" stroke="var(--brown)" stroke-width="3" fill="none"/>
+                            <circle cx="32" cy="16" r="5" fill="var(--brown)" opacity=".3"/>
+                            <rect x="22" y="25" width="20" height="5" rx="2.5" fill="var(--brown)" opacity=".35"/>
+                            <rect x="22" y="33" width="20" height="5" rx="2.5" fill="var(--brown)" opacity=".25"/>
+                            <rect x="22" y="41" width="20" height="5" rx="2.5" fill="var(--brown)" opacity=".15"/>
+                            <circle cx="32" cy="56" r="2" fill="var(--brown)" opacity=".3"/>
+                        </svg>
+                        <span class="font-inria text-xs sm:text-sm font-bold text-center leading-tight" style="color:var(--text)">Links para Bio</span>
+                    </div>
+                    <div class="flex-1 p-5 sm:p-6 md:p-7 pb-14 sm:pb-16">
+                        <p class="text-sm sm:text-base leading-relaxed" style="color:var(--text-muted)">Páginas personalizadas com todos os seus links essenciais reunidos em um único endereço fácil de compartilhar. Design exclusivo alinhado à sua identidade visual, otimizado para redes sociais e com análise de cliques em tempo real.</p>
+                    </div>
+                    <a asp-controller="Account" asp-action="Login" class="ms-svc-btn absolute bottom-0 right-0 text-xs sm:text-sm font-bold px-8 sm:px-10 py-3 sm:py-3.5 rounded-tl-[50px]">Solicitar serviço</a>
+                </div>
+
+                @* 9. Sistemas Web *@
+                <div class="ms-svc-card rounded-l-[44px] rounded-r-[60px] flex items-stretch overflow-hidden relative">
+                    <div class="ms-svc-icon w-28 sm:w-36 rounded-[44px] p-4 sm:p-5 flex flex-col justify-center items-center shrink-0 gap-2">
+                        <svg class="w-12 h-12 sm:w-14 sm:h-14" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="8" y="8" width="48" height="48" rx="4" stroke="var(--brown)" stroke-width="3" fill="none"/>
+                            <path d="M8 22h48" stroke="var(--brown)" stroke-width="2" opacity=".4"/>
+                            <rect x="14" y="29" width="12" height="20" rx="2" fill="var(--brown)" opacity=".2"/>
+                            <rect x="30" y="29" width="22" height="8" rx="2" fill="var(--brown)" opacity=".2"/>
+                            <rect x="30" y="41" width="14" height="8" rx="2" fill="var(--brown)" opacity=".15"/>
+                            <circle cx="14" cy="16" r="2" fill="var(--brown)"/><circle cx="20" cy="16" r="2" fill="var(--brown)"/>
+                        </svg>
+                        <span class="font-inria text-xs sm:text-sm font-bold text-center leading-tight" style="color:var(--text)">Sistemas Web</span>
+                    </div>
+                    <div class="flex-1 p-5 sm:p-6 md:p-7 pb-14 sm:pb-16">
+                        <p class="text-sm sm:text-base leading-relaxed" style="color:var(--text-muted)">Sistemas sob medida para digitalizar e automatizar processos do seu negócio. Desenvolvemos painéis de gestão, controle de estoque, relatórios e CRMs que eliminam planilhas, reduzem erros e aumentam a produtividade da equipe.</p>
+                    </div>
+                    <a asp-controller="Account" asp-action="Login" class="ms-svc-btn absolute bottom-0 right-0 text-xs sm:text-sm font-bold px-8 sm:px-10 py-3 sm:py-3.5 rounded-tl-[50px]">Solicitar serviço</a>
+                </div>
+
+                @* 10. Agendamento *@
+                <div class="ms-svc-card rounded-l-[44px] rounded-r-[60px] flex items-stretch overflow-hidden relative">
+                    <div class="ms-svc-icon w-28 sm:w-36 rounded-[44px] p-4 sm:p-5 flex flex-col justify-center items-center shrink-0 gap-2">
+                        <svg class="w-12 h-12 sm:w-14 sm:h-14" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="8" y="14" width="48" height="44" rx="4" stroke="var(--brown)" stroke-width="3" fill="none"/>
+                            <path d="M8 26h48" stroke="var(--brown)" stroke-width="2" opacity=".4"/>
+                            <path d="M22 8v12M42 8v12" stroke="var(--brown)" stroke-width="3" stroke-linecap="round"/>
+                            <rect x="16" y="33" width="8" height="7" rx="1.5" fill="var(--brown)" opacity=".3"/>
+                            <rect x="28" y="33" width="8" height="7" rx="1.5" fill="var(--brown)" opacity=".5"/>
+                            <rect x="40" y="33" width="8" height="7" rx="1.5" fill="var(--brown)" opacity=".2"/>
+                            <rect x="16" y="44" width="8" height="7" rx="1.5" fill="var(--brown)" opacity=".2"/>
+                            <rect x="28" y="44" width="8" height="7" rx="1.5" fill="var(--brown)" opacity=".15"/>
+                        </svg>
+                        <span class="font-inria text-xs sm:text-sm font-bold text-center leading-tight" style="color:var(--text)">Agendamento</span>
+                    </div>
+                    <div class="flex-1 p-5 sm:p-6 md:p-7 pb-14 sm:pb-16">
+                        <p class="text-sm sm:text-base leading-relaxed" style="color:var(--text-muted)">Sites com sistema de agendamento online integrado para que seus clientes marquem horários 24h por dia. Inclui notificações automáticas por e-mail, gestão de disponibilidade e painel de controle para clínicas, salões e consultorias.</p>
+                    </div>
+                    <a asp-controller="Account" asp-action="Login" class="ms-svc-btn absolute bottom-0 right-0 text-xs sm:text-sm font-bold px-8 sm:px-10 py-3 sm:py-3.5 rounded-tl-[50px]">Solicitar serviço</a>
+                </div>
+
+                @* 11. Multi-idiomas *@
+                <div class="ms-svc-card rounded-l-[44px] rounded-r-[60px] flex items-stretch overflow-hidden relative">
+                    <div class="ms-svc-icon w-28 sm:w-36 rounded-[44px] p-4 sm:p-5 flex flex-col justify-center items-center shrink-0 gap-2">
+                        <svg class="w-12 h-12 sm:w-14 sm:h-14" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="32" cy="32" r="24" stroke="var(--brown)" stroke-width="3" fill="none"/>
+                            <path d="M32 8c0 0-10 10-10 24s10 24 10 24" stroke="var(--brown)" stroke-width="2.5" opacity=".5"/>
+                            <path d="M32 8c0 0 10 10 10 24s-10 24-10 24" stroke="var(--brown)" stroke-width="2.5" opacity=".5"/>
+                            <path d="M8 32h48" stroke="var(--brown)" stroke-width="2.5" opacity=".4"/>
+                            <path d="M10 20h44M10 44h44" stroke="var(--brown)" stroke-width="2" opacity=".2"/>
+                        </svg>
+                        <span class="font-inria text-xs sm:text-sm font-bold text-center leading-tight" style="color:var(--text)">Multi-idiomas</span>
+                    </div>
+                    <div class="flex-1 p-5 sm:p-6 md:p-7 pb-14 sm:pb-16">
+                        <p class="text-sm sm:text-base leading-relaxed" style="color:var(--text-muted)">Sites adaptados para múltiplos idiomas com alternância fluida sem recarregamento de página. Amplie seu alcance para públicos internacionais com traduções profissionais e URLs localizadas que melhoram o SEO global.</p>
+                    </div>
+                    <a asp-controller="Account" asp-action="Login" class="ms-svc-btn absolute bottom-0 right-0 text-xs sm:text-sm font-bold px-8 sm:px-10 py-3 sm:py-3.5 rounded-tl-[50px]">Solicitar serviço</a>
+                </div>
+
+                @* 12. Redesign *@
+                <div class="ms-svc-card rounded-l-[44px] rounded-r-[60px] flex items-stretch overflow-hidden relative">
+                    <div class="ms-svc-icon w-28 sm:w-36 rounded-[44px] p-4 sm:p-5 flex flex-col justify-center items-center shrink-0 gap-2">
+                        <svg class="w-12 h-12 sm:w-14 sm:h-14" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M10 54L20 44l-6-6L54 10l-4-4L10 46l6 6-6 2z" stroke="var(--brown)" stroke-width="3" stroke-linejoin="round" fill="none"/>
+                            <path d="M20 44l-6-6" stroke="var(--brown)" stroke-width="3" stroke-linecap="round"/>
+                            <rect x="40" y="8" width="12" height="12" rx="2" stroke="var(--brown)" stroke-width="2.5" fill="none" opacity=".4"/>
+                            <path d="M46 8V4M46 24v-4M56 14h-4M36 14h4" stroke="var(--brown)" stroke-width="2" stroke-linecap="round" opacity=".4"/>
+                        </svg>
+                        <span class="font-inria text-xs sm:text-sm font-bold text-center leading-tight" style="color:var(--text)">Redesign</span>
+                    </div>
+                    <div class="flex-1 p-5 sm:p-6 md:p-7 pb-14 sm:pb-16">
+                        <p class="text-sm sm:text-base leading-relaxed" style="color:var(--text-muted)">Reformulação visual completa de sites desatualizados, modernizando layout, tipografia, paleta de cores e experiência do usuário. Preservamos seu conteúdo e reputação enquanto entregamos uma presença digital renovada e competitiva.</p>
+                    </div>
+                    <a asp-controller="Account" asp-action="Login" class="ms-svc-btn absolute bottom-0 right-0 text-xs sm:text-sm font-bold px-8 sm:px-10 py-3 sm:py-3.5 rounded-tl-[50px]">Solicitar serviço</a>
+                </div>
+
+                @* 13. Manutenção *@
+                <div class="ms-svc-card rounded-l-[44px] rounded-r-[60px] flex items-stretch overflow-hidden relative">
+                    <div class="ms-svc-icon w-28 sm:w-36 rounded-[44px] p-4 sm:p-5 flex flex-col justify-center items-center shrink-0 gap-2">
+                        <svg class="w-12 h-12 sm:w-14 sm:h-14" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M48 12a8 8 0 0 0-8 8c0 1.2.14 2.36.4 3.46L12 52a4 4 0 0 0 0 5.66 4 4 0 0 0 5.66 0l28.54-28.4A12 12 0 0 0 48 30a12 12 0 0 0 2-23.83V12z" stroke="var(--brown)" stroke-width="3" fill="none" stroke-linejoin="round"/>
+                            <circle cx="16" cy="52" r="3" fill="var(--brown)" opacity=".4"/>
+                        </svg>
+                        <span class="font-inria text-xs sm:text-sm font-bold text-center leading-tight" style="color:var(--text)">Manutenção</span>
+                    </div>
+                    <div class="flex-1 p-5 sm:p-6 md:p-7 pb-14 sm:pb-16">
+                        <p class="text-sm sm:text-base leading-relaxed" style="color:var(--text-muted)">Suporte técnico contínuo para manter seu site seguro, rápido e atualizado. Realizamos correção de bugs, atualização de plugins, backups periódicos e ajustes de layout para garantir operação estável e sem interrupções ao longo do tempo.</p>
+                    </div>
+                    <a asp-controller="Account" asp-action="Login" class="ms-svc-btn absolute bottom-0 right-0 text-xs sm:text-sm font-bold px-8 sm:px-10 py-3 sm:py-3.5 rounded-tl-[50px]">Solicitar serviço</a>
+                </div>
+
+                @* 14. SEO & Performance *@
+                <div class="ms-svc-card rounded-l-[44px] rounded-r-[60px] flex items-stretch overflow-hidden relative">
+                    <div class="ms-svc-icon w-28 sm:w-36 rounded-[44px] p-4 sm:p-5 flex flex-col justify-center items-center shrink-0 gap-2">
+                        <svg class="w-12 h-12 sm:w-14 sm:h-14" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="26" cy="26" r="16" stroke="var(--brown)" stroke-width="3" fill="none"/>
+                            <path d="M38 38l14 14" stroke="var(--brown)" stroke-width="3" stroke-linecap="round"/>
+                            <path d="M18 26h4M26 18v4" stroke="var(--brown)" stroke-width="2.5" stroke-linecap="round" opacity=".5"/>
+                            <path d="M20 32l3-3 4 4 5-6 4 3" stroke="var(--brown)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity=".6"/>
+                        </svg>
+                        <span class="font-inria text-xs sm:text-sm font-bold text-center leading-tight" style="color:var(--text)">SEO & Performance</span>
+                    </div>
+                    <div class="flex-1 p-5 sm:p-6 md:p-7 pb-14 sm:pb-16">
+                        <p class="text-sm sm:text-base leading-relaxed" style="color:var(--text-muted)">Otimização técnica completa de SEO on-page e velocidade de carregamento. Melhoramos o posicionamento no Google com estrutura semântica correta, compressão de imagens, cache avançado e relatórios detalhados de performance.</p>
+                    </div>
+                    <a asp-controller="Account" asp-action="Login" class="ms-svc-btn absolute bottom-0 right-0 text-xs sm:text-sm font-bold px-8 sm:px-10 py-3 sm:py-3.5 rounded-tl-[50px]">Solicitar serviço</a>
+                </div>
+
+                @* 15. Migração *@
+                <div class="ms-svc-card rounded-l-[44px] rounded-r-[60px] flex items-stretch overflow-hidden relative">
+                    <div class="ms-svc-icon w-28 sm:w-36 rounded-[44px] p-4 sm:p-5 flex flex-col justify-center items-center shrink-0 gap-2">
+                        <svg class="w-12 h-12 sm:w-14 sm:h-14" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="6" y="8" width="22" height="18" rx="3" stroke="var(--brown)" stroke-width="3" fill="none" opacity=".5"/>
+                            <rect x="36" y="38" width="22" height="18" rx="3" stroke="var(--brown)" stroke-width="3" fill="none"/>
+                            <path d="M28 17h8l-4-5M28 17l4 5" stroke="var(--brown)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" opacity=".4"/>
+                            <path d="M36 47h-8l4-5M36 47l-4 5" stroke="var(--brown)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M17 26v12M47 38V26" stroke="var(--brown)" stroke-width="2" stroke-linecap="round" opacity=".3"/>
+                        </svg>
+                        <span class="font-inria text-xs sm:text-sm font-bold text-center leading-tight" style="color:var(--text)">Migração</span>
+                    </div>
+                    <div class="flex-1 p-5 sm:p-6 md:p-7 pb-14 sm:pb-16">
+                        <p class="text-sm sm:text-base leading-relaxed" style="color:var(--text-muted)">Transferência segura do seu site para uma nova hospedagem com zero perda de dados. Cuidamos de DNS, SSL, banco de dados e configurações de servidor para garantir chegada ao novo ambiente sem erros e com mínimo de downtime.</p>
+                    </div>
+                    <a asp-controller="Account" asp-action="Login" class="ms-svc-btn absolute bottom-0 right-0 text-xs sm:text-sm font-bold px-8 sm:px-10 py-3 sm:py-3.5 rounded-tl-[50px]">Solicitar serviço</a>
+                </div>
+
+            </div>
+
+            @* Botão ver mais *@
+            <div class="flex justify-center mt-8 md:mt-10">
+                <button type="button" onclick="toggleSvcExtra()" id="btn-ver-mais" class="ms-ver-mais-btn">
+                    <span id="svc-ver-mais-txt">Ver mais serviços</span>
+                    <svg id="svc-ver-mais-icon" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M6 9l6 6 6-6"/>
+                    </svg>
+                </button>
+            </div>
+
+            </div>@* fim coluna direita *@
+        </div>
+    </section>
+
+
 </div>
+
+@section Scripts {
+<script>
+// Alterna a exibição dos cards de serviço extras e atualiza o botão
+function toggleSvcExtra() {
+    const el   = document.getElementById('svc-extra');
+    const txt  = document.getElementById('svc-ver-mais-txt');
+    const icon = document.getElementById('svc-ver-mais-icon');
+    const isHidden = el.style.display === 'none';
+    el.style.display = isHidden ? '' : 'none';
+    txt.textContent  = isHidden ? 'Ver menos' : 'Ver mais serviços';
+    icon.style.transform = isHidden ? 'rotate(180deg)' : '';
+}
+</script>
+}

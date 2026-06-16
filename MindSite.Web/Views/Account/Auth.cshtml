@@ -1,0 +1,487 @@
+@{
+    ViewData["Title"] = "Entrar";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="pt-br" data-theme="light">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - MindSite</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="apple-touch-icon" sizes="180x180" href="~/favicons/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="~/favicons/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="~/favicons/favicon-16x16.png">
+    <link rel="manifest" href="~/favicons/site.webmanifest">
+    <link href="https://fonts.googleapis.com/css2?family=Inria+Serif:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:400,800" rel="stylesheet">
+    <link rel="stylesheet" href="~/css/site.css"/>
+</head>
+<body class="min-h-screen m-0 p-0" style="background:var(--bg)">
+
+    <a href="/" aria-label="Voltar para o início"
+       class="fixed top-4 left-4 z-[60] w-10 h-10 rounded-full flex items-center justify-center shadow-md transition-all hover:scale-110"
+       style="background:var(--brown);color:#fff;border:1px solid var(--border)">
+        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
+        </svg>
+    </a>
+
+    <button id="btnTheme"
+            class="fixed top-4 right-4 z-[60] w-10 h-10 rounded-full flex items-center justify-center shadow-md transition-all hover:scale-110"
+            style="background:var(--brown); color:#fff"
+            title="Alternar tema" aria-label="Alternar modo escuro e claro">
+    </button>
+
+    @* Seção mobile de autenticação *@
+    <div class="md:hidden flex flex-col items-center min-h-screen pt-16 pb-10 px-5" style="background:var(--bg)">
+
+        <!-- Logo mobile -->
+        <div class="flex flex-col items-center mb-6" style="color:var(--brown)">
+            <svg version="1.0" xmlns="http://www.w3.org/2000/svg"
+                 width="64" height="64" viewBox="0 0 500 500"
+                 preserveAspectRatio="xMidYMid meet">
+                <g transform="translate(0,497) scale(0.1,-0.1)" stroke="none">
+                    <path fill="currentColor" d="M2350 4310 l0 -630 -389 0 -390 0 26 93 c90 329 211 607 362 827 70 103 234 259 316 302 39 21 71 38 73 38 1 0 2 -283 2 -630z"/>
+                    <path fill="currentColor" d="M2916 4765 c211 -210 383 -543 504 -980 12 -43 24 -85 27 -92 4 -11 -70 -13 -386 -13 l-391 0 0 631 0 630 73 -38 c52 -28 99 -65 173 -138z"/>
+                    <path fill="currentColor" d="M1748 4843 c-1 -5 -35 -56 -74 -115 -168 -250 -313 -600 -404 -973 l-17 -70 -457 -3 c-407 -2 -458 -1 -452 13 14 37 151 243 221 332 161 204 422 436 645 573 109 67 269 147 390 195 52 20 104 41 115 45 26 11 37 12 33 3z"/>
+                    <path fill="currentColor" d="M3355 4820 c220 -77 445 -201 653 -357 102 -77 316 -277 386 -361 60 -72 155 -200 191 -257 50 -78 95 -155 95 -161 0 -2 -205 -3 -456 -2 l-457 3 -34 130 c-33 127 -111 370 -138 430 -8 17 -26 59 -40 95 -48 116 -136 279 -209 388 -84 126 -84 127 -60 118 11 -5 42 -16 69 -26z"/>
+                    <path fill="currentColor" d="M1186 3333 c-6 -47 -22 -177 -36 -301 -23 -199 -31 -522 -20 -779 6 -139 12 -258 15 -265 2 -7 9 -62 15 -123 6 -60 14 -138 18 -173 l8 -62 -505 2 -506 3 -38 125 c-75 249 -107 469 -107 730 0 292 48 573 142 828 l19 52 501 0 500 0 -6 -37z"/>
+                    <path fill="currentColor" d="M2350 3138 l0 -231 -22 19 c-27 23 -179 168 -343 327 l-120 116 243 1 242 0 0 -232z"/>
+                    <path fill="currentColor" d="M3520 3318 c34 -159 60 -514 60 -833 0 -316 -27 -706 -49 -705 -3 0 -40 33 -82 73 -96 90 -419 399 -559 533 -58 56 -131 125 -162 154 l-58 52 0 389 0 389 419 0 419 0 12 -52z"/>
+                    <path fill="currentColor" d="M4848 3318 c27 -72 78 -257 96 -348 86 -430 50 -922 -95 -1310 l-11 -30 -498 0 c-273 0 -499 2 -502 5 -2 3 -1 33 4 67 66 529 69 1067 8 1498 -5 36 -12 89 -16 118 l-6 52 500 0 501 0 19 -52z"/>
+                    <path fill="currentColor" d="M1675 3019 c60 -58 162 -155 225 -215 63 -61 169 -162 235 -225 66 -64 141 -135 168 -159 l47 -43 0 -373 0 -374 -422 2 -422 3 -7 27 c-10 37 -37 265 -49 413 -22 269 -8 845 26 1078 l7 48 41 -38 c22 -21 90 -86 151 -144z"/>
+                    <path fill="currentColor" d="M2808 1938 c70 -68 170 -165 222 -215 l95 -93 -227 0 -228 0 0 215 c0 118 3 215 6 215 3 0 63 -55 132 -122z"/>
+                    <path fill="currentColor" d="M1270 1223 c89 -371 241 -739 410 -991 38 -56 64 -102 57 -102 -27 0 -210 75 -336 137 -433 214 -808 571 -1056 1006 l-27 47 464 0 464 0 24 -97z"/>
+                    <path fill="currentColor" d="M2350 680 c0 -511 -3 -640 -13 -640 -24 0 -139 75 -199 129 -190 173 -349 448 -481 831 -30 87 -87 287 -87 307 0 11 73 13 390 13 l390 0 0 -640z"/>
+                    <path fill="currentColor" d="M3450 1308 c0 -20 -58 -223 -92 -323 -36 -107 -121 -312 -156 -375 -116 -212 -213 -346 -322 -442 -63 -56 -174 -128 -197 -128 -11 0 -13 117 -13 640 l0 640 390 0 c305 0 390 -3 390 -12z"/>
+                    <path fill="currentColor" d="M4669 1263 c-18 -32 -63 -103 -101 -159 -298 -437 -698 -756 -1181 -940 -49 -19 -95 -34 -102 -34 -8 0 15 43 55 102 164 245 309 590 401 956 l34 132 463 0 463 0 -32 -57z"/>
+                </g>
+            </svg>
+            <span class="font-['Inria_Serif'] text-3xl font-bold mt-2" style="color:var(--brown)">MindSite</span>
+        </div>
+
+        <!-- Abas mobile -->
+        <div class="flex rounded-2xl overflow-hidden mb-5 w-full max-w-sm shadow" style="background:var(--surface)">
+            <button id="mTabLogin" type="button" onclick="mShowLogin()"
+                    class="flex-1 py-3 font-semibold text-sm transition-all rounded-l-2xl"
+                    style="background:var(--brown); color:#fff">
+                Entrar
+            </button>
+            <button id="mTabCad" type="button" onclick="mShowCad()"
+                    class="flex-1 py-3 font-semibold text-sm transition-all rounded-r-2xl"
+                    style="color:var(--text-muted)">
+                Cadastrar
+            </button>
+        </div>
+
+        @* Formulário de login mobile *@
+        <div id="mLoginCard" class="ms-card w-full max-w-sm p-6 flex flex-col gap-4">
+            <form id="mFormLogin" asp-controller="Account" asp-action="Login" method="post" class="flex flex-col gap-4">
+                @Html.AntiForgeryToken()
+
+                <div>
+                    <label for="mLoginEmail" class="text-xs font-semibold uppercase tracking-wider mb-1 block" style="color:var(--text-muted)">E-mail</label>
+                    <input id="mLoginEmail" type="email" name="Email" required autocomplete="email"
+                           class="ms-input w-full px-5 py-3 rounded-xl shadow-inner outline-none transition focus:ring-2 focus:ring-[#623f25]" placeholder="seu@email.com" aria-required="true"/>
+                </div>
+                <div>
+                    <label for="mLoginSenha" class="text-xs font-semibold uppercase tracking-wider mb-1 block" style="color:var(--text-muted)">Senha</label>
+                    <div class="relative">
+                        <input id="mLoginSenha" type="password" name="Senha" required autocomplete="current-password"
+                               class="ms-input w-full px-5 py-3 pr-12 rounded-xl shadow-inner outline-none transition focus:ring-2 focus:ring-[#623f25]" placeholder="••••••••" aria-required="true"/>
+                        <button type="button" onclick="toggleSenha('mLoginSenha',this)" tabindex="-1"
+                                class="absolute inset-y-0 right-3 flex items-center px-1 transition-opacity hover:opacity-70" style="color:var(--text-muted)" aria-label="Mostrar/ocultar senha">
+                            <svg class="w-5 h-5 eye-off" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"/></svg>
+                            <svg class="w-5 h-5 eye-on hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                        </button>
+                    </div>
+                    <div class="text-right mt-1">
+                        <a asp-controller="Account" asp-action="RecuperarSenha" class="text-sm italic hover:underline" style="color:var(--brown)">Esqueci minha senha...</a>
+                    </div>
+                </div>
+
+                <button type="submit" class="w-full py-3 rounded-2xl font-bold text-white transition-all hover:opacity-90" style="background:var(--brown)">Entrar</button>
+            </form>
+
+            <div class="flex items-center gap-3 my-1">
+                <div class="flex-1 h-px" style="background:var(--border)"></div>
+                <span class="text-xs" style="color:var(--text-muted)">ou</span>
+                <div class="flex-1 h-px" style="background:var(--border)"></div>
+            </div>
+            <a href="/Account/LoginGoogle"
+               class="w-full flex items-center justify-center gap-3 py-3 rounded-2xl font-semibold text-sm transition-all hover:shadow-md border"
+               style="background:#fff; color:#3c4043; border-color:#dadce0">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="w-5 h-5" aria-hidden="true">
+                    <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+                    <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+                    <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/>
+                    <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+                </svg>
+                Entrar com Google
+            </a>
+        </div>
+
+        @* Formulário de cadastro mobile *@
+        <div id="mCadCard" class="ms-card w-full max-w-sm p-6 flex-col gap-3 hidden">
+            <form id="mFormCadastro" asp-controller="Account" asp-action="Cadastro" method="post" class="flex flex-col gap-3">
+                @Html.AntiForgeryToken()
+
+                <div>
+                    <label for="mCNome" class="text-xs font-semibold uppercase tracking-wider mb-1 block" style="color:var(--text-muted)">Nome Completo</label>
+                    <input id="mCNome" type="text" name="NomeCompleto" required autocomplete="name"
+                           class="ms-input w-full px-5 py-3 rounded-xl shadow-inner outline-none" placeholder="Seu nome completo" aria-required="true"/>
+                </div>
+                <div>
+                    <label for="mCEmail" class="text-xs font-semibold uppercase tracking-wider mb-1 block" style="color:var(--text-muted)">E-mail</label>
+                    <input id="mCEmail" type="email" name="Email" required autocomplete="email"
+                           class="ms-input w-full px-5 py-3 rounded-xl shadow-inner outline-none" placeholder="seu@email.com" aria-required="true"/>
+                </div>
+                <div>
+                    <label for="mCTel" class="text-xs font-semibold uppercase tracking-wider mb-1 block" style="color:var(--text-muted)">Telefone</label>
+                    <input id="mCTel" type="tel" name="Telefone" required autocomplete="tel"
+                           data-mask="tel" maxlength="16"
+                           class="ms-input w-full px-5 py-3 rounded-xl shadow-inner outline-none" placeholder="(11) 99999-9999" aria-required="true"/>
+                </div>
+                <div>
+                    <label for="mCSenha" class="text-xs font-semibold uppercase tracking-wider mb-1 block" style="color:var(--text-muted)">Senha <span class="text-[10px] normal-case">(mín. 6 caracteres)</span></label>
+                    <div class="relative">
+                        <input id="mCSenha" type="password" name="Senha" required minlength="6" autocomplete="new-password"
+                               class="ms-input w-full px-5 py-3 pr-12 rounded-xl shadow-inner outline-none" placeholder="••••••••" aria-required="true"/>
+                        <button type="button" onclick="toggleSenha('mCSenha',this)" tabindex="-1"
+                                class="absolute inset-y-0 right-3 flex items-center px-1 transition-opacity hover:opacity-70" style="color:var(--text-muted)" aria-label="Mostrar/ocultar senha">
+                            <svg class="w-5 h-5 eye-off" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"/></svg>
+                            <svg class="w-5 h-5 eye-on hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                        </button>
+                    </div>
+                </div>
+                <div>
+                    <label for="mCConfirma" class="text-xs font-semibold uppercase tracking-wider mb-1 block" style="color:var(--text-muted)">Confirmar Senha</label>
+                    <div class="relative">
+                        <input id="mCConfirma" type="password" name="ConfirmarSenha" required autocomplete="new-password"
+                               class="ms-input w-full px-5 py-3 pr-12 rounded-xl shadow-inner outline-none" placeholder="••••••••" aria-required="true"/>
+                        <button type="button" onclick="toggleSenha('mCConfirma',this)" tabindex="-1"
+                                class="absolute inset-y-0 right-3 flex items-center px-1 transition-opacity hover:opacity-70" style="color:var(--text-muted)" aria-label="Mostrar/ocultar senha">
+                            <svg class="w-5 h-5 eye-off" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"/></svg>
+                            <svg class="w-5 h-5 eye-on hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                        </button>
+                    </div>
+                </div>
+                <div>
+                    <label class="flex items-start gap-2 cursor-pointer text-xs leading-snug" style="color:var(--text)">
+                        <input type="checkbox" name="AceitouContrato" value="true" required
+                               class="mt-0.5 w-4 h-4 flex-shrink-0 accent-[color:var(--brown)]"/>
+                        <span>Li e aceito os <a asp-controller="Home" asp-action="Termos" target="_blank" class="underline font-semibold" style="color:var(--brown)">Termos de Uso</a> e a <a asp-controller="Home" asp-action="Privacidade" target="_blank" class="underline font-semibold" style="color:var(--brown)">Política de Privacidade</a> da MindSite.</span>
+                    </label>
+                </div>
+
+                <button type="submit" class="w-full py-3 rounded-2xl font-bold text-white transition-all hover:opacity-90 mt-1" style="background:var(--brown)">Cadastrar</button>
+            </form>
+        </div>
+    </div>
+
+    @* Seção desktop de autenticação com painel deslizante *@
+    <div class="hidden md:block w-screen h-screen overflow-hidden">
+        <div id="container" class="group relative w-screen h-screen overflow-hidden" style="background:var(--bg)">
+
+            <!-- Painel esquerdo (formulários) -->
+            <div class="absolute top-0 left-0 w-[40%] h-full z-[50] flex items-center justify-center transition-all duration-1000 ease-in-out
+                        rounded-tr-[50px] rounded-br-[50px]
+                        group-[.right-panel-active]:translate-x-[150%]
+                        group-[.right-panel-active]:rounded-tr-[0px] group-[.right-panel-active]:rounded-br-[0px]
+                        group-[.right-panel-active]:rounded-tl-[50px] group-[.right-panel-active]:rounded-bl-[50px]"
+                 style="background:var(--bg2)">
+
+                <!-- Formulário de Cadastro -->
+                <div class="absolute top-0 left-0 w-full h-full px-10 flex flex-col items-center justify-center transition-all duration-1000 ease-in-out opacity-0 z-[1] translate-x-[500%]
+                            group-[.right-panel-active]:opacity-100 group-[.right-panel-active]:z-[2] group-[.right-panel-active]:translate-x-0">
+
+                    <form id="formCadastro" asp-controller="Account" asp-action="Cadastro" method="post" class="w-full max-w-sm flex flex-col gap-3">
+                        @Html.AntiForgeryToken()
+
+                        <h1 class="font-['Inria_Serif'] text-5xl text-center mb-2 flex flex-row items-center justify-center" style="color:var(--brown)">
+                            Cadastr
+                            <div class="mt-[8.5px]" style="color:var(--brown)">
+                                <svg version="1.0" xmlns="http://www.w3.org/2000/svg"
+                                    width="28" height="28" viewBox="0 0 500 500"
+                                    preserveAspectRatio="xMidYMid meet"
+                                    style="display:block;margin:0">
+                                    <g transform="translate(0,497) scale(0.1,-0.1)" stroke="none">
+                                        <path fill="currentColor" d="M2350 4310 l0 -630 -389 0 -390 0 26 93 c90 329 211 607 362 827 70 103 234 259 316 302 39 21 71 38 73 38 1 0 2 -283 2 -630z"/>
+                                        <path fill="currentColor" d="M2916 4765 c211 -210 383 -543 504 -980 12 -43 24 -85 27 -92 4 -11 -70 -13 -386 -13 l-391 0 0 631 0 630 73 -38 c52 -28 99 -65 173 -138z"/>
+                                        <path fill="currentColor" d="M1748 4843 c-1 -5 -35 -56 -74 -115 -168 -250 -313 -600 -404 -973 l-17 -70 -457 -3 c-407 -2 -458 -1 -452 13 14 37 151 243 221 332 161 204 422 436 645 573 109 67 269 147 390 195 52 20 104 41 115 45 26 11 37 12 33 3z"/>
+                                        <path fill="currentColor" d="M3355 4820 c220 -77 445 -201 653 -357 102 -77 316 -277 386 -361 60 -72 155 -200 191 -257 50 -78 95 -155 95 -161 0 -2 -205 -3 -456 -2 l-457 3 -34 130 c-33 127 -111 370 -138 430 -8 17 -26 59 -40 95 -48 116 -136 279 -209 388 -84 126 -84 127 -60 118 11 -5 42 -16 69 -26z"/>
+                                        <path fill="currentColor" d="M1186 3333 c-6 -47 -22 -177 -36 -301 -23 -199 -31 -522 -20 -779 6 -139 12 -258 15 -265 2 -7 9 -62 15 -123 6 -60 14 -138 18 -173 l8 -62 -505 2 -506 3 -38 125 c-75 249 -107 469 -107 730 0 292 48 573 142 828 l19 52 501 0 500 0 -6 -37z"/>
+                                        <path fill="currentColor" d="M2350 3138 l0 -231 -22 19 c-27 23 -179 168 -343 327 l-120 116 243 1 242 0 0 -232z"/>
+                                        <path fill="currentColor" d="M3520 3318 c34 -159 60 -514 60 -833 0 -316 -27 -706 -49 -705 -3 0 -40 33 -82 73 -96 90 -419 399 -559 533 -58 56 -131 125 -162 154 l-58 52 0 389 0 389 419 0 419 0 12 -52z"/>
+                                        <path fill="currentColor" d="M4848 3318 c27 -72 78 -257 96 -348 86 -430 50 -922 -95 -1310 l-11 -30 -498 0 c-273 0 -499 2 -502 5 -2 3 -1 33 4 67 66 529 69 1067 8 1498 -5 36 -12 89 -16 118 l-6 52 500 0 501 0 19 -52z"/>
+                                        <path fill="currentColor" d="M1675 3019 c60 -58 162 -155 225 -215 63 -61 169 -162 235 -225 66 -64 141 -135 168 -159 l47 -43 0 -373 0 -374 -422 2 -422 3 -7 27 c-10 37 -37 265 -49 413 -22 269 -8 845 26 1078 l7 48 41 -38 c22 -21 90 -86 151 -144z"/>
+                                        <path fill="currentColor" d="M2808 1938 c70 -68 170 -165 222 -215 l95 -93 -227 0 -228 0 0 215 c0 118 3 215 6 215 3 0 63 -55 132 -122z"/>
+                                        <path fill="currentColor" d="M1270 1223 c89 -371 241 -739 410 -991 38 -56 64 -102 57 -102 -27 0 -210 75 -336 137 -433 214 -808 571 -1056 1006 l-27 47 464 0 464 0 24 -97z"/>
+                                        <path fill="currentColor" d="M2350 680 c0 -511 -3 -640 -13 -640 -24 0 -139 75 -199 129 -190 173 -349 448 -481 831 -30 87 -87 287 -87 307 0 11 73 13 390 13 l390 0 0 -640z"/>
+                                        <path fill="currentColor" d="M3450 1308 c0 -20 -58 -223 -92 -323 -36 -107 -121 -312 -156 -375 -116 -212 -213 -346 -322 -442 -63 -56 -174 -128 -197 -128 -11 0 -13 117 -13 640 l0 640 390 0 c305 0 390 -3 390 -12z"/>
+                                        <path fill="currentColor" d="M4669 1263 c-18 -32 -63 -103 -101 -159 -298 -437 -698 -756 -1181 -940 -49 -19 -95 -34 -102 -34 -8 0 15 43 55 102 164 245 309 590 401 956 l34 132 463 0 463 0 -32 -57z"/>
+                                    </g>
+                                </svg>
+                            </div>
+                        </h1>
+
+                        <div>
+                            <label for="cNome" class="text-xs font-semibold uppercase tracking-wider mb-1 block" style="color:var(--text-muted)">Nome Completo</label>
+                            <input id="cNome" type="text" name="NomeCompleto" required autocomplete="name"
+                                   class="ms-input w-full px-6 py-3 rounded-xl shadow-inner outline-none focus:ring-2 focus:ring-[#623f25]" placeholder="Seu nome completo" aria-required="true"/>
+                        </div>
+                        <div>
+                            <label for="cEmail" class="text-xs font-semibold uppercase tracking-wider mb-1 block" style="color:var(--text-muted)">E-mail</label>
+                            <input id="cEmail" type="email" name="Email" required autocomplete="email"
+                                   class="ms-input w-full px-6 py-3 rounded-xl shadow-inner outline-none focus:ring-2 focus:ring-[#623f25]" placeholder="seu@email.com" aria-required="true"/>
+                        </div>
+                        <div>
+                            <label for="cTel" class="text-xs font-semibold uppercase tracking-wider mb-1 block" style="color:var(--text-muted)">Telefone</label>
+                            <input id="cTel" type="tel" name="Telefone" required autocomplete="tel"
+                                   data-mask="tel" maxlength="16"
+                                   class="ms-input w-full px-6 py-3 rounded-xl shadow-inner outline-none focus:ring-2 focus:ring-[#623f25]" placeholder="(11) 99999-9999" aria-required="true"/>
+                        </div>
+                        <div>
+                            <label for="cSenha" class="text-xs font-semibold uppercase tracking-wider mb-1 block" style="color:var(--text-muted)">Senha <span class="text-[10px] normal-case">(mín. 6 caracteres)</span></label>
+                            <div class="relative">
+                                <input id="cSenha" type="password" name="Senha" required minlength="6" autocomplete="new-password"
+                                       class="ms-input w-full px-6 py-3 pr-12 rounded-xl shadow-inner outline-none focus:ring-2 focus:ring-[#623f25]" placeholder="••••••••" aria-required="true"/>
+                                <button type="button" onclick="toggleSenha('cSenha',this)" tabindex="-1"
+                                        class="absolute inset-y-0 right-3 flex items-center px-1 transition-opacity hover:opacity-70" style="color:var(--text-muted)" aria-label="Mostrar/ocultar senha">
+                                    <svg class="w-5 h-5 eye-off" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88"/></svg>
+                                    <svg class="w-5 h-5 eye-on hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.964-7.178z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                                </button>
+                            </div>
+                        </div>
+                        <div>
+                            <label for="cConfirma" class="text-xs font-semibold uppercase tracking-wider mb-1 block" style="color:var(--text-muted)">Confirmar Senha</label>
+                            <div class="relative">
+                                <input id="cConfirma" type="password" name="ConfirmarSenha" required autocomplete="new-password"
+                                       class="ms-input w-full px-6 py-3 pr-12 rounded-xl shadow-inner outline-none focus:ring-2 focus:ring-[#623f25]" placeholder="••••••••" aria-required="true"/>
+                                <button type="button" onclick="toggleSenha('cConfirma',this)" tabindex="-1"
+                                        class="absolute inset-y-0 right-3 flex items-center px-1 transition-opacity hover:opacity-70" style="color:var(--text-muted)" aria-label="Mostrar/ocultar senha">
+                                    <svg class="w-5 h-5 eye-off" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88"/></svg>
+                                    <svg class="w-5 h-5 eye-on hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.964-7.178z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="flex items-start gap-2 cursor-pointer text-xs leading-snug" style="color:var(--text)">
+                                <input type="checkbox" name="AceitouContrato" value="true" required
+                                       class="mt-0.5 w-4 h-4 flex-shrink-0 accent-[color:var(--brown)]"/>
+                                <span>Li e aceito os <a asp-controller="Home" asp-action="Termos" target="_blank" class="underline font-semibold" style="color:var(--brown)">Termos de Uso</a> e a <a asp-controller="Home" asp-action="Privacidade" target="_blank" class="underline font-semibold" style="color:var(--brown)">Política de Privacidade</a> da MindSite.</span>
+                            </label>
+                        </div>
+
+                        <div class="flex flex-row justify-between gap-4 mt-4 mx-[25px]">
+                            <button type="submit" class="w-[150px] bg-[#6A462C] text-white py-3 rounded-2xl hover:bg-[#4d392a] font-bold text-center">Cadastrar</button>
+                            <button type="button" id="signEntra" class="w-[150px] bg-[#926A44] text-white py-3 rounded-2xl hover:bg-[#623f25] font-bold text-center">Voltar</button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Formulário de Login -->
+                <div class="absolute top-0 left-0 w-full h-full px-10 flex flex-col items-center justify-center transition-all duration-1000 ease-in-out opacity-100 z-[2] translate-x-0
+                            group-[.right-panel-active]:opacity-0 group-[.right-panel-active]:z-[1] group-[.right-panel-active]:translate-x-[-500%]">
+
+                    <form id="formLogin" asp-controller="Account" asp-action="Login" method="post" class="w-full max-w-sm flex flex-col gap-4">
+                        @Html.AntiForgeryToken()
+
+                        <h1 class="font-['Inria_Serif'] flex flex-row justify-center text-[50px] text-center mb-2 leading-tight" style="color:var(--brown)">
+                            L
+                            <div class="mt-[21.5px] ml-[3px]" style="color:var(--brown)">
+                                <svg version="1.0" xmlns="http://www.w3.org/2000/svg"
+                                    width="28" height="28" viewBox="0 0 500 500"
+                                    preserveAspectRatio="xMidYMid meet"
+                                    style="display:block;margin:0">
+                                    <g transform="translate(0,497) scale(0.1,-0.1)" stroke="none">
+                                        <path fill="currentColor" d="M2350 4310 l0 -630 -389 0 -390 0 26 93 c90 329 211 607 362 827 70 103 234 259 316 302 39 21 71 38 73 38 1 0 2 -283 2 -630z"/>
+                                        <path fill="currentColor" d="M2916 4765 c211 -210 383 -543 504 -980 12 -43 24 -85 27 -92 4 -11 -70 -13 -386 -13 l-391 0 0 631 0 630 73 -38 c52 -28 99 -65 173 -138z"/>
+                                        <path fill="currentColor" d="M1748 4843 c-1 -5 -35 -56 -74 -115 -168 -250 -313 -600 -404 -973 l-17 -70 -457 -3 c-407 -2 -458 -1 -452 13 14 37 151 243 221 332 161 204 422 436 645 573 109 67 269 147 390 195 52 20 104 41 115 45 26 11 37 12 33 3z"/>
+                                        <path fill="currentColor" d="M3355 4820 c220 -77 445 -201 653 -357 102 -77 316 -277 386 -361 60 -72 155 -200 191 -257 50 -78 95 -155 95 -161 0 -2 -205 -3 -456 -2 l-457 3 -34 130 c-33 127 -111 370 -138 430 -8 17 -26 59 -40 95 -48 116 -136 279 -209 388 -84 126 -84 127 -60 118 11 -5 42 -16 69 -26z"/>
+                                        <path fill="currentColor" d="M1186 3333 c-6 -47 -22 -177 -36 -301 -23 -199 -31 -522 -20 -779 6 -139 12 -258 15 -265 2 -7 9 -62 15 -123 6 -60 14 -138 18 -173 l8 -62 -505 2 -506 3 -38 125 c-75 249 -107 469 -107 730 0 292 48 573 142 828 l19 52 501 0 500 0 -6 -37z"/>
+                                        <path fill="currentColor" d="M2350 3138 l0 -231 -22 19 c-27 23 -179 168 -343 327 l-120 116 243 1 242 0 0 -232z"/>
+                                        <path fill="currentColor" d="M3520 3318 c34 -159 60 -514 60 -833 0 -316 -27 -706 -49 -705 -3 0 -40 33 -82 73 -96 90 -419 399 -559 533 -58 56 -131 125 -162 154 l-58 52 0 389 0 389 419 0 419 0 12 -52z"/>
+                                        <path fill="currentColor" d="M4848 3318 c27 -72 78 -257 96 -348 86 -430 50 -922 -95 -1310 l-11 -30 -498 0 c-273 0 -499 2 -502 5 -2 3 -1 33 4 67 66 529 69 1067 8 1498 -5 36 -12 89 -16 118 l-6 52 500 0 501 0 19 -52z"/>
+                                        <path fill="currentColor" d="M1675 3019 c60 -58 162 -155 225 -215 63 -61 169 -162 235 -225 66 -64 141 -135 168 -159 l47 -43 0 -373 0 -374 -422 2 -422 3 -7 27 c-10 37 -37 265 -49 413 -22 269 -8 845 26 1078 l7 48 41 -38 c22 -21 90 -86 151 -144z"/>
+                                        <path fill="currentColor" d="M2808 1938 c70 -68 170 -165 222 -215 l95 -93 -227 0 -228 0 0 215 c0 118 3 215 6 215 3 0 63 -55 132 -122z"/>
+                                        <path fill="currentColor" d="M1270 1223 c89 -371 241 -739 410 -991 38 -56 64 -102 57 -102 -27 0 -210 75 -336 137 -433 214 -808 571 -1056 1006 l-27 47 464 0 464 0 24 -97z"/>
+                                        <path fill="currentColor" d="M2350 680 c0 -511 -3 -640 -13 -640 -24 0 -139 75 -199 129 -190 173 -349 448 -481 831 -30 87 -87 287 -87 307 0 11 73 13 390 13 l390 0 0 -640z"/>
+                                        <path fill="currentColor" d="M3450 1308 c0 -20 -58 -223 -92 -323 -36 -107 -121 -312 -156 -375 -116 -212 -213 -346 -322 -442 -63 -56 -174 -128 -197 -128 -11 0 -13 117 -13 640 l0 640 390 0 c305 0 390 -3 390 -12z"/>
+                                        <path fill="currentColor" d="M4669 1263 c-18 -32 -63 -103 -101 -159 -298 -437 -698 -756 -1181 -940 -49 -19 -95 -34 -102 -34 -8 0 15 43 55 102 164 245 309 590 401 956 l34 132 463 0 463 0 -32 -57z"/>
+                                    </g>
+                                </svg>
+                            </div>
+                            gin
+                        </h1>
+
+                        <div>
+                            <label for="loginEmail" class="text-xs font-semibold uppercase tracking-wider mb-1 block" style="color:var(--text-muted)">E-mail</label>
+                            <input id="loginEmail" type="email" name="Email" required autocomplete="email"
+                                   class="ms-input w-full px-6 py-4 rounded-xl shadow-inner outline-none transition focus:ring-2 focus:ring-[#623f25]" placeholder="seu@email.com" aria-required="true"/>
+                        </div>
+                        <div>
+                            <label for="loginSenha" class="text-xs font-semibold uppercase tracking-wider mb-1 block" style="color:var(--text-muted)">Senha</label>
+                            <div class="relative">
+                                <input id="loginSenha" type="password" name="Senha" required autocomplete="current-password"
+                                       class="ms-input w-full px-6 py-4 pr-12 rounded-xl shadow-inner outline-none transition focus:ring-2 focus:ring-[#623f25]" placeholder="••••••••" aria-required="true"/>
+                                <button type="button" onclick="toggleSenha('loginSenha',this)" tabindex="-1"
+                                        class="absolute inset-y-0 right-3 flex items-center px-1 transition-opacity hover:opacity-70" style="color:var(--text-muted)" aria-label="Mostrar/ocultar senha">
+                                    <svg class="w-5 h-5 eye-off" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88"/></svg>
+                                    <svg class="w-5 h-5 eye-on hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.964-7.178z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                                </button>
+                            </div>
+                            <div class="text-right mt-1">
+                                <a asp-controller="Account" asp-action="RecuperarSenha" class="text-sm italic hover:underline transition-colors" style="color:var(--brown)">Esqueci minha senha...</a>
+                            </div>
+                        </div>
+
+                        <div class="flex flex-row justify-between gap-4 mt-2 mx-[25px]">
+                            <button type="submit" class="w-[150px] bg-[#6A462C] text-[#fafafa] py-3 rounded-2xl hover:bg-[#4d392a] transition-all font-semibold text-lg shadow-md">Entrar</button>
+                            <button type="button" id="signUp" class="w-[150px] bg-[#926A44] text-[#fafafa] text-center py-3 rounded-2xl hover:bg-[#623f25] transition-all font-semibold text-lg shadow-md">Cadastrar</button>
+                        </div>
+
+                        <div class="flex items-center gap-3 mt-2">
+                            <div class="flex-1 h-px" style="background:var(--border)"></div>
+                            <span class="text-xs" style="color:var(--text-muted)">ou</span>
+                            <div class="flex-1 h-px" style="background:var(--border)"></div>
+                        </div>
+                        <a href="/Account/LoginGoogle"
+                           class="w-full flex items-center justify-center gap-3 py-3 rounded-2xl font-semibold text-sm transition-all hover:shadow-md border"
+                           style="background:#fff; color:#3c4043; border-color:#dadce0">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="w-5 h-5" aria-hidden="true">
+                                <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+                                <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+                                <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/>
+                                <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+                            </svg>
+                            Entrar com Google
+                        </a>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Painel direito (SVG decorativo) -->
+            <div class="absolute top-0 left-[40%] w-[60%] h-full overflow-hidden transition-transform duration-1000 ease-in-out z-[1]
+                        group-[.right-panel-active]:-translate-x-[67%]">
+                <div class="h-full w-full flex items-center justify-center relative" style="color:var(--auth-svg-deco)">
+                    <svg version="1.0" xmlns="http://www.w3.org/2000/svg"
+                        width="600" height="600" viewBox="0 0 502 502"
+                        preserveAspectRatio="xMidYMid meet">
+                        <g transform="translate(0,497) scale(0.1,-0.1)" stroke="none">
+                            <path fill="currentColor" d="M2350 4310 l0 -630 -389 0 -390 0 26 93 c90 329 211 607 362 827 70 103 234 259 316 302 39 21 71 38 73 38 1 0 2 -283 2 -630z"/>
+                            <path fill="currentColor" d="M2916 4765 c211 -210 383 -543 504 -980 12 -43 24 -85 27 -92 4 -11 -70 -13 -386 -13 l-391 0 0 631 0 630 73 -38 c52 -28 99 -65 173 -138z"/>
+                            <path fill="currentColor" d="M1748 4843 c-1 -5 -35 -56 -74 -115 -168 -250 -313 -600 -404 -973 l-17 -70 -457 -3 c-407 -2 -458 -1 -452 13 14 37 151 243 221 332 161 204 422 436 645 573 109 67 269 147 390 195 52 20 104 41 115 45 26 11 37 12 33 3z"/>
+                            <path fill="currentColor" d="M3355 4820 c220 -77 445 -201 653 -357 102 -77 316 -277 386 -361 60 -72 155 -200 191 -257 50 -78 95 -155 95 -161 0 -2 -205 -3 -456 -2 l-457 3 -34 130 c-33 127 -111 370 -138 430 -8 17 -26 59 -40 95 -48 116 -136 279 -209 388 -84 126 -84 127 -60 118 11 -5 42 -16 69 -26z"/>
+                            <path fill="currentColor" d="M1186 3333 c-6 -47 -22 -177 -36 -301 -23 -199 -31 -522 -20 -779 6 -139 12 -258 15 -265 2 -7 9 -62 15 -123 6 -60 14 -138 18 -173 l8 -62 -505 2 -506 3 -38 125 c-75 249 -107 469 -107 730 0 292 48 573 142 828 l19 52 501 0 500 0 -6 -37z"/>
+                            <path fill="currentColor" d="M2350 3138 l0 -231 -22 19 c-27 23 -179 168 -343 327 l-120 116 243 1 242 0 0 -232z"/>
+                            <path fill="currentColor" d="M3520 3318 c34 -159 60 -514 60 -833 0 -316 -27 -706 -49 -705 -3 0 -40 33 -82 73 -96 90 -419 399 -559 533 -58 56 -131 125 -162 154 l-58 52 0 389 0 389 419 0 419 0 12 -52z"/>
+                            <path fill="currentColor" d="M4848 3318 c27 -72 78 -257 96 -348 86 -430 50 -922 -95 -1310 l-11 -30 -498 0 c-273 0 -499 2 -502 5 -2 3 -1 33 4 67 66 529 69 1067 8 1498 -5 36 -12 89 -16 118 l-6 52 500 0 501 0 19 -52z"/>
+                            <path fill="currentColor" d="M1675 3019 c60 -58 162 -155 225 -215 63 -61 169 -162 235 -225 66 -64 141 -135 168 -159 l47 -43 0 -373 0 -374 -422 2 -422 3 -7 27 c-10 37 -37 265 -49 413 -22 269 -8 845 26 1078 l7 48 41 -38 c22 -21 90 -86 151 -144z"/>
+                            <path fill="currentColor" d="M2808 1938 c70 -68 170 -165 222 -215 l95 -93 -227 0 -228 0 0 215 c0 118 3 215 6 215 3 0 63 -55 132 -122z"/>
+                            <path fill="currentColor" d="M1270 1223 c89 -371 241 -739 410 -991 38 -56 64 -102 57 -102 -27 0 -210 75 -336 137 -433 214 -808 571 -1056 1006 l-27 47 464 0 464 0 24 -97z"/>
+                            <path fill="currentColor" d="M2350 680 c0 -511 -3 -640 -13 -640 -24 0 -139 75 -199 129 -190 173 -349 448 -481 831 -30 87 -87 287 -87 307 0 11 73 13 390 13 l390 0 0 -640z"/>
+                            <path fill="currentColor" d="M3450 1308 c0 -20 -58 -223 -92 -323 -36 -107 -121 -312 -156 -375 -116 -212 -213 -346 -322 -442 -63 -56 -174 -128 -197 -128 -11 0 -13 117 -13 640 l0 640 390 0 c305 0 390 -3 390 -12z"/>
+                            <path fill="currentColor" d="M4669 1263 c-18 -32 -63 -103 -101 -159 -298 -437 -698 -756 -1181 -940 -49 -19 -95 -34 -102 -34 -8 0 15 43 55 102 164 245 309 590 401 956 l34 132 463 0 463 0 -32 -57z"/>
+                        </g>
+                    </svg>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="~/js/site.js"></script>
+    <script>
+        // Inicialização do tema salvo no localStorage
+        const temaSalvo = localStorage.getItem('ms-theme') || 'light';
+        document.documentElement.setAttribute('data-theme', temaSalvo);
+
+        // Controle do painel deslizante no desktop
+        const signUpButton = document.getElementById('signUp');
+        const signEntraButton = document.getElementById('signEntra');
+        const container = document.getElementById('container');
+
+        if (signUpButton) signUpButton.addEventListener('click', () => container.classList.add("right-panel-active"));
+        if (signEntraButton) signEntraButton.addEventListener('click', () => container.classList.remove("right-panel-active"));
+
+        // Alternância entre abas de login e cadastro no mobile
+        function mShowLogin() {
+            document.getElementById('mLoginCard').classList.remove('hidden');
+            document.getElementById('mCadCard').classList.add('hidden');
+            document.getElementById('mTabLogin').style.cssText = 'background:var(--brown);color:#fff';
+            document.getElementById('mTabCad').style.cssText = 'background:transparent;color:var(--text-muted)';
+        }
+        function mShowCad() {
+            document.getElementById('mCadCard').classList.remove('hidden');
+            document.getElementById('mLoginCard').classList.add('hidden');
+            document.getElementById('mTabCad').style.cssText = 'background:var(--brown);color:#fff';
+            document.getElementById('mTabLogin').style.cssText = 'background:transparent;color:var(--text-muted)';
+        }
+
+        // Abre direto no painel de cadastro se a URL contiver ?modo=cadastro
+        if (new URLSearchParams(location.search).get('modo') === 'cadastro') {
+            if (container) container.classList.add("right-panel-active");
+            mShowCad();
+        }
+
+        // Validação dos formulários no desktop
+        document.getElementById('formCadastro')?.addEventListener('submit', function(e) {
+            let ok = MsVal.form(this);
+            ok = MsVal.senhas('cSenha', 'cConfirma') && ok;
+            const check = this.querySelector('[name="AceitouContrato"]');
+            if (check && !check.checked) { MsVal.erro(check.nextElementSibling || check, 'Você deve aceitar os termos'); ok = false; }
+            if (!ok) e.preventDefault();
+        });
+        document.getElementById('formLogin')?.addEventListener('submit', function(e) {
+            if (!MsVal.form(this)) e.preventDefault();
+        });
+        document.getElementById('cConfirma')?.addEventListener('input', function() {
+            if (this.value && this.value !== document.getElementById('cSenha').value) MsVal.erro(this, 'Senhas não conferem');
+            else if (this.value) MsVal.ok(this);
+        });
+
+        // Validação dos formulários no mobile
+        document.getElementById('mFormCadastro')?.addEventListener('submit', function(e) {
+            let ok = MsVal.form(this);
+            ok = MsVal.senhas('mCSenha', 'mCConfirma') && ok;
+            const check = this.querySelector('[name="AceitouContrato"]');
+            if (check && !check.checked) { MsVal.erro(check.nextElementSibling || check, 'Você deve aceitar os termos'); ok = false; }
+            if (!ok) e.preventDefault();
+        });
+        document.getElementById('mFormLogin')?.addEventListener('submit', function(e) {
+            if (!MsVal.form(this)) e.preventDefault();
+        });
+        document.getElementById('mCConfirma')?.addEventListener('input', function() {
+            if (this.value && this.value !== document.getElementById('mCSenha').value) MsVal.erro(this, 'Senhas não conferem');
+            else if (this.value) MsVal.ok(this);
+        });
+
+        // Toast notifications from server
+        @if (TempData["Erro"] != null)
+        {
+            @:showToast(@Json.Serialize(TempData["Erro"]!.ToString()), 'erro');
+        }
+        @if (TempData["Success"] != null)
+        {
+            @:showToast(@Json.Serialize(TempData["Success"]!.ToString()), 'success');
+        }
+        @if (TempData["ErroCadastro"] != null)
+        {
+            @:showToast(@Json.Serialize(TempData["ErroCadastro"]!.ToString()), 'erro');
+        }
+
+        // Alterna visibilidade do campo de senha
+        function toggleSenha(id, btn) {
+            const inp = document.getElementById(id);
+            if (!inp) return;
+            const isHidden = inp.type === 'password';
+            inp.type = isHidden ? 'text' : 'password';
+            btn.querySelector('.eye-off').classList.toggle('hidden', isHidden);
+            btn.querySelector('.eye-on').classList.toggle('hidden', !isHidden);
+        }
+    </script>
+</body>
+</html>

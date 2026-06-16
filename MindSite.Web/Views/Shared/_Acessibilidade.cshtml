@@ -1,0 +1,92 @@
+﻿@* Painel de Acessibilidade Visual *@
+
+@* Filtro SVG para daltonismo (invisível) *@
+<svg class="daltonismo-filter" aria-hidden="true">
+    <defs>
+        <filter id="daltonismo-svg-filter">
+            <feColorMatrix type="matrix" values="
+                0.567 0.433 0     0 0
+                0.558 0.442 0     0 0
+                0     0.242 0.758 0 0
+                0     0     0     1 0"/>
+        </filter>
+    </defs>
+</svg>
+
+@* Botão flutuante de acessibilidade *@
+<div class="fixed top-1/2 -translate-y-1/2 right-6 z-50 flex flex-col items-end gap-3">
+
+    @* Botão tema claro/escuro *@
+    <button id="btnTheme"
+        class="w-11 h-11 rounded-full flex items-center justify-center shadow-lg transition-all hover:scale-110 focus-visible:ring-2 focus-visible:ring-offset-2"
+        style="background:var(--brown); color:#fff;"
+        title="Alternar modo escuro/claro"
+        aria-label="Alternar modo escuro e claro">
+        @* ícone injetado pelo JS *@
+    </button>
+
+    @* Botão acessibilidade *@
+    <button id="btnAcessibilidade"
+        class="w-11 h-11 rounded-full flex items-center justify-center shadow-lg transition-all hover:scale-110 focus-visible:ring-2 focus-visible:ring-offset-2"
+        style="background:var(--brown-dark); color:#fff;"
+        title="Opções de Acessibilidade"
+        aria-label="Opções de acessibilidade visual"
+        aria-expanded="false">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+        </svg>
+    </button>
+
+    @* Painel de acessibilidade *@
+    <div id="painelAcessibilidade"
+        class="hidden ms-card p-5 w-72 fade-down"
+        role="dialog" aria-label="Painel de acessibilidade">
+        <div class="flex items-center justify-between mb-4">
+            <h3 class="font-bold text-sm" style="color:var(--text);">Acessibilidade Visual</h3>
+            <button id="btnFecharAcesso" aria-label="Fechar painel" style="color:var(--text-muted);">
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+        </div>
+
+        <div class="flex flex-col gap-2">
+            <p class="text-xs font-semibold uppercase tracking-wider mb-1" style="color:var(--text-muted);">Modo de cor</p>
+
+            <button class="access-btn btn-ghost text-left px-3 py-2 rounded-lg text-sm flex items-center gap-2 focus-visible:ring-2 focus-visible:ring-[color:var(--brown)]"
+                data-mode="normal" title="Cores padrão">
+                <span class="w-5 h-5 rounded-full border-2 border-current inline-block"></span>
+                Padrão
+            </button>
+
+            <button class="access-btn btn-ghost text-left px-3 py-2 rounded-lg text-sm flex items-center gap-2 focus-visible:ring-2 focus-visible:ring-[color:var(--brown)]"
+                data-mode="alto-contraste" title="Alto contraste">
+                <span class="w-5 h-5 rounded-full bg-yellow-400 inline-block"></span>
+                Alto Contraste
+            </button>
+
+            <button class="access-btn btn-ghost text-left px-3 py-2 rounded-lg text-sm flex items-center gap-2 focus-visible:ring-2 focus-visible:ring-[color:var(--brown)]"
+                data-mode="daltonismo" title="Simulação de daltonismo">
+                <span class="w-5 h-5 rounded-full inline-block" style="background:linear-gradient(135deg,#f97316,#3b82f6)"></span>
+                Daltonismo
+            </button>
+
+            <div class="w-full h-px my-1" style="background:var(--border)"></div>
+
+            <p class="text-xs font-semibold uppercase tracking-wider mb-1" style="color:var(--text-muted);">Texto</p>
+
+            <button class="access-btn btn-ghost text-left px-3 py-2 rounded-lg text-sm flex items-center gap-2 focus-visible:ring-2 focus-visible:ring-[color:var(--brown)]"
+                data-mode="fonte-grande" title="Aumentar fonte">
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7"/></svg>
+                Fonte Grande
+            </button>
+
+            <button class="access-btn btn-ghost text-left px-3 py-2 rounded-lg text-sm flex items-center gap-2 focus-visible:ring-2 focus-visible:ring-[color:var(--brown)]"
+                data-mode="espacamento" title="Maior espaçamento">
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h8M4 18h16"/></svg>
+                Espaçamento +
+            </button>
+        </div>
+    </div>
+</div>

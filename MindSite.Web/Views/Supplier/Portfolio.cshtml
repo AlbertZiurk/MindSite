@@ -1,0 +1,155 @@
+﻿@model List<MindSite.Entities.ItemPortfolio>
+@{
+    ViewData["Title"] = "Meu Portfólio";
+    Layout = "_LayoutSupplier";
+}
+
+@* MODAL DE CONFIRMAÇÃO REUTILIZÁVEL (Substitui o confirm nativo) *@
+<div id="modalConfirmSupplier" class="modal-overlay hidden fixed inset-0 z-50 flex items-center justify-center" aria-modal="true" role="dialog">
+    <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" onclick="closeModal('modalConfirmSupplier')"></div>
+    <div class="modal-box relative ms-card p-6 w-full max-w-sm mx-4 z-10 text-center" style="background:var(--surface)">
+        <div class="w-12 h-12 rounded-full mx-auto mb-3 flex items-center justify-center text-xl font-bold shadow-inner" style="background:var(--error-bg); color:rgb(239,68,68)">
+            !
+        </div>
+        <h3 id="confirmTitle" class="font-inria text-xl font-bold mb-2" style="color:var(--text)">Confirmar Exclusão</h3>
+        <p id="confirmMessage" class="text-xs mb-6 leading-relaxed" style="color:var(--text-muted)">Tem certeza que deseja realizar esta operação?</p>
+        
+        <div class="flex gap-3">
+            <button onclick="closeModal('modalConfirmSupplier')" class="btn-ghost flex-1 py-2 text-xs">Cancelar</button>
+            <button id="btnConfirmarSubmit" class="bg-red-500 hover:bg-red-600 flex-1 py-2 text-xs font-bold text-white rounded-xl transition-colors">Remover</button>
+        </div>
+    </div>
+</div>
+
+@* Modal adicionar item *@
+<div id="modalAddPortfolio" class="modal-overlay hidden fixed inset-0 z-50 flex items-center justify-center" aria-modal="true" role="dialog">
+    <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" onclick="closeModal('modalAddPortfolio')"></div>
+    <div class="modal-box relative ms-card p-8 w-full max-w-md mx-4 z-10 overflow-y-auto" style="max-height:85vh">
+        <button onclick="closeModal('modalAddPortfolio')" class="absolute top-4 right-4" style="color:var(--text-muted)" aria-label="Fechar">
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+        <h3 class="font-inria text-2xl font-bold mb-6" style="color:var(--text)">Novo Item</h3>
+        <form asp-controller="Supplier" asp-action="AdicionarPortfolio" method="post" enctype="multipart/form-data" class="flex flex-col gap-4">
+            @Html.AntiForgeryToken()
+            <div>
+                <label class="text-xs font-semibold uppercase tracking-wider mb-1 block" style="color:var(--text-muted)">Título *</label>
+                <input type="text" name="Titulo" class="ms-input" required maxlength="200" placeholder="Ex: E-commerce para loja de roupas"/>
+            </div>
+            <div>
+                <label class="text-xs font-semibold uppercase tracking-wider mb-1 block" style="color:var(--text-muted)">Descrição</label>
+                <textarea name="Descricao" class="ms-textarea" rows="3" maxlength="1000" placeholder="Descreva o projeto..."></textarea>
+            </div>
+            <div>
+                <label class="text-xs font-semibold uppercase tracking-wider mb-1 block" style="color:var(--text-muted)">Link do Projeto</label>
+                <input type="url" name="LinkUrl" class="ms-input" placeholder="https://seusite.com.br"/>
+            </div>
+            <div>
+                <label class="text-xs font-semibold uppercase tracking-wider mb-1 block" style="color:var(--text-muted)">Imagem de Capa (opcional, máx. 5 MB)</label>
+                <input type="file" name="imagem" class="text-xs" style="color:var(--text-muted)" accept=".png,.jpg,.jpeg,.gif,.webp"/>
+            </div>
+            <div class="flex gap-3 mt-2">
+                <button type="button" onclick="closeModal('modalAddPortfolio')" class="btn-ghost flex-1">Cancelar</button>
+                <button type="submit" class="btn-primary flex-1">Adicionar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="container mx-auto px-6 py-10">
+    <div class="flex flex-wrap items-center justify-between gap-4 mb-8">
+        <div>
+            <h1 class="font-inria text-4xl font-bold" style="color:var(--text)">Meu Portfólio</h1>
+            <p class="text-sm mt-1" style="color:var(--text-muted)">Mostre seus melhores trabalhos</p>
+        </div>
+        <button onclick="openModal('modalAddPortfolio')" class="btn-primary text-sm">+ Adicionar Item</button>
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="ms-card p-16 text-center">
+            <svg class="w-16 h-16 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="color:var(--text-muted)" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+            </svg>
+            <p class="text-lg font-medium mb-2" style="color:var(--text-muted)">Nenhum item no portfólio</p>
+            <p class="text-sm mb-6" style="color:var(--text-muted)">Adicione projetos concluídos para atrair mais clientes.</p>
+            <button onclick="openModal('modalAddPortfolio')" class="btn-primary inline-block text-sm">Adicionar meu primeiro item</button>
+        </div>
+    }
+    else
+    {
+        @* Grade de itens do portfólio *@
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            @foreach (var item in Model)
+            {
+                <div class="ms-card overflow-hidden flex flex-col">
+                    @if (!string.IsNullOrEmpty(item.ImagemCaminho))
+                    {
+                        <div class="h-40 overflow-hidden" style="background:var(--bg2)">
+                            <img src="@item.ImagemCaminho" alt="@item.Titulo" class="w-full h-full object-cover"/>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="h-40 flex items-center justify-center" style="background:var(--bg2)">
+                            <svg class="w-12 h-12" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="color:var(--text-muted)" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                            </svg>
+                        </div>
+                    }
+                    <div class="p-5 flex flex-col flex-1">
+                        <h3 class="font-bold text-base mb-1" style="color:var(--text)">@item.Titulo</h3>
+                        @if (!string.IsNullOrEmpty(item.Descricao))
+                        {
+                            <p class="text-xs mb-3 flex-1" style="color:var(--text-muted)">@item.Descricao</p>
+                        }
+                        <div class="flex items-center justify-between gap-2 mt-auto pt-3" style="border-top:1px solid var(--border)">
+                            @if (!string.IsNullOrEmpty(item.LinkUrl))
+                            {
+                                <a href="@item.LinkUrl" target="_blank" class="text-xs hover:underline flex items-center gap-1" style="color:var(--brown)">
+                                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                                    Ver projeto
+                                </a>
+                            }
+                            else
+                            {
+                                <span></span>
+                            }
+                            <form id="formRemoverPortfolio-@item.Id" asp-controller="Supplier" asp-action="RemoverPortfolio" method="post" class="inline">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="id" value="@item.Id"/>
+                                <button type="button" class="text-xs text-red-500 hover:text-red-700 hover:underline"
+                                        onclick="confirmarRemoverCustom('formRemoverPortfolio-@item.Id', 'Remover do Portfólio', 'Tem certeza que deseja remover o item &quot;@item.Titulo&quot; permanentemente?')">
+                                    Remover
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>
+
+@section Scripts {
+<script>
+// Intercepta a intenção de exclusão e abre o modal customizado
+function confirmarRemoverCustom(formId, titulo, mensagem) {
+    document.getElementById('confirmTitle').textContent = titulo;
+    document.getElementById('confirmMessage').textContent = mensagem;
+    
+    const btnConfirmar = document.getElementById('btnConfirmarSubmit');
+    
+    // Clona o botão para eliminar listeners antigos presos a IDs de itens anteriores
+    const novoBtn = btnConfirmar.cloneNode(true);
+    btnConfirmar.parentNode.replaceChild(novoBtn, btnConfirmar);
+    
+    // Vincula a submissão ao formulário correto
+    novoBtn.addEventListener('click', () => {
+        const form = document.getElementById(formId);
+        if (form) form.submit();
+    });
+    
+    openModal('modalConfirmSupplier');
+}
+</script>
+}

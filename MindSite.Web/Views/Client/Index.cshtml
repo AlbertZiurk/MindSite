@@ -1,0 +1,1107 @@
+﻿@{
+    ViewData["Title"] = "Início";
+    Layout = "_LayoutClient";
+}
+
+<style>
+    /* Section backgrounds */
+    #home, #fornecedor { background: #F4F3EE; }
+    #servicos          { background: #F9F8F3; }
+
+    [data-theme="dark"]          #home,
+    [data-theme="dark"]          #fornecedor { background: var(--bg);  }
+    [data-theme="dark"]          #servicos   { background: var(--bg2); }
+    [data-theme="dark"]          .ms-svc-card { background: #1A1410; }
+
+    [data-access="alto-contraste"] #home,
+    [data-access="alto-contraste"] #fornecedor,
+    [data-access="alto-contraste"] #servicos   { background: var(--bg); }
+
+    /* Floating card (Hero & Fornecedor) */
+    .ms-float-wrap {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+    }
+    .ms-float-blob { display: none; }
+    .ms-float-card {
+        background: var(--surface);
+        border-radius: 30px;
+        box-shadow: 0 20px 60px var(--shadow);
+        padding: 1.5rem;
+        display: flex;
+        flex-direction: column;
+        gap: 1.25rem;
+        width: 100%;
+        max-width: 360px;
+        position: relative;
+        z-index: 1;
+    }
+    .ms-float-img {
+        width: 100%;
+        height: 200px;
+        border-radius: 25px;
+        overflow: hidden;
+        box-shadow: inset 0 2px 8px rgba(0,0,0,.12);
+    }
+    @@media (min-width: 768px) {
+        .ms-float-wrap  { width: 520px; min-height: 540px; }
+        .ms-float-blob  {
+            display: block;
+            position: absolute;
+            width: 480px; height: 280px;
+            background: var(--brown);
+            border-radius: 30px;
+            box-shadow: 0 10px 30px var(--shadow);
+            top: 50%; left: 50%;
+            transform: translate(-50%, 5%);
+        }
+        .ms-float-card  {
+            position: absolute;
+            width: 400px; height: 500px;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -60%);
+            padding: 2rem;
+            gap: 1.5rem;
+            max-width: none;
+        }
+        .ms-float-img   { height: 280px; }
+    }
+
+    /* Service cards (horizontal) */
+    .ms-svc-card {
+        background: var(--bg2);
+        transition: transform .2s, box-shadow .2s;
+        box-shadow: 0 2px 10px rgba(0,0,0,.06);
+    }
+    .ms-svc-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 28px rgba(0,0,0,.1);
+    }
+    [data-theme="dark"] .ms-svc-card { background: #1A1410; }
+    .ms-svc-icon {
+        background: color-mix(in srgb, var(--brown) 12%, transparent);
+    }
+    .ms-svc-btn {
+        background: var(--brown); color: #fff; cursor: pointer; border: none;
+        transition: background .2s, transform .1s;
+    }
+    .ms-svc-btn:hover  { background: var(--brown-dark); }
+    .ms-svc-btn:active { transform: scale(.95); }
+    .ms-ver-mais-btn {
+        display: flex; align-items: center; gap: .5rem;
+        padding: .7rem 2rem; border-radius: 10px;
+        font-weight: 700; font-size: .875rem;
+        border: 1.5px solid var(--brown);
+        color: var(--brown); background: transparent;
+        cursor: pointer; transition: background .2s, color .2s;
+    }
+    .ms-ver-mais-btn:hover { background: var(--brown); color: #fff; }
+    #svc-ver-mais-icon { transition: transform .3s; }
+
+    /* Index buttons */
+    .ms-idx-primary {
+        display: block; width: 100%; text-align: center;
+        background: var(--brown); color: #fff;
+        font-weight: 700; border-radius: .5rem;
+        padding: .75rem 1rem;
+        transition: background .2s, transform .1s;
+    }
+    .ms-idx-primary:hover  { background: var(--brown-dark); }
+    .ms-idx-primary:active { transform: scale(.98); }
+
+    .ms-idx-secondary {
+        display: block; width: 100%; text-align: center;
+        background: var(--bg2); color: var(--text);
+        font-weight: 700; border-radius: .5rem;
+        padding: .75rem 1rem;
+        transition: filter .2s;
+    }
+    .ms-idx-secondary:hover { filter: brightness(.95); }
+
+    /* Benefício check */
+    .ms-check { background: var(--brown-dark); }
+    [data-theme="dark"] .ms-check svg,
+    [data-access="alto-contraste"] .ms-check svg { color: #1A1410; }
+
+    /* Modal input */
+    .ms-req-input {
+        width: 100%;
+        border: 2px solid color-mix(in srgb, var(--brown-dark) 40%, transparent);
+        border-radius: 20px;
+        padding: .625rem 1rem;
+        font-size: .875rem;
+        color: var(--text);
+        background: color-mix(in srgb, var(--bg2) 30%, var(--bg));
+        outline: none;
+        font-family: inherit;
+        transition: border-color .2s, background .3s;
+    }
+    .ms-req-input::placeholder { color: var(--text-muted); opacity: .7; }
+    .ms-req-input:focus  { border-color: var(--brown-dark); }
+    .ms-req-input option { background: var(--bg); color: var(--text); }
+</style>
+
+@* Modal contrato do cliente *@
+<div id="modalContratoCliente" class="modal-overlay hidden fixed inset-0 z-[60] flex items-center justify-center" aria-modal="true" role="dialog">
+    <div class="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
+    <div class="modal-box relative ms-card w-full max-w-2xl mx-4 z-10 flex flex-col" style="max-height:90vh">
+        <div class="px-6 md:px-8 py-5 border-b flex items-center justify-between flex-shrink-0" style="border-color:var(--border);background:var(--bg2)">
+            <div>
+                <h3 class="font-inria font-bold text-xl" style="color:var(--text)">Termo de Compromisso</h3>
+                <p class="text-xs mt-0.5" style="color:var(--text-muted)">Leia com atenção antes de prosseguir</p>
+            </div>
+            <svg class="w-7 h-7 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="color:var(--brown)" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+            </svg>
+        </div>
+        <div class="flex-1 overflow-y-auto px-6 md:px-8 py-6 text-sm leading-relaxed" style="color:var(--text)">
+            <p class="font-bold text-base mb-5" style="color:var(--brown)">CONTRATO CLIENTE</p>
+            <div class="flex flex-col gap-5">
+                <div>
+                    <p class="font-semibold mb-2" style="color:var(--text)">Responsabilidades</p>
+                    <ul class="flex flex-col gap-1 pl-1" style="color:var(--text-muted)">
+                        <li class="flex gap-2"><span>●</span><span>Enviar informações corretas;</span></li>
+                        <li class="flex gap-2"><span>●</span><span>Fornecer materiais necessários;</span></li>
+                        <li class="flex gap-2"><span>●</span><span>Responder solicitações no prazo;</span></li>
+                        <li class="flex gap-2"><span>●</span><span>Realizar pagamentos conforme combinado.</span></li>
+                    </ul>
+                </div>
+                <div>
+                    <p class="font-semibold mb-2" style="color:var(--text)">Pagamento</p>
+                    <ul class="flex flex-col gap-1 pl-1" style="color:var(--text-muted)">
+                        <li class="flex gap-2"><span>●</span><span>30% no início do projeto;</span></li>
+                        <li class="flex gap-2"><span>●</span><span>70% após aprovação final;</span></li>
+                        <li class="flex gap-2"><span>●</span><span>Taxas bancárias podem ser aplicadas em estornos.</span></li>
+                    </ul>
+                </div>
+                <div>
+                    <p class="font-semibold mb-2" style="color:var(--text)">Não é permitido</p>
+                    <ul class="flex flex-col gap-1 pl-1" style="color:var(--text-muted)">
+                        <li class="flex gap-2"><span>●</span><span>Solicitar conteúdos ilegais;</span></li>
+                        <li class="flex gap-2"><span>●</span><span>Tentar negociar fora da plataforma;</span></li>
+                        <li class="flex gap-2"><span>●</span><span>Utilizar o sistema de forma abusiva;</span></li>
+                        <li class="flex gap-2"><span>●</span><span>Praticar fraudes.</span></li>
+                    </ul>
+                </div>
+                <div>
+                    <p class="font-semibold mb-2" style="color:var(--text)">Cancelamento</p>
+                    <ul class="flex flex-col gap-1 pl-1" style="color:var(--text-muted)">
+                        <li class="flex gap-2"><span>●</span><span>Antes do início: poderá haver retenção de taxas;</span></li>
+                        <li class="flex gap-2"><span>●</span><span>Após início: valores poderão ser proporcionais ao trabalho executado.</span></li>
+                    </ul>
+                </div>
+                <div>
+                    <p class="font-semibold mb-2" style="color:var(--text)">Mediação</p>
+                    <p style="color:var(--text-muted)">A MindSite poderá analisar mensagens, arquivos e entregas em casos de disputa.</p>
+                </div>
+                <div class="border-t pt-4" style="border-color:var(--border)">
+                    <p class="font-semibold mb-3" style="color:var(--text)">Assinatura de Consentimento</p>
+                    <div class="flex flex-col gap-3">
+                        <div>
+                            <label class="text-xs font-bold uppercase tracking-wider mb-1 block" style="color:var(--text-muted)">Nome</label>
+                            <input type="text" id="contratoClienteNome" class="ms-req-input" readonly
+                                   value="@(ViewBag.NomeCompleto ?? "")" maxlength="100"
+                                   style="opacity:0.7;cursor:default"/>
+                        </div>
+                        <div>
+                            <label class="text-xs font-bold uppercase tracking-wider mb-1 block" style="color:var(--text-muted)">CPF</label>
+                            <input type="text" id="contratoClienteCPF" class="ms-req-input" placeholder="000.000.000-00"
+                                   value="@(ViewBag.CPF ?? "")" inputmode="numeric" maxlength="14"
+                                   oninput="mascararCpfCnpj(this);verificarCamposContratoCliente()"/>
+                        </div>
+                        <div>
+                            <label class="text-xs font-bold uppercase tracking-wider mb-1 block" style="color:var(--text-muted)">Data</label>
+                            <input type="date" id="contratoClienteData" class="ms-req-input" readonly
+                                   style="opacity:0.7;cursor:default"/>
+                        </div>
+                        <label class="flex items-start gap-3 cursor-pointer pt-3 mt-1 border-t" style="border-color:var(--border)">
+                            <input type="checkbox" id="checkContratoCliente" class="w-5 h-5 mt-0.5 flex-shrink-0 accent-[color:var(--brown)]"
+                                   onchange="verificarCamposContratoCliente()"/>
+                            <span class="text-sm" style="color:var(--text)">Li e concordo com todos os termos e autorizo a MindSite a processar minha solicitação.</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="px-6 md:px-8 py-5 border-t flex-shrink-0" style="border-color:var(--border);background:var(--bg2)">
+            <div class="flex gap-3">
+                <button type="button" onclick="cancelarContratoCliente()" class="btn-ghost flex-1">Cancelar</button>
+                <button type="button" id="btnAceitarContratoCliente" disabled onclick="confirmarContratoCliente()"
+                        class="btn-primary flex-1 disabled:opacity-40 disabled:cursor-not-allowed">Aceitar Contrato</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@* Modal solicitar serviço *@
+<div id="modalServico" class="modal-overlay hidden fixed inset-0 z-50 flex items-center justify-center" aria-modal="true" role="dialog">
+    <div class="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
+    <div class="modal-box relative ms-card w-full max-w-2xl mx-4 z-10 flex flex-col" style="max-height:92vh">
+        <div class="px-6 md:px-8 py-5 border-b flex items-center justify-between flex-shrink-0" style="border-color:var(--border);background:var(--bg2)">
+            <div>
+                <h3 class="font-inria font-bold text-xl" style="color:var(--text)">Novo Projeto</h3>
+                <p class="text-xs mt-0.5" style="color:var(--text-muted)">Preencha os detalhes da sua solicitação</p>
+            </div>
+            <button onclick="closeModal('modalServico')" style="color:var(--text-muted)" aria-label="Fechar">
+                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+        </div>
+        <div class="flex-1 overflow-y-auto">
+            <form id="formServico" asp-controller="Client" asp-action="SolicitarServico" method="post" class="p-6 md:p-8 flex flex-col gap-6 md:gap-8">
+                @Html.AntiForgeryToken()
+                <input type="hidden" id="hidRequisitos"   name="Requisitos"       value=""/>
+                <input type="hidden" id="hidPrazoCliente" name="PrazoCliente"     value=""/>
+                <input type="hidden" id="hidDataPrazo"    name="DataPrazoCliente" value=""/>
+                <input type="hidden" id="hidOrcamento"    name="OrcamentoCliente" value=""/>
+
+                <div>
+                    <label class="text-xs font-bold uppercase tracking-wider mb-2 block" style="color:var(--text-muted)">Tipo de serviço *</label>
+                    <select name="Tipo" id="selectTipo" class="ms-req-input" onchange="selecionarTipo(parseInt(this.value))">
+                        <option value="">— Selecione o tipo de serviço —</option>
+                        <option value="4">Sites Institucionais</option>
+                        <option value="5">Landing Pages</option>
+                        <option value="6">One-Page Sites</option>
+                        <option value="7">Portfólios Digitais</option>
+                        <option value="8">Blogs e Portais</option>
+                        <option value="0">E-commerce</option>
+                        <option value="9">Plataformas EAD</option>
+                        <option value="10">Links para Bio</option>
+                        <option value="11">Sistemas Web</option>
+                        <option value="12">Agendamento Online</option>
+                        <option value="13">Multi-idiomas</option>
+                        <option value="14">Redesign de Site</option>
+                        <option value="15">Manutenção</option>
+                        <option value="16">SEO & Performance</option>
+                        <option value="17">Migração de Site</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="text-xs font-bold uppercase tracking-wider mb-2 block" style="color:var(--text-muted)">Nome do projeto *</label>
+                    <input type="text" name="NomeProjeto" class="ms-input" required maxlength="200" placeholder="Ex: Loja da Maria, Blog Tech Insights..."/>
+                </div>
+
+                <div id="reqs-0" class="hidden flex flex-col gap-5">
+                    <div class="w-full h-px" style="background:var(--border)"></div>
+                    <p class="text-xs font-bold uppercase tracking-wider" style="color:var(--text-muted)">Funcionalidades desejadas</p>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        @foreach (var item in new[]{ "Integração com meios de pagamento", "Catálogo de produtos com busca e filtros", "Área do cliente (login e cadastro)", "Painel administrativo para gestão", "Versão mobile otimizada", "Integração com sistema de estoque", "Chat/suporte ao cliente no site" })
+                        {
+                            <label class="flex items-start gap-2 cursor-pointer text-sm" style="color:var(--text)">
+                                <input type="checkbox" class="w-4 h-4 mt-0.5 flex-shrink-0 accent-[color:var(--brown)]" data-label="@item"/> @item
+                            </label>
+                        }
+                    </div>
+                    <div>
+                        <p class="text-xs font-bold uppercase tracking-wider mb-2" style="color:var(--text-muted)">Quantidade de produtos</p>
+                        <div class="flex flex-wrap gap-3">
+                            @foreach (var opt in new[]{ "Até 50", "51–200", "201–1.000", "Mais de 1.000" })
+                            {
+                                <label class="flex items-center gap-2 cursor-pointer text-sm" style="color:var(--text)">
+                                    <input type="radio" name="ecom-qtd" value="@opt" class="accent-[color:var(--brown)]" data-group="Quantidade de produtos"/> @opt
+                                </label>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                <div id="reqs-1" class="hidden flex flex-col gap-5">
+                    <div class="w-full h-px" style="background:var(--border)"></div>
+                    <p class="text-xs font-bold uppercase tracking-wider" style="color:var(--text-muted)">Funcionalidades desejadas</p>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        @foreach (var item in new[]{ "Design personalizado", "Sistema de comentários", "Newsletter / e-mail marketing", "Área de membros / assinantes", "Otimização para SEO", "Integração com redes sociais", "Busca interna" })
+                        {
+                            <label class="flex items-start gap-2 cursor-pointer text-sm" style="color:var(--text)">
+                                <input type="checkbox" class="w-4 h-4 mt-0.5 flex-shrink-0 accent-[color:var(--brown)]" data-label="@item"/> @item
+                            </label>
+                        }
+                    </div>
+                    <div>
+                        <p class="text-xs font-bold uppercase tracking-wider mb-2" style="color:var(--text-muted)">Frequência de publicação</p>
+                        <div class="flex flex-wrap gap-3">
+                            @foreach (var opt in new[]{ "Diária", "Semanal", "Mensal", "Indefinida" })
+                            {
+                                <label class="flex items-center gap-2 cursor-pointer text-sm" style="color:var(--text)">
+                                    <input type="radio" name="blog-freq" value="@opt" class="accent-[color:var(--brown)]" data-group="Frequência de publicação"/> @opt
+                                </label>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                <div id="reqs-2" class="hidden flex flex-col gap-5">
+                    <div class="w-full h-px" style="background:var(--border)"></div>
+                    <p class="text-xs font-bold uppercase tracking-wider" style="color:var(--text-muted)">O que você precisa?</p>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        @foreach (var item in new[]{ "Landing Page", "Site institucional", "Redesign de site existente", "Identidade visual / branding", "Capas para redes sociais", "Wireframes e protótipos (Figma)" })
+                        {
+                            <label class="flex items-start gap-2 cursor-pointer text-sm" style="color:var(--text)">
+                                <input type="checkbox" class="w-4 h-4 mt-0.5 flex-shrink-0 accent-[color:var(--brown)]" data-label="@item"/> @item
+                            </label>
+                        }
+                    </div>
+                    <div>
+                        <label class="text-xs font-bold uppercase tracking-wider mb-2 block" style="color:var(--text-muted)">Referências de design (sites, links)</label>
+                        <textarea class="ms-textarea w-full" rows="3" data-group="Referências" placeholder="Cole links ou descreva referências que você gosta..."></textarea>
+                    </div>
+                </div>
+
+                <div id="reqs-3" class="hidden flex flex-col gap-5">
+                    <div class="w-full h-px" style="background:var(--border)"></div>
+                    <p class="text-xs font-bold uppercase tracking-wider" style="color:var(--text-muted)">O que você precisa?</p>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        @foreach (var item in new[]{ "Landing Page de captação", "Gerenciamento de Google Ads", "Gerenciamento de Meta Ads", "E-mail marketing", "Relatórios e análises de performance", "Estratégia de conteúdo orgânico" })
+                        {
+                            <label class="flex items-start gap-2 cursor-pointer text-sm" style="color:var(--text)">
+                                <input type="checkbox" class="w-4 h-4 mt-0.5 flex-shrink-0 accent-[color:var(--brown)]" data-label="@item"/> @item
+                            </label>
+                        }
+                    </div>
+                    <div>
+                        <p class="text-xs font-bold uppercase tracking-wider mb-2" style="color:var(--text-muted)">Objetivo principal</p>
+                        <div class="flex flex-wrap gap-3">
+                            @foreach (var opt in new[]{ "Gerar leads", "Aumentar vendas", "Lançamento de produto", "Fortalecer a marca" })
+                            {
+                                <label class="flex items-center gap-2 cursor-pointer text-sm" style="color:var(--text)">
+                                    <input type="radio" name="mkt-obj" value="@opt" class="accent-[color:var(--brown)]" data-group="Objetivo"/> @opt
+                                </label>
+                            }
+                        </div>
+                    </div>
+                    <div>
+                        <label class="text-xs font-bold uppercase tracking-wider mb-2 block" style="color:var(--text-muted)">Orçamento mensal estimado para mídia</label>
+                        <input type="text" class="ms-input" data-group="Orçamento para mídia" placeholder="Ex: R$ 500/mês, ainda não definido..."/>
+                    </div>
+                </div>
+
+                @* Painel genérico para os novos tipos de serviço *@
+                <div id="reqs-generic" class="hidden flex flex-col gap-5">
+                    <div class="w-full h-px" style="background:var(--border)"></div>
+                    <p class="text-xs font-bold uppercase tracking-wider" style="color:var(--text-muted)">O que você precisa?</p>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        @foreach (var item in new[]{ "Versão mobile responsiva", "Painel de gerenciamento", "Formulário de contato", "Integração com redes sociais", "Otimização para SEO", "Integração com sistema existente", "Suporte pós-entrega", "Treinamento de uso da plataforma" })
+                        {
+                            <label class="flex items-start gap-2 cursor-pointer text-sm" style="color:var(--text)">
+                                <input type="checkbox" class="w-4 h-4 mt-0.5 flex-shrink-0 accent-[color:var(--brown)]" data-label="@item"/> @item
+                            </label>
+                        }
+                    </div>
+                    <div>
+                        <label class="text-xs font-bold uppercase tracking-wider mb-2 block" style="color:var(--text-muted)">Detalhes específicos</label>
+                        <textarea class="ms-textarea w-full" rows="3" data-group="Detalhes" placeholder="Descreva qualquer requisito específico do projeto..."></textarea>
+                    </div>
+                </div>
+
+                <div class="flex flex-col gap-5">
+                    <div class="w-full h-px" style="background:var(--border)"></div>
+                    <div>
+                        <p class="text-xs font-bold uppercase tracking-wider mb-2" style="color:var(--text-muted)">Prazo esperado *</p>
+                        <div class="flex flex-col gap-2">
+                            @foreach (var opt in new[]{ new{Val="Meses1a3",Label="1 a 3 meses"}, new{Val="Ate6Meses",Label="Até 6 meses"}, new{Val="Ate1Ano",Label="Até 1 ano"}, new{Val="MaisDeUmAno",Label="Mais de 1 ano"}, new{Val="NaoSei",Label="Não sei (o fornecedor definirá o prazo)"}, new{Val="DataEspecifica",Label="Definir uma data"} })
+                            {
+                                <label class="flex items-center gap-2 cursor-pointer text-sm select-none" style="color:var(--text)">
+                                    <input type="radio" name="prazoOpcao" value="@opt.Val" class="accent-[color:var(--brown)]" onchange="onPrazoChange(this)"/> @opt.Label
+                                </label>
+                            }
+                        </div>
+                        <div id="divDataPrazo" class="hidden mt-3">
+                            <label class="text-xs font-semibold uppercase tracking-wider mb-1 block" style="color:var(--text-muted)">Data de entrega</label>
+                            <input type="date" id="inputDataPrazo" class="ms-input" min="@DateTime.Today.AddDays(1).ToString("yyyy-MM-dd")"/>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="text-xs font-bold uppercase tracking-wider mb-2 block" style="color:var(--text-muted)">Informações adicionais</label>
+                        <textarea id="obsGeral" class="ms-textarea w-full" rows="3" placeholder="Conte mais sobre o projeto, referências, restrições..."></textarea>
+                    </div>
+                </div>
+
+                <div class="flex flex-col gap-5">
+                    <div class="w-full h-px" style="background:var(--border)"></div>
+                    <div>
+                        <p class="text-xs font-bold uppercase tracking-wider mb-2" style="color:var(--text-muted)">Orçamento *</p>
+                        <div class="flex flex-col gap-2">
+                            <label class="flex items-center gap-2 cursor-pointer text-sm select-none" style="color:var(--text)">
+                                <input type="radio" name="orcamentoOpcao" value="definido" class="accent-[color:var(--brown)]" onchange="onOrcamentoChange(this)"/>
+                                Tenho um orçamento definido
+                            </label>
+                            <div id="divOrcamentoValor" class="hidden ml-6 mt-1">
+                                <label class="text-xs font-semibold uppercase tracking-wider mb-1 block" style="color:var(--text-muted)">Valor disponível</label>
+                                <div class="relative max-w-[200px]">
+                                    <span class="absolute left-3 top-1/2 -translate-y-1/2 text-sm font-semibold select-none" style="color:var(--text-muted)">R$</span>
+                                    <input type="number" id="inputOrcamento" class="ms-input pl-10" min="1" step="0.01" placeholder="0,00"/>
+                                </div>
+                            </div>
+                            <label class="flex items-center gap-2 cursor-pointer text-sm select-none" style="color:var(--text)">
+                                <input type="radio" name="orcamentoOpcao" value="naosei" class="accent-[color:var(--brown)]" onchange="onOrcamentoChange(this)"/>
+                                Não sei (será definido pelo Admin)
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex gap-3">
+                    <button type="button" onclick="closeModal('modalServico')" class="btn-ghost flex-1 text-center text-sm">Cancelar</button>
+                    <button type="button" onclick="submeterServico()" class="btn-primary flex-1 text-center text-sm">Solicitar Serviço</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@* Page content *@
+<div class="flex flex-col w-full">
+
+    @* Home *@
+    <section id="home" class="scroll-mt-20 min-h-screen flex items-center">
+        <div class="container mx-auto px-6 py-20 mt-16 md:mt-20 flex flex-col md:flex-row items-center justify-between gap-10 md:gap-16 w-full">
+
+            <div class="flex-1 flex flex-col items-start gap-6 md:gap-8">
+                <h1 class="font-inria text-5xl sm:text-6xl md:text-7xl font-bold leading-tight" style="color:var(--text)">
+                    O futuro do Desenvolvimento Web chegou!
+                </h1>
+                <p class="text-base md:text-xl max-w-2xl leading-relaxed" style="color:var(--text-muted)">
+                    Encontre os melhores fornecedores de web design e solicite seu projeto digital de forma simples, rápida e transparente — tudo em um só lugar.
+                </p>
+            </div>
+
+            <div class="flex-1 flex items-center justify-center w-full mt-4 md:mt-0">
+                <div class="ms-float-wrap">
+                    <div class="ms-float-blob"></div>
+                    <div class="ms-float-card">
+                        <div class="ms-float-img">
+                            <img src="~/img/corporacao.png" alt="Sede MindSite" class="w-full h-full object-cover">
+                        </div>
+                        <div class="flex flex-col gap-3 md:gap-4">
+                            <a href="#servicos" class="ms-idx-secondary text-base md:text-lg">
+                                Veja nossos serviços
+                            </a>
+                            <a href="#fornecedor" class="ms-idx-primary text-base md:text-lg shadow-md">
+                                Quero me tornar um Fornecedor
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    @* Serviços *@
+    <section id="servicos" class="scroll-mt-20">
+        <div class="container mx-auto px-6 py-16 md:py-20 flex flex-col lg:flex-row gap-12 lg:gap-20 items-start">
+
+            @* Coluna esquerda — título, descrição e botão *@
+            <div class="w-full lg:w-80 lg:flex-shrink-0 lg:sticky lg:top-28 flex flex-col gap-6 md:gap-8">
+                <h1 class="font-inria text-5xl md:text-6xl font-bold" style="color:var(--text)">Serviços</h1>
+                <div class="flex flex-col gap-4 text-base leading-relaxed" style="color:var(--text-muted)">
+                    <p>Oferecemos soluções completas em desenvolvimento web para cada etapa da sua presença digital — do primeiro site até sistemas complexos sob medida.</p>
+                    <p>Cada projeto é desenvolvido com atenção aos detalhes e foco em resultados reais para o seu negócio.</p>
+                </div>
+                <a asp-controller="Client" asp-action="MeusServicos"
+                   class="ms-idx-primary font-bold text-base rounded-xl shadow-sm"
+                   style="display:inline-block;width:auto;padding:.7rem 1.75rem;text-align:center">
+                    Meus serviços
+                </a>
+            </div>
+
+            @* Coluna direita — cards *@
+            <div class="flex-1 w-full flex flex-col gap-5 md:gap-6">
+
+            @* 4 cards visíveis *@
+
+                @* 1. Sites Institucionais *@
+                <div class="ms-svc-card rounded-l-[44px] rounded-r-[60px] flex items-stretch overflow-hidden relative">
+                    <div class="ms-svc-icon w-28 sm:w-36 rounded-[44px] p-4 sm:p-5 flex flex-col justify-center items-center shrink-0 gap-2">
+                        <svg class="w-12 h-12 sm:w-14 sm:h-14" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="6" y="10" width="52" height="38" rx="4" stroke="var(--brown)" stroke-width="3" fill="none"/>
+                            <path d="M6 18h52" stroke="var(--brown)" stroke-width="3"/>
+                            <circle cx="13" cy="14" r="2" fill="var(--brown)"/><circle cx="20" cy="14" r="2" fill="var(--brown)"/><circle cx="27" cy="14" r="2" fill="var(--brown)"/>
+                            <rect x="14" y="26" width="16" height="14" rx="2" fill="var(--brown)" opacity=".3"/>
+                            <rect x="34" y="26" width="16" height="6" rx="2" fill="var(--brown)" opacity=".3"/>
+                            <rect x="34" y="35" width="10" height="5" rx="2" fill="var(--brown)" opacity=".3"/>
+                            <path d="M24 48v6M40 48v6M18 54h28" stroke="var(--brown)" stroke-width="3" stroke-linecap="round"/>
+                        </svg>
+                        <span class="font-inria text-xs sm:text-sm font-bold text-center leading-tight" style="color:var(--text)">Sites Institucionais</span>
+                    </div>
+                    <div class="flex-1 p-5 sm:p-6 md:p-7 pb-14 sm:pb-16">
+                        <p class="text-sm sm:text-base leading-relaxed" style="color:var(--text-muted)">Sites profissionais que representam a identidade da sua empresa online. Apresentamos sua história, serviços e diferenciais com design moderno e responsivo, gerando contatos qualificados e transmitindo credibilidade ao seu público desde o primeiro acesso.</p>
+                    </div>
+                    <button type="button" onclick="abrirModalServico(4)" class="ms-svc-btn absolute bottom-0 right-0 text-xs sm:text-sm font-bold px-8 sm:px-10 py-3 sm:py-3.5 rounded-tl-[50px]">Solicitar serviço</button>
+                </div>
+
+                @* 2. Landing Pages *@
+                <div class="ms-svc-card rounded-l-[44px] rounded-r-[60px] flex items-stretch overflow-hidden relative">
+                    <div class="ms-svc-icon w-28 sm:w-36 rounded-[44px] p-4 sm:p-5 flex flex-col justify-center items-center shrink-0 gap-2">
+                        <svg class="w-12 h-12 sm:w-14 sm:h-14" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="8" y="8" width="48" height="48" rx="4" stroke="var(--brown)" stroke-width="3" fill="none"/>
+                            <path d="M8 22h48" stroke="var(--brown)" stroke-width="3"/>
+                            <rect x="16" y="30" width="32" height="4" rx="2" fill="var(--brown)" opacity=".4"/>
+                            <rect x="20" y="38" width="24" height="3" rx="1.5" fill="var(--brown)" opacity=".25"/>
+                            <rect x="22" y="44" width="20" height="3" rx="1.5" fill="var(--brown)" opacity=".15"/>
+                            <circle cx="32" cy="16" r="3" fill="var(--brown)"/>
+                        </svg>
+                        <span class="font-inria text-xs sm:text-sm font-bold text-center leading-tight" style="color:var(--text)">Landing Pages</span>
+                    </div>
+                    <div class="flex-1 p-5 sm:p-6 md:p-7 pb-14 sm:pb-16">
+                        <p class="text-sm sm:text-base leading-relaxed" style="color:var(--text-muted)">Páginas estratégicas de alta conversão criadas especificamente para campanhas e lançamentos. Cada elemento é pensado para capturar a atenção do visitante e transformá-lo em lead ou cliente de forma rápida, direta e eficiente.</p>
+                    </div>
+                    <button type="button" onclick="abrirModalServico(5)" class="ms-svc-btn absolute bottom-0 right-0 text-xs sm:text-sm font-bold px-8 sm:px-10 py-3 sm:py-3.5 rounded-tl-[50px]">Solicitar serviço</button>
+                </div>
+
+                @* 3. One-Page Sites *@
+                <div class="ms-svc-card rounded-l-[44px] rounded-r-[60px] flex items-stretch overflow-hidden relative">
+                    <div class="ms-svc-icon w-28 sm:w-36 rounded-[44px] p-4 sm:p-5 flex flex-col justify-center items-center shrink-0 gap-2">
+                        <svg class="w-12 h-12 sm:w-14 sm:h-14" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="14" y="4" width="36" height="56" rx="4" stroke="var(--brown)" stroke-width="3" fill="none"/>
+                            <rect x="20" y="12" width="24" height="3" rx="1.5" fill="var(--brown)" opacity=".4"/>
+                            <rect x="20" y="19" width="18" height="3" rx="1.5" fill="var(--brown)" opacity=".25"/>
+                            <rect x="20" y="26" width="22" height="3" rx="1.5" fill="var(--brown)" opacity=".25"/>
+                            <rect x="20" y="33" width="16" height="3" rx="1.5" fill="var(--brown)" opacity=".2"/>
+                            <circle cx="32" cy="48" r="3" fill="var(--brown)" opacity=".5"/>
+                        </svg>
+                        <span class="font-inria text-xs sm:text-sm font-bold text-center leading-tight" style="color:var(--text)">One-Page Sites</span>
+                    </div>
+                    <div class="flex-1 p-5 sm:p-6 md:p-7 pb-14 sm:pb-16">
+                        <p class="text-sm sm:text-base leading-relaxed" style="color:var(--text-muted)">Sites elegantes em uma única página com navegação por rolagem fluida. Ideais para profissionais autônomos, eventos e startups que querem transmitir sua mensagem de forma objetiva, impactante e sem distrações desnecessárias.</p>
+                    </div>
+                    <button type="button" onclick="abrirModalServico(6)" class="ms-svc-btn absolute bottom-0 right-0 text-xs sm:text-sm font-bold px-8 sm:px-10 py-3 sm:py-3.5 rounded-tl-[50px]">Solicitar serviço</button>
+                </div>
+
+                @* 4. Portfólios Digitais *@
+                <div class="ms-svc-card rounded-l-[44px] rounded-r-[60px] flex items-stretch overflow-hidden relative">
+                    <div class="ms-svc-icon w-28 sm:w-36 rounded-[44px] p-4 sm:p-5 flex flex-col justify-center items-center shrink-0 gap-2">
+                        <svg class="w-12 h-12 sm:w-14 sm:h-14" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="8" y="16" width="48" height="36" rx="4" stroke="var(--brown)" stroke-width="3" fill="none"/>
+                            <path d="M20 16V10a4 4 0 0 1 4-4h16a4 4 0 0 1 4 4v6" stroke="var(--brown)" stroke-width="3"/>
+                            <rect x="16" y="26" width="14" height="14" rx="2" fill="var(--brown)" opacity=".3"/>
+                            <rect x="34" y="26" width="14" height="6" rx="2" fill="var(--brown)" opacity=".2"/>
+                            <rect x="34" y="35" width="10" height="5" rx="2" fill="var(--brown)" opacity=".15"/>
+                        </svg>
+                        <span class="font-inria text-xs sm:text-sm font-bold text-center leading-tight" style="color:var(--text)">Portfólios Digitais</span>
+                    </div>
+                    <div class="flex-1 p-5 sm:p-6 md:p-7 pb-14 sm:pb-16">
+                        <p class="text-sm sm:text-base leading-relaxed" style="color:var(--text-muted)">Vitrines digitais personalizadas para fotógrafos, designers, arquitetos e profissionais criativos. Destaque seus melhores trabalhos em galerias modernas e conquiste novos clientes com uma apresentação que reflete seu estilo único.</p>
+                    </div>
+                    <button type="button" onclick="abrirModalServico(7)" class="ms-svc-btn absolute bottom-0 right-0 text-xs sm:text-sm font-bold px-8 sm:px-10 py-3 sm:py-3.5 rounded-tl-[50px]">Solicitar serviço</button>
+                </div>
+
+            @* 11 cards extras ocultos *@
+            <div id="svc-extra" style="display:none" class="flex flex-col gap-5 md:gap-6">
+
+                @* 5. Blogs e Portais *@
+                <div class="ms-svc-card rounded-l-[44px] rounded-r-[60px] flex items-stretch overflow-hidden relative">
+                    <div class="ms-svc-icon w-28 sm:w-36 rounded-[44px] p-4 sm:p-5 flex flex-col justify-center items-center shrink-0 gap-2">
+                        <svg class="w-12 h-12 sm:w-14 sm:h-14" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="8" y="8" width="48" height="48" rx="4" stroke="var(--brown)" stroke-width="3" fill="none"/>
+                            <path d="M8 20h48" stroke="var(--brown)" stroke-width="2" opacity=".4"/>
+                            <rect x="14" y="27" width="20" height="14" rx="2" fill="var(--brown)" opacity=".25"/>
+                            <rect x="38" y="27" width="14" height="4" rx="2" fill="var(--brown)" opacity=".2"/>
+                            <rect x="38" y="34" width="10" height="3" rx="1.5" fill="var(--brown)" opacity=".15"/>
+                            <rect x="14" y="44" width="36" height="3" rx="1.5" fill="var(--brown)" opacity=".1"/>
+                        </svg>
+                        <span class="font-inria text-xs sm:text-sm font-bold text-center leading-tight" style="color:var(--text)">Blogs e Portais</span>
+                    </div>
+                    <div class="flex-1 p-5 sm:p-6 md:p-7 pb-14 sm:pb-16">
+                        <p class="text-sm sm:text-base leading-relaxed" style="color:var(--text-muted)">Plataformas de conteúdo otimizadas para SEO com editor intuitivo, categorias, tags e integração com redes sociais. Construa autoridade no seu nicho publicando artigos que atraem visitantes orgânicos e posicionam sua marca no Google.</p>
+                    </div>
+                    <button type="button" onclick="abrirModalServico(8)" class="ms-svc-btn absolute bottom-0 right-0 text-xs sm:text-sm font-bold px-8 sm:px-10 py-3 sm:py-3.5 rounded-tl-[50px]">Solicitar serviço</button>
+                </div>
+
+                @* 6. E-commerce *@
+                <div class="ms-svc-card rounded-l-[44px] rounded-r-[60px] flex items-stretch overflow-hidden relative">
+                    <div class="ms-svc-icon w-28 sm:w-36 rounded-[44px] p-4 sm:p-5 flex flex-col justify-center items-center shrink-0 gap-2">
+                        <svg class="w-12 h-12 sm:w-14 sm:h-14" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M8 10h6l8 28h28l6-20H18" stroke="var(--brown)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                            <circle cx="28" cy="52" r="4" fill="var(--brown)" opacity=".5"/>
+                            <circle cx="44" cy="52" r="4" fill="var(--brown)" opacity=".5"/>
+                            <path d="M26 30l4 4 8-8" stroke="var(--brown)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        <span class="font-inria text-xs sm:text-sm font-bold text-center leading-tight" style="color:var(--text)">E-commerce</span>
+                    </div>
+                    <div class="flex-1 p-5 sm:p-6 md:p-7 pb-14 sm:pb-16">
+                        <p class="text-sm sm:text-base leading-relaxed" style="color:var(--text-muted)">Lojas virtuais completas, seguras e escaláveis com catálogo de produtos, carrinho de compras, integração com múltiplos meios de pagamento e painel administrativo intuitivo para gerenciar pedidos, estoque e clientes com facilidade.</p>
+                    </div>
+                    <button type="button" onclick="abrirModalServico(0)" class="ms-svc-btn absolute bottom-0 right-0 text-xs sm:text-sm font-bold px-8 sm:px-10 py-3 sm:py-3.5 rounded-tl-[50px]">Solicitar serviço</button>
+                </div>
+
+                @* 7. Plataformas EAD *@
+                <div class="ms-svc-card rounded-l-[44px] rounded-r-[60px] flex items-stretch overflow-hidden relative">
+                    <div class="ms-svc-icon w-28 sm:w-36 rounded-[44px] p-4 sm:p-5 flex flex-col justify-center items-center shrink-0 gap-2">
+                        <svg class="w-12 h-12 sm:w-14 sm:h-14" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="6" y="10" width="52" height="34" rx="4" stroke="var(--brown)" stroke-width="3" fill="none"/>
+                            <path d="M6 18h52" stroke="var(--brown)" stroke-width="2" opacity=".4"/>
+                            <polygon points="26,24 26,38 42,31" fill="var(--brown)" opacity=".4"/>
+                            <path d="M20 48v4M44 48v4M14 52h36" stroke="var(--brown)" stroke-width="3" stroke-linecap="round"/>
+                        </svg>
+                        <span class="font-inria text-xs sm:text-sm font-bold text-center leading-tight" style="color:var(--text)">Plataformas EAD</span>
+                    </div>
+                    <div class="flex-1 p-5 sm:p-6 md:p-7 pb-14 sm:pb-16">
+                        <p class="text-sm sm:text-base leading-relaxed" style="color:var(--text-muted)">Ambientes de ensino online completos com módulos de aula, upload de vídeos e materiais, área do aluno, emissão de certificados e controle de progresso. Ideal para escolas, instrutores e empresas que oferecem treinamentos.</p>
+                    </div>
+                    <button type="button" onclick="abrirModalServico(9)" class="ms-svc-btn absolute bottom-0 right-0 text-xs sm:text-sm font-bold px-8 sm:px-10 py-3 sm:py-3.5 rounded-tl-[50px]">Solicitar serviço</button>
+                </div>
+
+                @* 8. Links para Bio *@
+                <div class="ms-svc-card rounded-l-[44px] rounded-r-[60px] flex items-stretch overflow-hidden relative">
+                    <div class="ms-svc-icon w-28 sm:w-36 rounded-[44px] p-4 sm:p-5 flex flex-col justify-center items-center shrink-0 gap-2">
+                        <svg class="w-12 h-12 sm:w-14 sm:h-14" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="18" y="4" width="28" height="56" rx="6" stroke="var(--brown)" stroke-width="3" fill="none"/>
+                            <circle cx="32" cy="16" r="5" fill="var(--brown)" opacity=".3"/>
+                            <rect x="22" y="25" width="20" height="5" rx="2.5" fill="var(--brown)" opacity=".35"/>
+                            <rect x="22" y="33" width="20" height="5" rx="2.5" fill="var(--brown)" opacity=".25"/>
+                            <rect x="22" y="41" width="20" height="5" rx="2.5" fill="var(--brown)" opacity=".15"/>
+                            <circle cx="32" cy="56" r="2" fill="var(--brown)" opacity=".3"/>
+                        </svg>
+                        <span class="font-inria text-xs sm:text-sm font-bold text-center leading-tight" style="color:var(--text)">Links para Bio</span>
+                    </div>
+                    <div class="flex-1 p-5 sm:p-6 md:p-7 pb-14 sm:pb-16">
+                        <p class="text-sm sm:text-base leading-relaxed" style="color:var(--text-muted)">Páginas personalizadas com todos os seus links essenciais reunidos em um único endereço fácil de compartilhar. Design exclusivo alinhado à sua identidade visual, otimizado para redes sociais e com análise de cliques em tempo real.</p>
+                    </div>
+                    <button type="button" onclick="abrirModalServico(10)" class="ms-svc-btn absolute bottom-0 right-0 text-xs sm:text-sm font-bold px-8 sm:px-10 py-3 sm:py-3.5 rounded-tl-[50px]">Solicitar serviço</button>
+                </div>
+
+                @* 9. Sistemas Web *@
+                <div class="ms-svc-card rounded-l-[44px] rounded-r-[60px] flex items-stretch overflow-hidden relative">
+                    <div class="ms-svc-icon w-28 sm:w-36 rounded-[44px] p-4 sm:p-5 flex flex-col justify-center items-center shrink-0 gap-2">
+                        <svg class="w-12 h-12 sm:w-14 sm:h-14" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="8" y="8" width="48" height="48" rx="4" stroke="var(--brown)" stroke-width="3" fill="none"/>
+                            <path d="M8 22h48" stroke="var(--brown)" stroke-width="2" opacity=".4"/>
+                            <rect x="14" y="29" width="12" height="20" rx="2" fill="var(--brown)" opacity=".2"/>
+                            <rect x="30" y="29" width="22" height="8" rx="2" fill="var(--brown)" opacity=".2"/>
+                            <rect x="30" y="41" width="14" height="8" rx="2" fill="var(--brown)" opacity=".15"/>
+                            <circle cx="14" cy="16" r="2" fill="var(--brown)"/><circle cx="20" cy="16" r="2" fill="var(--brown)"/>
+                        </svg>
+                        <span class="font-inria text-xs sm:text-sm font-bold text-center leading-tight" style="color:var(--text)">Sistemas Web</span>
+                    </div>
+                    <div class="flex-1 p-5 sm:p-6 md:p-7 pb-14 sm:pb-16">
+                        <p class="text-sm sm:text-base leading-relaxed" style="color:var(--text-muted)">Sistemas sob medida para digitalizar e automatizar processos do seu negócio. Desenvolvemos painéis de gestão, controle de estoque, relatórios e CRMs que eliminam planilhas, reduzem erros e aumentam a produtividade da equipe.</p>
+                    </div>
+                    <button type="button" onclick="abrirModalServico(11)" class="ms-svc-btn absolute bottom-0 right-0 text-xs sm:text-sm font-bold px-8 sm:px-10 py-3 sm:py-3.5 rounded-tl-[50px]">Solicitar serviço</button>
+                </div>
+
+                @* 10. Agendamento *@
+                <div class="ms-svc-card rounded-l-[44px] rounded-r-[60px] flex items-stretch overflow-hidden relative">
+                    <div class="ms-svc-icon w-28 sm:w-36 rounded-[44px] p-4 sm:p-5 flex flex-col justify-center items-center shrink-0 gap-2">
+                        <svg class="w-12 h-12 sm:w-14 sm:h-14" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="8" y="14" width="48" height="44" rx="4" stroke="var(--brown)" stroke-width="3" fill="none"/>
+                            <path d="M8 26h48" stroke="var(--brown)" stroke-width="2" opacity=".4"/>
+                            <path d="M22 8v12M42 8v12" stroke="var(--brown)" stroke-width="3" stroke-linecap="round"/>
+                            <rect x="16" y="33" width="8" height="7" rx="1.5" fill="var(--brown)" opacity=".3"/>
+                            <rect x="28" y="33" width="8" height="7" rx="1.5" fill="var(--brown)" opacity=".5"/>
+                            <rect x="40" y="33" width="8" height="7" rx="1.5" fill="var(--brown)" opacity=".2"/>
+                            <rect x="16" y="44" width="8" height="7" rx="1.5" fill="var(--brown)" opacity=".2"/>
+                            <rect x="28" y="44" width="8" height="7" rx="1.5" fill="var(--brown)" opacity=".15"/>
+                        </svg>
+                        <span class="font-inria text-xs sm:text-sm font-bold text-center leading-tight" style="color:var(--text)">Agendamento</span>
+                    </div>
+                    <div class="flex-1 p-5 sm:p-6 md:p-7 pb-14 sm:pb-16">
+                        <p class="text-sm sm:text-base leading-relaxed" style="color:var(--text-muted)">Sites com sistema de agendamento online integrado para que seus clientes marquem horários 24h por dia. Inclui notificações automáticas por e-mail, gestão de disponibilidade e painel de controle para clínicas, salões e consultorias.</p>
+                    </div>
+                    <button type="button" onclick="abrirModalServico(12)" class="ms-svc-btn absolute bottom-0 right-0 text-xs sm:text-sm font-bold px-8 sm:px-10 py-3 sm:py-3.5 rounded-tl-[50px]">Solicitar serviço</button>
+                </div>
+
+                @* 11. Multi-idiomas *@
+                <div class="ms-svc-card rounded-l-[44px] rounded-r-[60px] flex items-stretch overflow-hidden relative">
+                    <div class="ms-svc-icon w-28 sm:w-36 rounded-[44px] p-4 sm:p-5 flex flex-col justify-center items-center shrink-0 gap-2">
+                        <svg class="w-12 h-12 sm:w-14 sm:h-14" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="32" cy="32" r="24" stroke="var(--brown)" stroke-width="3" fill="none"/>
+                            <path d="M32 8c0 0-10 10-10 24s10 24 10 24" stroke="var(--brown)" stroke-width="2.5" opacity=".5"/>
+                            <path d="M32 8c0 0 10 10 10 24s-10 24-10 24" stroke="var(--brown)" stroke-width="2.5" opacity=".5"/>
+                            <path d="M8 32h48" stroke="var(--brown)" stroke-width="2.5" opacity=".4"/>
+                            <path d="M10 20h44M10 44h44" stroke="var(--brown)" stroke-width="2" opacity=".2"/>
+                        </svg>
+                        <span class="font-inria text-xs sm:text-sm font-bold text-center leading-tight" style="color:var(--text)">Multi-idiomas</span>
+                    </div>
+                    <div class="flex-1 p-5 sm:p-6 md:p-7 pb-14 sm:pb-16">
+                        <p class="text-sm sm:text-base leading-relaxed" style="color:var(--text-muted)">Sites adaptados para múltiplos idiomas com alternância fluida sem recarregamento de página. Amplie seu alcance para públicos internacionais com traduções profissionais e URLs localizadas que melhoram o SEO global.</p>
+                    </div>
+                    <button type="button" onclick="abrirModalServico(13)" class="ms-svc-btn absolute bottom-0 right-0 text-xs sm:text-sm font-bold px-8 sm:px-10 py-3 sm:py-3.5 rounded-tl-[50px]">Solicitar serviço</button>
+                </div>
+
+                @* 12. Redesign *@
+                <div class="ms-svc-card rounded-l-[44px] rounded-r-[60px] flex items-stretch overflow-hidden relative">
+                    <div class="ms-svc-icon w-28 sm:w-36 rounded-[44px] p-4 sm:p-5 flex flex-col justify-center items-center shrink-0 gap-2">
+                        <svg class="w-12 h-12 sm:w-14 sm:h-14" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M10 54L20 44l-6-6L54 10l-4-4L10 46l6 6-6 2z" stroke="var(--brown)" stroke-width="3" stroke-linejoin="round" fill="none"/>
+                            <path d="M20 44l-6-6" stroke="var(--brown)" stroke-width="3" stroke-linecap="round"/>
+                            <rect x="40" y="8" width="12" height="12" rx="2" stroke="var(--brown)" stroke-width="2.5" fill="none" opacity=".4"/>
+                            <path d="M46 8V4M46 24v-4M56 14h-4M36 14h4" stroke="var(--brown)" stroke-width="2" stroke-linecap="round" opacity=".4"/>
+                        </svg>
+                        <span class="font-inria text-xs sm:text-sm font-bold text-center leading-tight" style="color:var(--text)">Redesign</span>
+                    </div>
+                    <div class="flex-1 p-5 sm:p-6 md:p-7 pb-14 sm:pb-16">
+                        <p class="text-sm sm:text-base leading-relaxed" style="color:var(--text-muted)">Reformulação visual completa de sites desatualizados, modernizando layout, tipografia, paleta de cores e experiência do usuário. Preservamos seu conteúdo e reputação enquanto entregamos uma presença digital renovada e competitiva.</p>
+                    </div>
+                    <button type="button" onclick="abrirModalServico(14)" class="ms-svc-btn absolute bottom-0 right-0 text-xs sm:text-sm font-bold px-8 sm:px-10 py-3 sm:py-3.5 rounded-tl-[50px]">Solicitar serviço</button>
+                </div>
+
+                @* 13. Manutenção *@
+                <div class="ms-svc-card rounded-l-[44px] rounded-r-[60px] flex items-stretch overflow-hidden relative">
+                    <div class="ms-svc-icon w-28 sm:w-36 rounded-[44px] p-4 sm:p-5 flex flex-col justify-center items-center shrink-0 gap-2">
+                        <svg class="w-12 h-12 sm:w-14 sm:h-14" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M48 12a8 8 0 0 0-8 8c0 1.2.14 2.36.4 3.46L12 52a4 4 0 0 0 0 5.66 4 4 0 0 0 5.66 0l28.54-28.4A12 12 0 0 0 48 30a12 12 0 0 0 2-23.83V12z" stroke="var(--brown)" stroke-width="3" fill="none" stroke-linejoin="round"/>
+                            <circle cx="16" cy="52" r="3" fill="var(--brown)" opacity=".4"/>
+                        </svg>
+                        <span class="font-inria text-xs sm:text-sm font-bold text-center leading-tight" style="color:var(--text)">Manutenção</span>
+                    </div>
+                    <div class="flex-1 p-5 sm:p-6 md:p-7 pb-14 sm:pb-16">
+                        <p class="text-sm sm:text-base leading-relaxed" style="color:var(--text-muted)">Suporte técnico contínuo para manter seu site seguro, rápido e atualizado. Realizamos correção de bugs, atualização de plugins, backups periódicos e ajustes de layout para garantir operação estável e sem interrupções ao longo do tempo.</p>
+                    </div>
+                    <button type="button" onclick="abrirModalServico(15)" class="ms-svc-btn absolute bottom-0 right-0 text-xs sm:text-sm font-bold px-8 sm:px-10 py-3 sm:py-3.5 rounded-tl-[50px]">Solicitar serviço</button>
+                </div>
+
+                @* 14. SEO & Performance *@
+                <div class="ms-svc-card rounded-l-[44px] rounded-r-[60px] flex items-stretch overflow-hidden relative">
+                    <div class="ms-svc-icon w-28 sm:w-36 rounded-[44px] p-4 sm:p-5 flex flex-col justify-center items-center shrink-0 gap-2">
+                        <svg class="w-12 h-12 sm:w-14 sm:h-14" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="26" cy="26" r="16" stroke="var(--brown)" stroke-width="3" fill="none"/>
+                            <path d="M38 38l14 14" stroke="var(--brown)" stroke-width="3" stroke-linecap="round"/>
+                            <path d="M18 26h4M26 18v4" stroke="var(--brown)" stroke-width="2.5" stroke-linecap="round" opacity=".5"/>
+                            <path d="M20 32l3-3 4 4 5-6 4 3" stroke="var(--brown)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity=".6"/>
+                        </svg>
+                        <span class="font-inria text-xs sm:text-sm font-bold text-center leading-tight" style="color:var(--text)">SEO & Performance</span>
+                    </div>
+                    <div class="flex-1 p-5 sm:p-6 md:p-7 pb-14 sm:pb-16">
+                        <p class="text-sm sm:text-base leading-relaxed" style="color:var(--text-muted)">Otimização técnica completa de SEO on-page e velocidade de carregamento. Melhoramos o posicionamento no Google com estrutura semântica correta, compressão de imagens, cache avançado e relatórios detalhados de performance.</p>
+                    </div>
+                    <button type="button" onclick="abrirModalServico(16)" class="ms-svc-btn absolute bottom-0 right-0 text-xs sm:text-sm font-bold px-8 sm:px-10 py-3 sm:py-3.5 rounded-tl-[50px]">Solicitar serviço</button>
+                </div>
+
+                @* 15. Migração *@
+                <div class="ms-svc-card rounded-l-[44px] rounded-r-[60px] flex items-stretch overflow-hidden relative">
+                    <div class="ms-svc-icon w-28 sm:w-36 rounded-[44px] p-4 sm:p-5 flex flex-col justify-center items-center shrink-0 gap-2">
+                        <svg class="w-12 h-12 sm:w-14 sm:h-14" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="6" y="8" width="22" height="18" rx="3" stroke="var(--brown)" stroke-width="3" fill="none" opacity=".5"/>
+                            <rect x="36" y="38" width="22" height="18" rx="3" stroke="var(--brown)" stroke-width="3" fill="none"/>
+                            <path d="M28 17h8l-4-5M28 17l4 5" stroke="var(--brown)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" opacity=".4"/>
+                            <path d="M36 47h-8l4-5M36 47l-4 5" stroke="var(--brown)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M17 26v12M47 38V26" stroke="var(--brown)" stroke-width="2" stroke-linecap="round" opacity=".3"/>
+                        </svg>
+                        <span class="font-inria text-xs sm:text-sm font-bold text-center leading-tight" style="color:var(--text)">Migração</span>
+                    </div>
+                    <div class="flex-1 p-5 sm:p-6 md:p-7 pb-14 sm:pb-16">
+                        <p class="text-sm sm:text-base leading-relaxed" style="color:var(--text-muted)">Transferência segura do seu site para uma nova hospedagem com zero perda de dados. Cuidamos de DNS, SSL, banco de dados e configurações de servidor para garantir chegada ao novo ambiente sem erros e com mínimo de downtime.</p>
+                    </div>
+                    <button type="button" onclick="abrirModalServico(17)" class="ms-svc-btn absolute bottom-0 right-0 text-xs sm:text-sm font-bold px-8 sm:px-10 py-3 sm:py-3.5 rounded-tl-[50px]">Solicitar serviço</button>
+                </div>
+
+            </div>
+
+            @* Botão ver mais *@
+            <div class="flex justify-center mt-8 md:mt-10">
+                <button type="button" onclick="toggleSvcExtra()" id="btn-ver-mais" class="ms-ver-mais-btn">
+                    <span id="svc-ver-mais-txt">Ver mais serviços</span>
+                    <svg id="svc-ver-mais-icon" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M6 9l6 6 6-6"/>
+                    </svg>
+                </button>
+            </div>
+
+            </div>@* fim coluna direita *@
+        </div>
+    </section>
+
+    @* Fornecedor *@
+    <section id="fornecedor" class="scroll-mt-20 min-h-screen flex items-center">
+        <div class="container mx-auto px-6 py-16 md:py-24 flex flex-col lg:flex-row gap-12 lg:gap-16 items-center">
+
+            <div class="flex-[1.4] flex flex-col gap-7 md:gap-8">
+                <div class="rounded-[30px] px-6 md:px-8 py-4 md:py-5 self-start shadow-sm" style="background:var(--bg2)">
+                    <h2 class="font-inria text-3xl md:text-4xl font-bold" style="color:var(--text)">Junte-se ao time</h2>
+                </div>
+
+                <div class="flex flex-col gap-4 md:gap-5 text-base leading-relaxed max-w-xl" style="color:var(--text)">
+                    <p>A MindSite conecta você a clientes que precisam exatamente do que você oferece. Cadastre-se como fornecedor, publique seus serviços e comece a receber solicitações de projetos sem complicação.</p>
+                    <p>Gerencie suas entregas, mantenha seu portfólio atualizado e cresça sua base de clientes com total controle e organização pela nossa plataforma.</p>
+                </div>
+
+                <div class="flex flex-col gap-3 mt-2">
+                    @foreach (var item in new[]{ "Acesso a clientes qualificados da plataforma", "Gestão de projetos e entregas centralizadas", "Pagamentos seguros e transparentes" })
+                    {
+                        <div class="flex items-center gap-3">
+                            <span class="ms-check w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
+                                </svg>
+                            </span>
+                            <span class="text-sm font-medium" style="color:var(--text)">@item</span>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <div class="flex-1 flex items-center justify-center w-full mt-6 lg:mt-0">
+                <div class="ms-float-wrap">
+                    <div class="ms-float-blob"></div>
+                    <div class="ms-float-card">
+                        <div class="ms-float-img">
+                            <img src="~/img/contrato.png" alt="Contrato MindSite" class="w-full h-full object-cover">
+                        </div>
+                        <div class="flex flex-col gap-3 md:gap-4">
+                            <a asp-controller="Account" asp-action="VirnarFornecedor" class="ms-idx-primary text-base md:text-lg shadow-md">
+                                Tornar-se Fornecedor
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+</div>
+
+@section Scripts {
+<script>
+const TIPO_NOMES = {
+    0:"E-commerce", 1:"Blog", 2:"Web Design", 3:"Marketing",
+    4:"Sites Institucionais", 5:"Landing Pages", 6:"One-Page Sites", 7:"Portfólios Digitais",
+    8:"Blogs e Portais", 9:"Plataformas EAD", 10:"Links para Bio", 11:"Sistemas Web",
+    12:"Agendamento", 13:"Multi-idiomas", 14:"Redesign", 15:"Manutenção",
+    16:"SEO & Performance", 17:"Migração"
+};
+const OLD_TIPOS = [0, 1, 2, 3];
+
+// Alterna a exibição dos cards de serviço extras
+function toggleSvcExtra() {
+    const el   = document.getElementById('svc-extra');
+    const txt  = document.getElementById('svc-ver-mais-txt');
+    const icon = document.getElementById('svc-ver-mais-icon');
+    const isHidden = el.style.display === 'none';
+    el.style.display = isHidden ? '' : 'none';
+    txt.textContent  = isHidden ? 'Ver menos' : 'Ver mais serviços';
+    icon.style.transform = isHidden ? 'rotate(180deg)' : '';
+}
+
+// Abre o modal de solicitação de serviço e pré-seleciona o tipo se informado
+function abrirModalServico(tipo) {
+    document.getElementById('formServico').reset();
+    [0,1,2,3].forEach(i => document.getElementById(`reqs-${i}`)?.classList.add('hidden'));
+    document.getElementById('reqs-generic')?.classList.add('hidden');
+    const erroDiv = document.getElementById('erroServico');
+    if (erroDiv) erroDiv.remove();
+    if (tipo !== undefined) {
+        const sel = document.getElementById('selectTipo');
+        if (sel) { sel.value = tipo; selecionarTipo(tipo); }
+    }
+    openModal('modalServico');
+}
+
+const PH_DETALHES = {
+    4:  'Ex: Quero um site com 5 páginas (Home, Sobre, Serviços, Blog, Contato). A empresa é um escritório de advocacia. Precisamos de formulário de contato e mapa do Google integrado.',
+    5:  'Ex: Landing page para lançamento do meu curso de fotografia. Quero seção de depoimentos, cronômetro de oferta, FAQs e botão flutuante do WhatsApp.',
+    6:  'Ex: Site para fotógrafo freelancer com seções de: apresentação, portfólio, serviços, sobre mim e contato. Navegação suave por rolagem.',
+    7:  'Ex: Portfólio de designer gráfico com galeria dividida por categorias (logos, posts, embalagens). Preciso de filtro por categoria e botão para baixar meu currículo.',
+    8:  'Ex: Portal de notícias sobre tecnologia com categorias (IA, Gadgets, Startups), busca interna, destaques na home e integração com newsletter.',
+    9:  'Ex: Plataforma para cursos de inglês online. Preciso de área do aluno com acesso a videoaulas, downloads de materiais, questionários e emissão de certificado.',
+    10: 'Ex: Link para bio do meu Instagram de confeitaria. Quero mostrar cardápio, botão de pedido via WhatsApp, links para redes sociais e galeria de fotos.',
+    11: 'Ex: Sistema de controle de estoque para minha loja física. Cadastro de produtos, entradas/saídas, alerta de estoque mínimo e exportação em Excel.',
+    12: 'Ex: Agendamento para clínica de estética. Cliente escolhe profissional, serviço e horário. Confirmação por WhatsApp e painel de agenda para a equipe.',
+    13: 'Ex: Meu site precisa de versões em português, inglês e espanhol. Conteúdo já traduzido. Quero troca de idioma no menu e URLs separadas por idioma (hreflang).',
+    14: 'Ex: Site atual é de 2018 e parece desatualizado. Quero modernizar o visual mantendo a estrutura de páginas. Novo design deve ser mobile-first seguindo meu manual de marca.',
+    15: 'Ex: Site em WordPress com plugins desatualizados e formulário quebrado em mobile. Preciso de atualização dos plugins, otimização de velocidade e backup automático semanal.',
+    16: 'Ex: Site de consultoria com 20 páginas. Quero ranquear por "consultoria financeira São Paulo" e reduzir o carregamento para menos de 2 segundos no PageSpeed.',
+    17: 'Ex: Migrar meu site do Wix para WordPress. Preservar todo o conteúdo, configurar novo domínio e ativar SSL no servidor novo sem mais de 2 horas de downtime.'
+};
+
+const PH_OBS = {
+    0:  'Ex: Referências de lojas que gosto: site1.com, site2.com. Prefiro visual minimalista. Estoque no ERP Bling. Preciso de integração com API dos Correios para cálculo de frete.',
+    1:  'Ex: Tenho 50 artigos no Blogger para importar. Estilo visual parecido com o Medium. Quero compatibilidade com Google AdSense para monetização futura.',
+    2:  'Ex: Paleta definida: azul-marinho (#0A1628) e dourado (#C9A84C). Referências de estilo: Awwwards.com. Tenho todas as imagens e textos prontos para envio.',
+    3:  'Ex: Concorrente principal: empresa XYZ. Já temos conta no Google Ads pausada. Público-alvo: mulheres 25–45 interessadas em bem-estar. Foco em conversão, não só cliques.',
+    4:  'Ex: Temos logotipo e manual de marca. Cores: azul (#003366) e branco. Textos fornecidos por nós. Referência: site1.com. Precisamos de integração com Google Analytics.',
+    5:  'Ex: Copywriting da página já está pronto. Referência de design: (link). A página será promovida via Google Ads com pixel do Facebook e integração com RD Station.',
+    6:  'Ex: Tenho fotos profissionais para o site. Tons terrosos, tipografia moderna. Referência: (link). Domínio já registrado: meusite.com.br.',
+    7:  'Ex: Tenho 30 projetos organizados por categoria para enviar. Referência que admiro: (link). Quero também uma versão em inglês do portfólio.',
+    8:  'Ex: Atualmente no Wordpress.com e quero migrar. Tenho 80 artigos. Paleta: verde e cinza. Quero Mailchimp para newsletter e compartilhamento automático no LinkedIn.',
+    9:  'Ex: Já uso Hotmart mas quero plataforma própria. Tenho 5 cursos com vídeos no Vimeo. Preciso de comentários por aula e progresso salvo por aluno.',
+    10: 'Ex: Cores: rosa (#FF6B8B) e branco. Links: site, cardápio PDF, WhatsApp, Instagram, TikTok e formulário de encomenda. Quero animação ao clicar nos botões.',
+    11: 'Ex: Hoje usamos planilhas Google. Enviarei fluxogramas dos processos. Preciso de perfis de acesso (gerente, vendedor, estoquista) e relatórios exportáveis em PDF.',
+    12: 'Ex: 3 profissionais com horários distintos. Sessões de 1 hora. Quero bloqueio automático após reserva e lembrete por WhatsApp 24h antes do compromisso.',
+    13: 'Ex: Textos em inglês e espanhol já traduzidos e serão enviados em planilha. Quero hreflang configurado e detecção automática de idioma pelo país do visitante.',
+    14: 'Ex: Site atual: (link). Problemas: lento, sem mobile e menu confuso. Quero manter as URLs atuais para preservar o SEO já conquistado.',
+    15: 'Ex: WordPress 5.8 com 12 plugins desatualizados. Checkout travando em mobile. Quero backup automático semanal e relatório de saúde do site mensalmente.',
+    16: 'Ex: Nota atual no PageSpeed: 45. Palavras-chave prioritárias: "advogado trabalhista SP". Quero relatório mensal de posicionamento e análise dos concorrentes.',
+    17: 'Ex: Site no GoDaddy compartilhado. Quero ir para AWS ou Digital Ocean. Tenho acesso ao host atual e ao Registro.br. Janela de downtime aceita: até 2 horas.'
+};
+
+// Exibe o painel de requisitos do tipo selecionado e atualiza os placeholders
+function selecionarTipo(t) {
+    [0,1,2,3].forEach(i => document.getElementById(`reqs-${i}`)?.classList.add('hidden'));
+    document.getElementById('reqs-generic')?.classList.add('hidden');
+    if (OLD_TIPOS.includes(t)) {
+        document.getElementById(`reqs-${t}`)?.classList.remove('hidden');
+    } else if (!isNaN(t) && t !== '') {
+        document.getElementById('reqs-generic')?.classList.remove('hidden');
+    }
+
+    // Placeholders dinâmicos
+    const det = document.querySelector('#reqs-generic [data-group="Detalhes"]');
+    if (det) det.placeholder = PH_DETALHES[t] ?? 'Descreva qualquer requisito específico do projeto...';
+    const obs = document.getElementById('obsGeral');
+    if (obs) obs.placeholder = PH_OBS[t] ?? 'Conte mais sobre o projeto, referências, restrições...';
+}
+
+// Exibe mensagem de erro com lista de pendências no formulário de serviço
+function mostrarErroServico(linhas) {
+    let el = document.getElementById('erroServico');
+    if (!el) {
+        el = document.createElement('div');
+        el.id = 'erroServico';
+        el.className = 'rounded-xl px-4 py-3 text-sm font-medium';
+        el.style.cssText = 'background:rgba(239,68,68,.12);color:#ef4444;';
+        const btnRow = document.querySelector('#formServico .flex.gap-3:last-child');
+        if (btnRow) btnRow.before(el);
+    }
+    el.innerHTML = linhas.map(l => `• ${l}`).join('<br>');
+    el.scrollIntoView({ behavior:'smooth', block:'nearest' });
+}
+
+// Mostra ou oculta o campo de data específica conforme a opção de prazo escolhida
+function onPrazoChange(radio) {
+    document.getElementById('divDataPrazo').classList.toggle('hidden', radio.value !== 'DataEspecifica');
+    if (radio.value !== 'DataEspecifica') document.getElementById('inputDataPrazo').value = '';
+}
+
+// Mostra ou oculta o campo de valor do orçamento conforme a opção selecionada
+function onOrcamentoChange(radio) {
+    const div = document.getElementById('divOrcamentoValor');
+    if (radio.value === 'definido') {
+        div.classList.remove('hidden');
+        document.getElementById('inputOrcamento').focus();
+    } else {
+        div.classList.add('hidden');
+        document.getElementById('inputOrcamento').value = '';
+    }
+}
+
+// Valida o formulário de serviço, monta os requisitos e submete ou exibe erros
+function submeterServico() {
+    const erros = [];
+    const sel = document.getElementById('selectTipo');
+    if (!sel || sel.value === '') { MsVal.erro(sel, 'Selecione o tipo de serviço'); return; }
+    MsVal.ok(sel);
+    const tipo = parseInt(sel.value);
+    const panelId = OLD_TIPOS.includes(tipo) ? `reqs-${tipo}` : 'reqs-generic';
+
+    const nomeEl = document.querySelector('input[name="NomeProjeto"]');
+    if (!nomeEl?.value.trim()) { MsVal.erro(nomeEl, 'Informe o nome do projeto'); return; }
+    MsVal.ok(nomeEl);
+
+    const totalChecked = document.querySelectorAll(`#${panelId} input[type="checkbox"]:checked`).length;
+    if (totalChecked === 0) erros.push('Selecione ao menos uma opção desejada');
+
+    const radiosObrig = { 0:['ecom-qtd','Quantidade de produtos'], 1:['blog-freq','Frequência de publicação'], 3:['mkt-obj','Objetivo principal'] };
+    if (radiosObrig[tipo]) {
+        const [name, label] = radiosObrig[tipo];
+        if (!document.querySelector(`input[name="${name}"]:checked`)) erros.push(`Selecione: ${label}`);
+    }
+
+    const prazoEl = document.querySelector('input[name="prazoOpcao"]:checked');
+    if (!prazoEl) {
+        erros.push('Selecione o prazo esperado');
+    } else if (prazoEl.value === 'DataEspecifica') {
+        if (!document.getElementById('inputDataPrazo')?.value) erros.push('Selecione a data de entrega');
+    }
+
+    const orcOpcao = document.querySelector('input[name="orcamentoOpcao"]:checked');
+    if (!orcOpcao) {
+        erros.push('Selecione uma opção de orçamento');
+    } else if (orcOpcao.value === 'definido') {
+        const v = parseFloat(document.getElementById('inputOrcamento').value);
+        if (isNaN(v) || v <= 0) erros.push('Informe o valor do orçamento');
+    }
+
+    if (erros.length > 0) { mostrarErroServico(erros); return; }
+    const erroDiv = document.getElementById('erroServico');
+    if (erroDiv) erroDiv.remove();
+
+    let reqs = `Tipo: ${TIPO_NOMES[tipo]}\n`;
+    const checks = [...document.querySelectorAll(`#${panelId} input[type="checkbox"]:checked`)].map(cb => `• ${cb.dataset.label}`).join('\n');
+    if (checks) reqs += `\nFuncionalidades:\n${checks}\n`;
+    document.querySelectorAll(`#${panelId} input[type="radio"]:checked`).forEach(r => { if (r.dataset.group) reqs += `\n${r.dataset.group}: ${r.value}`; });
+    document.querySelectorAll(`#${panelId} [data-group]`).forEach(el => {
+        if (el.tagName === 'TEXTAREA' || (el.tagName === 'INPUT' && el.type === 'text')) {
+            const v = el.value.trim();
+            if (v) reqs += `\n${el.dataset.group}: ${v}`;
+        }
+    });
+
+    const prazoLabels = { Meses1a3:'1 a 3 meses', Ate6Meses:'Até 6 meses', Ate1Ano:'Até 1 ano', MaisDeUmAno:'Mais de 1 ano', NaoSei:'Não sei', DataEspecifica:'Data específica' };
+    const prazo = document.querySelector('input[name="prazoOpcao"]:checked');
+    if (prazo) {
+        reqs += `\n\nPrazo: ${prazoLabels[prazo.value] || prazo.value}`;
+        document.getElementById('hidPrazoCliente').value = prazo.value;
+        if (prazo.value === 'DataEspecifica') {
+            const d = document.getElementById('inputDataPrazo').value;
+            document.getElementById('hidDataPrazo').value = d;
+            if (d) reqs += ` (${new Date(d + 'T00:00:00').toLocaleDateString('pt-BR')})`;
+        } else {
+            document.getElementById('hidDataPrazo').value = '';
+        }
+    }
+
+    const obs = document.getElementById('obsGeral').value.trim();
+    if (obs) reqs += `\n\nInformações adicionais: ${obs}`;
+
+    const orcOpcao2 = document.querySelector('input[name="orcamentoOpcao"]:checked');
+    if (orcOpcao2?.value === 'definido') {
+        const val = parseFloat(document.getElementById('inputOrcamento').value);
+        document.getElementById('hidOrcamento').value = val;
+        reqs += `\n\nOrçamento do cliente: R$ ${val.toLocaleString('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2})}`;
+    } else {
+        document.getElementById('hidOrcamento').value = '';
+    }
+
+    document.getElementById('hidRequisitos').value = reqs.trim();
+
+    document.getElementById('checkContratoCliente').checked = false;
+    const cliDataField = document.getElementById('contratoClienteData');
+    const hoje = new Date().toISOString().split('T')[0];
+    if (cliDataField) { cliDataField.value = hoje; }
+    const cliCpfField = document.getElementById('contratoClienteCPF');
+    if (cliCpfField && cliCpfField.value) mascararCpfCnpj(cliCpfField);
+    verificarCamposContratoCliente();
+    openModal('modalContratoCliente');
+}
+
+// Remove caracteres inválidos do campo de nome no contrato
+function filtrarNome(el) {
+    const pos = el.selectionStart;
+    const cleaned = el.value.replace(/[^a-zA-ZÀ-ÿ\s''-]/g, '');
+    if (cleaned !== el.value) { el.value = cleaned; el.setSelectionRange(pos - 1, pos - 1); }
+}
+
+// Aplica máscara de CPF ao campo durante digitação
+function mascararCpfCnpj(el) {
+    const d = el.value.replace(/\D/g, '').slice(0, 11);
+    const n = d.length;
+    let m = '';
+    if      (n <= 3)  m = d;
+    else if (n <= 6)  m = d.slice(0,3) + '.' + d.slice(3);
+    else if (n <= 9)  m = d.slice(0,3) + '.' + d.slice(3,6) + '.' + d.slice(6);
+    else              m = d.slice(0,3) + '.' + d.slice(3,6) + '.' + d.slice(6,9) + '-' + d.slice(9);
+    el.value = m;
+}
+
+// Habilita o botão de aceitar contrato quando CPF está preenchido e checkbox marcado
+function verificarCamposContratoCliente() {
+    const cpf   = document.getElementById('contratoClienteCPF')?.value.trim();
+    const check = document.getElementById('checkContratoCliente')?.checked;
+    const digits    = cpf ? cpf.replace(/\D/g, '') : '';
+    const cpfValido = digits.length === 11;
+    document.getElementById('btnAceitarContratoCliente').disabled = !(cpfValido && check);
+}
+
+// Cancela o fluxo do contrato e fecha o modal
+function cancelarContratoCliente()  { closeModal('modalContratoCliente'); }
+// Fecha o modal do contrato e submete o formulário de solicitação
+function confirmarContratoCliente() { closeModal('modalContratoCliente'); closeModal('modalServico'); document.getElementById('formServico').submit(); }
+
+@if (ViewBag.AbrirFormulario == true)
+{
+    <text>document.addEventListener('DOMContentLoaded', () => abrirModalServico());</text>
+}
+</script>
+}

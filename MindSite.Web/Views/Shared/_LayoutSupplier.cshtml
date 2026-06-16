@@ -1,0 +1,200 @@
+﻿<!DOCTYPE html>
+<html lang="pt-br" class="scroll-smooth">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>@ViewData["Title"] - MindSite</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inria+Serif:wght@400;700&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="~/css/site.css"/>
+    <script>(function(){ var t=localStorage.getItem('ms-theme'); if(t==='dark') document.documentElement.setAttribute('data-theme','dark'); })();</script>
+    <script>tailwind.config={theme:{extend:{fontFamily:{inria:['"Inria Serif"','serif'],sans:['Poppins','sans-serif']}}}}</script>
+    @await RenderSectionAsync("Styles", required: false)
+</head>
+<body class="min-h-screen flex flex-col">
+
+@{var action = ViewContext.RouteData.Values["Action"]?.ToString();
+  string Nav(string a) => action==a ? "font-bold border-b-2" : "";}
+
+<div id="notifDropdown" class="hidden fixed top-16 right-2 md:right-6 z-50 ms-card w-80 max-w-[calc(100vw-1rem)] max-h-96 overflow-y-auto shadow-xl">
+    <div class="px-4 py-3" style="background:var(--brown)"><p class="font-bold text-sm text-white">Notificações</p></div>
+    <div id="notifList"></div>
+</div>
+
+<header class="ms-header sticky top-0 z-40 shadow-sm">
+    <nav class="container mx-auto px-6 py-3 flex items-center justify-between">
+        <a class="flex items-center gap-1 text-3xl font-inria" style="color:var(--brown)" asp-controller="Supplier" asp-action="Index">
+            Mind
+            <svg version="1.0" xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 500 500" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+                <g transform="translate(0,497) scale(0.1,-0.1)" stroke="none">
+                    <path fill="currentColor" d="M2350 4310 l0 -630 -389 0 -390 0 26 93 c90 329 211 607 362 827 70 103 234 259 316 302 39 21 71 38 73 38 1 0 2 -283 2 -630z"/>
+                    <path fill="currentColor" d="M2916 4765 c211 -210 383 -543 504 -980 12 -43 24 -85 27 -92 4 -11 -70 -13 -386 -13 l-391 0 0 631 0 630 73 -38 c52 -28 99 -65 173 -138z"/>
+                    <path fill="currentColor" d="M1748 4843 c-1 -5 -35 -56 -74 -115 -168 -250 -313 -600 -404 -973 l-17 -70 -457 -3 c-407 -2 -458 -1 -452 13 14 37 151 243 221 332 161 204 422 436 645 573 109 67 269 147 390 195 52 20 104 41 115 45 26 11 37 12 33 3z"/>
+                    <path fill="currentColor" d="M3355 4820 c220 -77 445 -201 653 -357 102 -77 316 -277 386 -361 60 -72 155 -200 191 -257 50 -78 95 -155 95 -161 0 -2 -205 -3 -456 -2 l-457 3 -34 130 c-33 127 -111 370 -138 430 -8 17 -26 59 -40 95 -48 116 -136 279 -209 388 -84 126 -84 127 -60 118 11 -5 42 -16 69 -26z"/>
+                    <path fill="currentColor" d="M1186 3333 c-6 -47 -22 -177 -36 -301 -23 -199 -31 -522 -20 -779 6 -139 12 -258 15 -265 2 -7 9 -62 15 -123 6 -60 14 -138 18 -173 l8 -62 -505 2 -506 3 -38 125 c-75 249 -107 469 -107 730 0 292 48 573 142 828 l19 52 501 0 500 0 -6 -37z"/>
+                    <path fill="currentColor" d="M2350 3138 l0 -231 -22 19 c-27 23 -179 168 -343 327 l-120 116 243 1 242 0 0 -232z"/>
+                    <path fill="currentColor" d="M3520 3318 c34 -159 60 -514 60 -833 0 -316 -27 -706 -49 -705 -3 0 -40 33 -82 73 -96 90 -419 399 -559 533 -58 56 -131 125 -162 154 l-58 52 0 389 0 389 419 0 419 0 12 -52z"/>
+                    <path fill="currentColor" d="M4848 3318 c27 -72 78 -257 96 -348 86 -430 50 -922 -95 -1310 l-11 -30 -498 0 c-273 0 -499 2 -502 5 -2 3 -1 33 4 67 66 529 69 1067 8 1498 -5 36 -12 89 -16 118 l-6 52 500 0 501 0 19 -52z"/>
+                    <path fill="currentColor" d="M1675 3019 c60 -58 162 -155 225 -215 63 -61 169 -162 235 -225 66 -64 141 -135 168 -159 l47 -43 0 -373 0 -374 -422 2 -422 3 -7 27 c-10 37 -37 265 -49 413 -22 269 -8 845 26 1078 l7 48 41 -38 c22 -21 90 -86 151 -144z"/>
+                    <path fill="currentColor" d="M2808 1938 c70 -68 170 -165 222 -215 l95 -93 -227 0 -228 0 0 215 c0 118 3 215 6 215 3 0 63 -55 132 -122z"/>
+                    <path fill="currentColor" d="M1270 1223 c89 -371 241 -739 410 -991 38 -56 64 -102 57 -102 -27 0 -210 75 -336 137 -433 214 -808 571 -1056 1006 l-27 47 464 0 464 0 24 -97z"/>
+                    <path fill="currentColor" d="M2350 680 c0 -511 -3 -640 -13 -640 -24 0 -139 75 -199 129 -190 173 -349 448 -481 831 -30 87 -87 287 -87 307 0 11 73 13 390 13 l390 0 0 -640z"/>
+                    <path fill="currentColor" d="M3450 1308 c0 -20 -58 -223 -92 -323 -36 -107 -121 -312 -156 -375 -116 -212 -213 -346 -322 -442 -63 -56 -174 -128 -197 -128 -11 0 -13 117 -13 640 l0 640 390 0 c305 0 390 -3 390 -12z"/>
+                    <path fill="currentColor" d="M4669 1263 c-18 -32 -63 -103 -101 -159 -298 -437 -698 -756 -1181 -940 -49 -19 -95 -34 -102 -34 -8 0 15 43 55 102 164 245 309 590 401 956 l34 132 463 0 463 0 -32 -57z"/>
+                </g>
+            </svg>
+            Site
+        </a>
+        <div class="hidden md:flex items-center gap-8">
+            <ul class="flex items-center gap-6 text-sm font-medium" style="color:var(--text)">
+                <li><a asp-controller="Supplier" asp-action="Index"     class="nav-link hover:opacity-70 @Nav("Index")"     style="border-color:var(--brown)">Home</a></li>
+                <li><a asp-controller="Supplier" asp-action="Servicos"  class="nav-link hover:opacity-70 @Nav("Servicos")"  style="border-color:var(--brown)">Serviços</a></li>
+                <li><a asp-controller="Supplier" asp-action="Portfolio" class="nav-link hover:opacity-70 @Nav("Portfolio")" style="border-color:var(--brown)">Portfólio</a></li>
+                <li><a asp-controller="Supplier" asp-action="Chat"      class="nav-link hover:opacity-70 @Nav("Chat")"      style="border-color:var(--brown)">Chats</a></li>
+            </ul>
+            <div class="flex items-center gap-4">
+                <div class="relative">
+                    <button id="btnNotif" class="relative p-1 hover:scale-110 transition-transform" style="color:var(--brown)" aria-label="Notificações">
+                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+                        <span id="notifBadge" class="hidden absolute -top-1 -right-1 h-4 w-4 rounded-full text-[10px] font-bold flex items-center justify-center" style="background:#dc2626;color:#fff;"></span>
+                    </button>
+                </div>
+                <div class="relative group">
+                    <a asp-controller="Account" asp-action="Perfil" class="flex flex-col items-center select-none" title="Meu Perfil" aria-label="Meu Perfil">
+                        <div class="p-1.5 rounded-full group-hover:scale-105 transition-all" style="background:var(--brown);color:var(--icon-on-primary);">
+                            <svg class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                        </div>
+                        <span class="text-[11px] font-bold uppercase tracking-wider mt-0.5" style="color:var(--text)">@(User.Identity?.Name?.Split(' ')[0] ?? "Fornecedor")</span>
+                    </a>
+                    <div class="absolute right-0 top-full pt-1 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-150 z-50">
+                        <div class="ms-card shadow-xl rounded-xl overflow-hidden" style="min-width:160px">
+                            <a asp-controller="Account" asp-action="Perfil" class="flex items-center gap-2 px-4 py-2.5 text-sm hover:bg-[var(--bg2)] transition-colors" style="color:var(--text)">
+                                <svg class="h-4 w-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                                Meu Perfil
+                            </a>
+                            <a asp-controller="Account" asp-action="Logout" class="flex items-center gap-2 px-4 py-2.5 text-sm hover:bg-red-50 transition-colors border-t" style="color:#ef4444;border-color:var(--border)">
+                                <svg class="h-4 w-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+                                Sair
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        @* Botões mobile (sino + hamburger) *@
+        <div class="flex items-center gap-3 md:hidden">
+            <div class="relative">
+                <button id="btnNotif" class="relative p-1" style="color:var(--brown)" aria-label="Notificações">
+                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+                    <span id="notifBadge" class="hidden absolute -top-1 -right-1 h-4 w-4 rounded-full text-[10px] font-bold flex items-center justify-center" style="background:#dc2626;color:#fff;"></span>
+                </button>
+            </div>
+            <button id="btnMobileMenu" class="p-2 rounded-lg" style="color:var(--brown)" aria-label="Menu" aria-expanded="false">
+                <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                </svg>
+            </button>
+        </div>
+    </nav>
+</header>
+
+@* Menu mobile drawer *@
+<div id="mobileMenuOverlay" class="hidden fixed inset-0 z-50 md:hidden" aria-modal="true" role="dialog" aria-label="Menu de navegação">
+    <div class="absolute inset-0 bg-black/40" onclick="fecharMenuMobile()"></div>
+    <nav class="absolute top-0 right-0 h-full w-64 shadow-2xl flex flex-col" style="background:var(--bg)">
+        <div class="p-4 flex items-center justify-between border-b" style="border-color:var(--border)">
+            <span class="font-inria text-lg font-bold" style="color:var(--brown)">Menu</span>
+            <button onclick="fecharMenuMobile()" class="p-1 rounded-lg" style="color:var(--text-muted)" aria-label="Fechar menu">
+                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+        </div>
+        <div class="flex flex-col p-4 gap-1 flex-1 overflow-y-auto">
+            <a asp-controller="Supplier" asp-action="Index"     class="px-4 py-3 rounded-xl text-sm font-medium hover:opacity-70 transition-opacity" style="color:var(--text)">Home</a>
+            <a asp-controller="Supplier" asp-action="Servicos"  class="px-4 py-3 rounded-xl text-sm font-medium hover:opacity-70 transition-opacity" style="color:var(--text)">Serviços</a>
+            <a asp-controller="Supplier" asp-action="Portfolio" class="px-4 py-3 rounded-xl text-sm font-medium hover:opacity-70 transition-opacity" style="color:var(--text)">Portfólio</a>
+            <a asp-controller="Supplier" asp-action="Chat"      class="px-4 py-3 rounded-xl text-sm font-medium hover:opacity-70 transition-opacity" style="color:var(--text)">Chats</a>
+            <div class="mt-auto border-t pt-4" style="border-color:var(--border)">
+                <a asp-controller="Account" asp-action="Perfil" class="px-4 py-3 rounded-xl text-sm font-medium hover:opacity-70 flex items-center gap-2 transition-opacity" style="color:var(--text)">Meu Perfil</a>
+                <a asp-controller="Account" asp-action="Logout" class="px-4 py-3 rounded-xl text-sm font-semibold hover:opacity-70 transition-opacity" style="color:#ef4444">Sair</a>
+            </div>
+        </div>
+    </nav>
+</div>
+<script>
+// Abre o menu mobile drawer ao clicar no botão hamburger
+(function(){
+    const btn = document.getElementById('btnMobileMenu');
+    if (btn) btn.addEventListener('click', () => {
+        document.getElementById('mobileMenuOverlay').classList.remove('hidden');
+        btn.setAttribute('aria-expanded','true');
+    });
+})();
+// Fecha o menu mobile drawer e restaura o atributo aria
+function fecharMenuMobile() {
+    document.getElementById('mobileMenuOverlay').classList.add('hidden');
+    const btn = document.getElementById('btnMobileMenu');
+    if (btn) btn.setAttribute('aria-expanded','false');
+}
+</script>
+
+<main class="flex-1">
+    @RenderBody()
+</main>
+
+@await Html.PartialAsync("_Footer")
+@await Html.PartialAsync("_Acessibilidade")
+<script src="~/js/site.js"></script>
+
+@RenderSection("Scripts", required: false)
+
+@if (TempData["Success"] != null){<script>showToast(@Json.Serialize(TempData["Success"]!.ToString()),'success');</script>}
+@if (TempData["Erro"]    != null){<script>showToast(@Json.Serialize(TempData["Erro"]!.ToString()),'erro');</script>}
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.7/signalr.min.js" crossorigin="anonymous"></script>
+<script>
+
+    document.addEventListener("DOMContentLoaded", function () {
+    // Captura os parâmetros da URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const servicoIdParaAbrir = urlParams.get('abrirFinancasId');
+
+    if (servicoIdParaAbrir) {
+        // Dispara uma requisição AJAX rápida para buscar os valores exatos do banco
+        abrirModalFinanceiroNotificacao(servicoIdParaAbrir);
+    }
+});
+
+async function abrirModalFinanceiroNotificacao(id) {
+    try {
+        const response = await fetch(`/Supplier/ObterDetalhesRepasse/${id}`);
+        if (!response.ok) return;
+        
+        const dados = await response.json();
+
+        // Injeta os valores calculados dinamicamente no Modal
+        document.getElementById('financasProjetoId').textContent = `#${dados.id}`;
+        document.getElementById('financasValorRepasse').textContent = dados.valorLiquidoFormatado;
+        document.getElementById('financasDescricao').textContent = `Contrato Inicial + Modificações do Chat (Retenção de 8% da plataforma aplicada).`;
+
+        // Abre o seu modal padrão de exibição
+        openModal('modalFinancasRepasse');
+    } catch (erro) {
+        console.error("Erro ao carregar dados do repasse:", erro);
+    }
+}
+
+// Conexão SignalR para notificações em tempo real e redirecionamentos forçados
+(function () {
+    const hub = new signalR.HubConnectionBuilder()
+        .withUrl('/chatHub')
+        .withAutomaticReconnect()
+        .configureLogging(signalR.LogLevel.None)
+        .build();
+    hub.on('ForceRedirect', url => { window.location.href = url; });
+    hub.on('ReceiveNotificacao', n => MS.handleNotificacao(n));
+    hub.start().catch(() => {});
+})();
+</script>
+</body>
+</html>

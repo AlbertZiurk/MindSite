@@ -1,0 +1,181 @@
+﻿@model MindSite.ViewModels.AdminDashboardViewModel
+@{
+    ViewData["Title"] = "Painel Administrativo";
+    Layout = "_LayoutAdmin";
+}
+
+<div class="container mx-auto px-6 py-8">
+    <div class="mb-8">
+        <h1 class="font-inria text-3xl font-bold" style="color:var(--text)">Bem-vindo ao Painel Admin</h1>
+        <p class="text-sm mt-1" style="color:var(--text-muted)">Gerencie usuários, monitore conversas e acompanhe os resultados da MindSite.</p>
+    </div>
+
+    @* Alertas pendentes *@
+    @if (Model.FornecedoresPendentes > 0)
+    {
+        <div class="ms-card p-5 mb-6 flex items-start gap-4 border-l-4" style="border-left-color:var(--brown)">
+            <svg class="w-6 h-6 flex-shrink-0" style="color:var(--brown)" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+            </svg>
+            <div>
+                <p class="font-bold text-sm" style="color:var(--text)">@Model.FornecedoresPendentes fornecedor(es) aguardando aprovação</p>
+                <a asp-controller="Admin" asp-action="Usuarios" asp-route-tipo="Fornecedores"
+                   class="text-xs underline mt-0.5 inline-block" style="color:var(--brown)">Revisar agora →</a>
+            </div>
+        </div>
+    }
+
+    @* Cards métricas *@
+    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-5 mb-10">
+        @foreach (var card in new[]{
+            new { Label="Clientes",    Valor=Model.TotalClientes.ToString(),     Icone="users" },
+            new { Label="Fornecedores",Valor=Model.TotalFornecedores.ToString(), Icone="briefcase" },
+            new { Label="Proj. Pendentes",   Valor=Model.ServicosPendentes.ToString(), Icone="clock" },
+            new { Label="Proj. Ativos",      Valor=Model.ServicosAtivos.ToString(),    Icone="check" },
+            new { Label="Proj. Concluídos",  Valor=Model.ServicosConcluidos.ToString(),Icone="star" }
+        })
+        {
+            <div class="ms-card p-5 flex items-center justify-between">
+                <div>
+                    <p class="text-xs font-bold uppercase tracking-wider mb-1" style="color:var(--text-muted)">@card.Label</p>
+                    <p class="text-3xl font-bold font-inria" style="color:var(--brown)">@card.Valor</p>
+                </div>
+                <div class="w-10 h-10 rounded-xl flex items-center justify-center opacity-20" style="background:var(--brown)">
+                    @Html.Raw(GetIcon(card.Icone))
+                </div>
+            </div>
+        }
+    </div>
+
+    @* Modal de confirmação reutilizável para admin *@
+<div id="modalConfirmAdmin" class="modal-overlay hidden fixed inset-0 z-50 flex items-center justify-center" aria-modal="true" role="dialog">
+    <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" onclick="closeModal('modalConfirmAdmin')"></div>
+    <div class="modal-box relative ms-card p-6 w-full max-w-sm mx-4 z-10 text-center" style="background:var(--surface)">
+        <div class="w-12 h-12 rounded-full mx-auto mb-3 flex items-center justify-center text-xl font-bold shadow-inner" style="background:var(--error-bg); color:rgb(239,68,68)">
+            !
+        </div>
+        <h3 id="adminConfirmTitle" class="font-inria text-xl font-bold mb-2" style="color:var(--text)">Confirmar Ação</h3>
+        <p id="adminConfirmMessage" class="text-xs mb-6 leading-relaxed" style="color:var(--text-muted)">Tem certeza que deseja realizar esta operação?</p>
+        
+        <div class="flex gap-3">
+            <button onclick="closeModal('modalConfirmAdmin')" class="btn-ghost flex-1 py-2 text-xs">Cancelar</button>
+            <button id="btnAdminConfirmarSubmit" class="bg-red-500 hover:bg-red-600 flex-1 py-2 text-xs font-bold text-white rounded-xl transition-colors">Confirmar</button>
+        </div>
+    </div>
+</div>
+
+@* Aprovações pendentes *@
+@if (Model.SolicitacoesNovosFornecedores.Any())
+{
+    <div class="ms-card mb-8 overflow-hidden">
+        <div class="px-6 py-4 border-b" style="border-color:var(--border);background:var(--bg2)">
+            <h2 class="font-bold text-base" style="color:var(--text)">Solicitações para Virar Fornecedor</h2>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm ms-table">
+                <thead>
+                    <tr>
+                        <th class="text-left">Nome</th>
+                        <th class="text-left hidden sm:table-cell">E-mail</th>
+                        <th class="text-left hidden sm:table-cell">Data</th>
+                        <th class="text-right">Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var u in Model.SolicitacoesNovosFornecedores)
+                    {
+                        <tr>
+                            <td class="font-semibold" style="color:var(--text)">@u.NomeCompleto</td>
+                            <td class="hidden sm:table-cell" style="color:var(--text-muted)">@u.Email</td>
+                            <td class="hidden sm:table-cell" style="color:var(--text-muted)">@u.CriadoEm.ToLocalTime().ToString("dd/MM/yyyy")</td>
+                            <td class="text-right">
+                                <div class="flex gap-2 justify-end">
+                                    <form asp-controller="Admin" asp-action="AceitarFornecedor" method="post" class="inline">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="id" value="@u.Id"/>
+                                        <button type="submit" class="btn-primary text-xs px-3 py-1">Aprovar</button>
+                                    </form>
+                                    <form id="formRecusarFornecedor-@u.Id" asp-controller="Admin" asp-action="RecusarFornecedor" method="post" class="inline">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="id" value="@u.Id"/>
+                                        <button type="button" class="btn-danger text-xs px-3 py-1" 
+                                                onclick="confirmarRecusarAdmin('formRecusarFornecedor-@u.Id', 'Recusar Cadastro', 'Deseja realmente recusar a solicitação de fornecedor para &quot;@u.NomeCompleto&quot;?')">
+                                            Recusar
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}
+    @* Log de ações recentes *@
+    <div class="ms-card overflow-hidden">
+        <div class="px-6 py-4 border-b" style="border-color:var(--border);background:var(--bg2)">
+            <h2 class="font-bold text-base" style="color:var(--text)">Ações Recentes do Sistema</h2>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm ms-table">
+                <thead>
+                    <tr>
+                        <th class="text-left">Usuário</th>
+                        <th class="text-left">Ação</th>
+                        <th class="text-left hidden sm:table-cell">Data/Hora</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (!Model.AcoesRecentes.Any())
+                    {
+                        <tr><td colspan="3" class="text-center py-8" style="color:var(--text-muted)">Nenhuma ação registrada ainda.</td></tr>
+                    }
+                    @foreach (var log in Model.AcoesRecentes)
+                    {
+                        <tr>
+                            <td class="font-semibold" style="color:var(--brown)">@(log.Usuario?.NomeCompleto ?? "Sistema")</td>
+                            <td style="color:var(--text)">@log.Descricao</td>
+                            <td class="hidden sm:table-cell" style="color:var(--text-muted)">@log.RealizadaEm.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@* Função auxiliar para retornar o SVG do ícone pelo nome *@
+@functions {
+    static string GetIcon(string name) => name switch {
+        "users"     => @"<svg class='w-5 h-5 text-white' fill='none' viewBox='0 0 24 24' stroke='currentColor'><path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z'/></svg>",
+        "briefcase" => @"<svg class='w-5 h-5 text-white' fill='none' viewBox='0 0 24 24' stroke='currentColor'><path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z'/></svg>",
+        "clock"     => @"<svg class='w-5 h-5 text-white' fill='none' viewBox='0 0 24 24' stroke='currentColor'><path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z'/></svg>",
+        "check"     => @"<svg class='w-5 h-5 text-white' fill='none' viewBox='0 0 24 24' stroke='currentColor'><path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z'/></svg>",
+        _           => @"<svg class='w-5 h-5 text-white' fill='none' viewBox='0 0 24 24' stroke='currentColor'><path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z'/></svg>"
+    };
+}
+
+@section Scripts {
+<script>
+// Gerencia a confirmação visual da recusa de novos fornecedores
+function confirmarRecusarAdmin(formId, titulo, mensagem) {
+    document.getElementById('adminConfirmTitle').textContent = titulo;
+    document.getElementById('adminConfirmMessage').textContent = mensagem;
+    
+    const btnConfirmar = document.getElementById('btnAdminConfirmarSubmit');
+    
+    // Reseta listeners antigos duplicando o nó do botão
+    const novoBtn = btnConfirmar.cloneNode(true);
+    btnConfirmar.parentNode.replaceChild(novoBtn, btnConfirmar);
+    
+    // Executa o envio do formulário correspondente ao ID selecionado
+    novoBtn.addEventListener('click', () => {
+        const form = document.getElementById(formId);
+        if (form) form.submit();
+    });
+    
+    openModal('modalConfirmAdmin');
+}
+</script>
+}

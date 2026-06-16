@@ -1,0 +1,48 @@
+@{
+    ViewData["Title"] = "Pagamento Confirmado";
+    Layout = "_LayoutClient";
+    var tipo = ViewBag.Tipo as string;
+    var servicoId = ViewBag.ServicoId;
+    var isPagamentoFinal = tipo == "final";
+}
+
+@* Cartão de confirmação de pagamento com contador de redirecionamento *@
+<div class="container mx-auto px-6 py-20 flex flex-col items-center text-center">
+    <div class="ms-card p-12 w-full max-w-md">
+        <svg class="w-20 h-20 mx-auto mb-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="color:#16a34a" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+        <h1 class="font-inria text-3xl font-bold mb-3" style="color:var(--text)">Pagamento confirmado!</h1>
+        @if (isPagamentoFinal)
+        {
+            <p class="text-sm mb-2" style="color:var(--text-muted)">O pagamento final foi recebido com sucesso.</p>
+            <p class="text-sm mb-8" style="color:var(--text-muted)">Seu projeto foi marcado como <strong style="color:#16a34a">concluído</strong>. Obrigado por usar o MindSite!</p>
+        }
+        else
+        {
+            <p class="text-sm mb-2" style="color:var(--text-muted)">O pagamento inicial foi recebido com sucesso.</p>
+            <p class="text-sm mb-8" style="color:var(--text-muted)">O fornecedor foi notificado e o trabalho pode ser iniciado. Acompanhe o andamento em <strong>Meus Projetos</strong>.</p>
+        }
+
+        <a href="/Client/MeusServicos" class="btn-primary w-full text-sm">Ver Meus Projetos</a>
+        <p class="text-xs mt-5" style="color:var(--text-muted)">
+            Redirecionando automaticamente em <span id="countdown">5</span>s…
+        </p>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    // Contador regressivo que redireciona para Meus Projetos após 5 segundos
+    let segundos = 5;
+    const el = document.getElementById('countdown');
+    const timer = setInterval(() => {
+        segundos--;
+        if (el) el.textContent = segundos;
+        if (segundos <= 0) {
+            clearInterval(timer);
+            window.location.href = '/Client/MeusServicos';
+        }
+    }, 1000);
+</script>
+}
