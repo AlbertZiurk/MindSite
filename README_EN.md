@@ -80,13 +80,18 @@ MindSite/
 ├── docker-compose.yml      # Local development orchestration
 ├── Program.cs              # Application bootstrapper, middlewares, and Dependency Injection
 └── README.md               # Main documentation file
+```
 
 ## 👤 Team
 
 [Alberto Ziurkelis de Araujo](https://github.com/AlbertZiurk)
+
 [Guilherme Beltrame Nery] (https://github.com/GuilhermebNery)
+
 [João Pedro Serignolli Borin] (https://github.com/jpserignolli)
+
 [Josué Gumer Mamani Ticona] (https://github.com/yehoshuajosue)
+
 [Lucas Donato de Souza] (https://github.com/Donatinnho)
 
 📄 License
