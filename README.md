@@ -87,13 +87,13 @@ MindSite/
 
 [Alberto Ziurkelis de Araujo](https://github.com/AlbertZiurk)
 
-[Guilherme Beltrame Nery] (https://github.com/GuilhermebNery)
+[Guilherme Beltrame Nery](https://github.com/GuilhermebNery)
 
-[João Pedro Serignolli Borin] (https://github.com/jpserignolli)
+[João Pedro Serignolli Borin](https://github.com/jpserignolli)
 
-[Josué Gumer Mamani Ticona] (https://github.com/yehoshuajosue)
+[Josué Gumer Mamani Ticona](https://github.com/yehoshuajosue)
 
-[Lucas Donato de Souza] (https://github.com/Donatinnho)
+[Lucas Donato de Souza](https://github.com/Donatinnho)
 
 ## 📄 Licença
 
